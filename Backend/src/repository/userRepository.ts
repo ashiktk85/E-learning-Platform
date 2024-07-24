@@ -1,0 +1,1 @@
+import user , {IUser} from '../models/userModel'

@@ -3,7 +3,7 @@ import Footer from "../../components/common/user/Footer";
 import Navbar from "../../components/common/user/Navbar";
 import Banner from "../../components/common/user/HomeBanner";
 
-const Home = () => {
+const Home : React.FC =  () => {
   return (
     <>
       <Navbar />
