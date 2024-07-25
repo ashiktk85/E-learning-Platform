@@ -1,54 +1,95 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { Toaster, toast } from 'sonner';
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../redux/store";
+// import { validateOtp } from "../../validation/user/otpValidation";
+// import { verifyOtp } from "../../redux/actions/userAction";
+
+
 
 const OtpForm = () => {
-    const [otp , setOtp] = useState(Array(6).fill(""))
-    const [timer ,setTimer] = useState<number>(60)
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [errors, setErrors] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number>(60);
 
-    useEffect(() => {
-        const countdown = setInterval(() => {
-            if(timer > 0) {
-                setTimer(timer - 1)
-            }
-        }, 1000)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-        return () => clearInterval(countdown)
-    },[timer])
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newOtp = [...otp];
+    newOtp[index] = e.target.value;
+    setOtp(newOtp);
 
+    if (e.target.value.length > 0 && index < 5) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      if (nextInput) {
+        nextInput.focus();
+      }
+    }
+  };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // const otpValue = otp.join("");
+    // const validationError = validateOtp(otpValue);
+    // if (validationError) {
+    //   setErrors(validationError);
+    //   toast.error(validationError);
+    // } else {
+    //   const verificationResult = await dispatch(verifyOtp(otpValue) as any);
+    //   if (verificationResult === true) {
+    //     navigate('/dashboard');
+    //   }
+    // }
+  };
 
-
-    return (
-        <div>
-             <div className="flex h-screen items-center ml-32 mr-32" >
-      <div className="w-1/2 flex items-center justify-center bg-black text-white">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">OTP verification.</h1>
-          <p className="mb-8">valid upto 1 minute</p>
-          <div className="flex justify-center mb-4">
-            {otp.map((data, index) => (
-              <input
-                key={index}
-                id={`otp-input-${index}`}
-                type="text"
-                // maxLength="1"
-                className="w-12 h-12 mx-1 text-center border border-gray-300 rounded"
-                value={data}
-                // onChange={(e) => handleChange(e.target, index)}
-              />
-            ))}
-          </div>
-          <div className="mb-8">
-            <span>00 : {timer < 10 ? `0${timer}` : timer}</span>
-          </div>
-          <button className="px-4 py-2 bg-green-500 text-white rounded">Submit</button>
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <Toaster position="top-center" richColors />
+      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl">
+        <div className="md:w-1/2 p-8 bg-black text-white flex flex-col justify-center">
+          <h2 className="text-3xl font-semibold mb-6">OTP verification</h2>
+          <p className="text-sm mb-4">valid upto 1 minute</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex justify-between">
+              {otp.map((value, index) => (
+                <input
+                  key={index}
+                  id={`otp-${index}`}
+                  type="text"
+                  maxLength={1}
+                  value={value}
+                  onChange={(e) => handleChange(e, index)}
+                  className="w-12 h-12 text-center text-2xl bg-gray-800 text-white rounded-md focus:outline-none"
+                />
+              ))}
+            </div>
+            {errors && <div className="text-red-500 text-sm mt-1">{errors}</div>}
+            <div className="text-gray-400 mt-2">
+              {timeLeft > 0 ? `00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft}` : "Time expired"}
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-green-500 text-white py-2 rounded-md font-bold mt-4 hover:bg-green-600"
+              disabled={timeLeft === 0}
+            >
+              Submit
+            </button>
+          </form>
         </div>
-      </div>
-      <div className="w-80 bg-green-600 flex items-center justify-center ">
-        <img src="illustration.png" alt="Illustration" className="max-w-full h-auto" />
+        <div className="md:w-1/2 bg-green-500 flex items-center justify-center p-10">
+          <img src='' alt="OTP Illustration" className="w-full h-auto" />
+        </div>
       </div>
     </div>
-        </div>
-    );
-}
+  );
+};
 
 export default OtpForm;

@@ -3,12 +3,13 @@ import userRoute from './routes/userRoutes'
 import ConnectDB from './config/database';
 const mongoose = require('mongoose')
 // const user = require('../src/Modules/User/routes')
-const dotenv = require('dotenv')
+
+import dotenv from 'dotenv'
 const cors = require('cors')
 
 dotenv.config()
 
-const PORT = process.env.PORT || 7000
+const PORT = process.env.PORT || 7001
 
 ConnectDB()
 

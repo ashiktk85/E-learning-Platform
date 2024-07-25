@@ -1,13 +1,13 @@
 import React from 'react';
-import graphics from '../../../assets/userbanner/graphic_design.webp'
-import film from '../../../assets/userbanner/film_video.webp'
-import fine from '../../../assets/userbanner/fine_art.webp'
-import freelance from '../../../assets/userbanner/freelance.webp'
-import illustration from '../../../assets/userbanner/illustration.webp'
-import marketing from '../../../assets/userbanner/marketing.webp'
-import photography from '../../../assets/userbanner/photography.webp'
+import graphics from '../../../assets/userbanner/graphic_design.webp';
+import film from '../../../assets/userbanner/film_video.webp';
+import fine from '../../../assets/userbanner/fine_art.webp';
+import freelance from '../../../assets/userbanner/freelance.webp';
+import illustration from '../../../assets/userbanner/illustration.webp';
+import marketing from '../../../assets/userbanner/marketing.webp';
+import photography from '../../../assets/userbanner/photography.webp';
 
-import '../../../index.css'
+import '../../../index.css';
 
 const images = [
   graphics,
@@ -16,9 +16,8 @@ const images = [
   freelance,
   illustration,
   marketing,
-  photography
-
-]
+  photography,
+];
 
 const Banner: React.FC = () => {
   return (
@@ -29,7 +28,7 @@ const Banner: React.FC = () => {
             key={index}
             src={src}
             alt={`image-${index}`}
-            className="w-72 h-full object-cover rounded-md "
+            className="w-36 h-full md:w-48 lg:w-72 object-cover rounded-md mx-1"
           />
         ))}
         {images.map((src, index) => (
@@ -37,12 +36,12 @@ const Banner: React.FC = () => {
             key={index + images.length}
             src={src}
             alt={`image-${index + images.length}`}
-            className="w-72 h-full object-cover rounded-md "
+            className="w-36 h-full md:w-48 lg:w-72 object-cover rounded-md mx-1"
           />
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default Banner;

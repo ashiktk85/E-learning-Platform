@@ -9,7 +9,7 @@ const SignUp : React.FC = () => {
         <div className='h-screen bg-#dee1ea-900'>
            <Toaster position="top-center" richColors  />
             <Navbar />
-           <SignupForm />
+          <SignupForm />
            <Footer />
         </div>
     )
