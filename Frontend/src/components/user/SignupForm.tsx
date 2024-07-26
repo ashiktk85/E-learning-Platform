@@ -51,11 +51,15 @@ const SignupForm: React.FC = () => {
         confirmPassword
       }) as any);
 
+      if(registrationResult === false ) {
+        toast.error("Email already in use.")
+      }
+
       if (registrationResult === true) {
         console.log("getting t otp");
         
         navigate('/otp');
-      }
+      } 
     }
   };
 

@@ -3,8 +3,7 @@ import { Toaster, toast } from 'sonner';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
-// import { validateOtp } from "../../validation/user/otpValidation";
-// import { verifyOtp } from "../../redux/actions/userAction";
+import  {verifyOtp} from '../../redux/actions/userAction'
 
 
 
@@ -37,17 +36,19 @@ const OtpForm = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const otpValue = otp.join("");
-    // const validationError = validateOtp(otpValue);
-    // if (validationError) {
-    //   setErrors(validationError);
-    //   toast.error(validationError);
-    // } else {
-    //   const verificationResult = await dispatch(verifyOtp(otpValue) as any);
-    //   if (verificationResult === true) {
-    //     navigate('/dashboard');
-    //   }
-    // }
+    const otpValue = otp.join("");
+    const otpVerification = await dispatch(verifyOtp(otpValue))
+    if(otpVerification === "wrong") {
+      toast.error("Wrong OTP, try again!")
+    } else if (otpVerification === "expired") {
+      toast.error("OTP expired, send again.")
+    } else if (otpVerification === true) {
+      toast.success("OTP verifiaction successfull.")
+      setTimeout(() => {
+        navigate('/login')
+      }, 2000);
+      
+    }
   };
 
   return (
@@ -78,7 +79,6 @@ const OtpForm = () => {
             <button
               type="submit"
               className="w-full bg-green-500 text-white py-2 rounded-md font-bold mt-4 hover:bg-green-600"
-              disabled={timeLeft === 0}
             >
               Submit
             </button>

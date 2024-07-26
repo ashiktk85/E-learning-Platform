@@ -3,6 +3,7 @@ import userRoute from './routes/userRoutes'
 import ConnectDB from './config/database';
 const mongoose = require('mongoose')
 // const user = require('../src/Modules/User/routes')
+import { errorHandler } from './helper/errorHandleMiddleware';
 
 import dotenv from 'dotenv'
 const cors = require('cors')
@@ -24,11 +25,13 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use('/' ,userRoute)
 
+app.use(errorHandler)
+
 // Routes
 
 
 
 app.listen(PORT, () => {
-    console.log("Server running peacefully");   
+    console.log("Server running peacefully on" ,PORT);   
 })
 
