@@ -6,14 +6,16 @@ import GoogleButton from "../common/user/googleButton";
 import { loginValidation } from "../../validation/user/loginValidation";
 import { toast, Toaster } from "sonner";
 import { login } from "../../redux/actions/userAction";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../redux/store";
+import { Rootstate } from "../../redux/rootReducer";
 
 const LoginForm = () => {
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errors , setErrors] = useState<{email ?: string; password ?: string}>({})
+  const {loading , error } = useSelector((state : Rootstate) => state.user)
 
   const handleLogin  = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -31,7 +33,18 @@ const LoginForm = () => {
           }
         })
     } else {
-      const loginResult = await dispatch(login({email , password})).unwrap()
+      try {
+        const loginResult = await dispatch(login({ email, password })).unwrap();
+       if (loginResult) {
+          toast.success("Login successful");
+          setTimeout(() => {
+            navigate('/')
+          }, 1500);
+        }
+      } catch (err: any) {
+        
+        toast.error(err.message || 'An error occurred');
+      }
     }
     }
   }

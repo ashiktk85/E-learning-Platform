@@ -21,6 +21,7 @@ const Home: React.FC = () => {
           <h4 className="text-white text-sm md:text-base">
             Get unlimited access to thousands of courses.
           </h4>
+          
         </div>
 
         <div className="flex justify-center md:justify-start md:ml-36 mt-6">
@@ -30,7 +31,9 @@ const Home: React.FC = () => {
           >
             JOIN THE COMMUNITY
           </button>
+          
         </div>
+       
         <Banner />
       </div>
       <div className="bg-spotify-white min-h-screen">

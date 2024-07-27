@@ -80,4 +80,9 @@ export class UserService {
       throw new Error(error.message);
     }
   }
+
+  async verifyLogin (email : string , password : string) : Promise<{userInfo : {firstName : string ; email : string}; token : string} | any | null> {
+    return UserRepositary.validateLoginUser(email , password);
+}
+
 }

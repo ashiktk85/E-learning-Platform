@@ -46,14 +46,19 @@ export class UserController {
         }
     }
 
-    async verifyLogin(req : Request , res : Request) : Promise<void> {
+    async verifyLogin(req: Request, res: Response) {
         try {
-            const data = req.body;
-            console.log(data);
-            
-        } catch (error) {
-            
-        }
+            const { email, password } = req.body;
+      
+           
+            const result = await this.userService.verifyLogin(email, password);
+      
+            res.status(200).json({ message: 'Login successful', result });
+      
+          } catch (error: any) {
+            console.error(error.message);
+            res.status(500).json({ message: error.message });
+          }
     }
     
 }

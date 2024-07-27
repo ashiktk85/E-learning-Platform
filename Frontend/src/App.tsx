@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {store} from './redux/store'
 import { Provider } from 'react-redux';
 import OtpPage from './pages/user/OtpPage';
+import ProfilePage from './pages/user/Profile';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signup" Component={SignUp} />
         <Route path= '/' Component={Home} />
         <Route path='/otp' Component={OtpPage} />
+        <Route path='/profile' Component={ProfilePage} />
       </Routes>
     </Router>
     </Provider>
