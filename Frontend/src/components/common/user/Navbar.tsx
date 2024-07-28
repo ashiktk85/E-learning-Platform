@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const UserHeader = () => {
+const Navbar = () => {
 
   const [loggedIn , setIsLoggedIn] = useState<boolean>(false)
   const navigate = useNavigate()
@@ -23,10 +23,14 @@ const UserHeader = () => {
       navigate('/profile')
     }
 
+    const goToHome = () => {
+      navigate('/')
+    }
+
   return (
     <>
       <header className="bg-black text-white p-4 flex justify-between items-center sticky top-0 z-50 ">
-        <div className="text-spotify-green text-lg font-bold">Learn Sphere</div>
+        <div className="text-spotify-green text-lg font-bold hover: cursor-pointer" onClick={goToHome}>Learn Sphere</div>
         <div className="space-x-4 mr-10">
           {loggedIn ? (
             <>
@@ -53,4 +57,4 @@ const UserHeader = () => {
   );
 };
 
-export default UserHeader;
+export default Navbar;

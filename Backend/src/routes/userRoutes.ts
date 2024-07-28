@@ -12,6 +12,7 @@ const userController = new UserController(userService)
 route.post('/signUp' , userController.createUser.bind(userController))
 route.post('/otpVerification' ,userController.otpVerification.bind(userController))
 route.post('/verifyLogin' , userController.verifyLogin.bind(userController))
+route.post('/resendOtp' ,userController.resendOtp.bind(userController))
 
 export default route;
 

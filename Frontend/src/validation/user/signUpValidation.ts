@@ -15,28 +15,44 @@ export const validateSignUp = (
     confirmPassword?: string;
   } = {};
 
+ 
+
+  
+
+
   if (!firstName) {
-    errors.firstName = "First name required";
+    errors.firstName = "First name is required";
   }
 
-  if(!lastName) {
-    errors.lastName = "Last name required"
+
+  if (!lastName) {
+    errors.lastName = "Last name is required";
   }
 
-  if(!email) {
-    errors.lastName = "Email is required"
+
+  if (!email) {
+    errors.email = "Email is required";
+  } else if (!/\S+@\S+\.\S+/.test(email)) {
+    errors.email = "Email address is invalid";
   }
 
-  if(!phone) {
-    errors.lastName = "Phone number required"
+  if (!phone) {
+    errors.phone = "Phone number is required";
+  } else if (!/^\d{10}$/.test(phone)) {
+    errors.phone = "Phone number is invalid. It should be 10 digits.";
   }
 
-  if(!password) {
-    errors.lastName = "Password feild empty"
+
+  if (!password) {
+    errors.password = "Password is required";
+  } else if (password.length < 8) {
+    errors.password = "Password must be at least 8 characters";
   }
 
-  if(!confirmPassword) {
-    errors.lastName = "confirm password empty"
+  if (!confirmPassword) {
+    errors.confirmPassword = "Confirm password is required";
+  } else if (confirmPassword !== password) {
+    errors.confirmPassword = "Passwords do not match";
   }
 
   return errors;

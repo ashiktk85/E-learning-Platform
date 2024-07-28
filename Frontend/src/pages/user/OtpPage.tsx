@@ -7,7 +7,7 @@ const OtpPage : React.FC = () => {
     return (
         <>
     <div className="h-screen bg-#dee1ea-900 text-wh">
-    <Navbar />
+   
     <OtpForm />
     <Footer />
     </div>

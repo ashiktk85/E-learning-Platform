@@ -68,6 +68,29 @@ export const login = createAsyncThunk(
     }
   }
 );
+
+export const resendOtp = () => {
+  return async () => {
+    try {
+      const email = localStorage.getItem('userEmail')
+      if (!email) throw new Error("No email found in localStorage");
+
+      const response = await axios.post(`${url}/resendOtp`, { email });
+      if (response.status === 200) {
+        // Handle successful response
+        return true;
+      } else {
+        // Handle unexpected response status
+        throw new Error("Failed to resend OTP");
+      }
+    } catch (error  :any) {
+      // Handle error
+      console.error("Error resending OTP:", error.message);
+      return false;
+    }
+  };
+};
+ 
    
 
 

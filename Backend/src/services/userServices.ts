@@ -85,4 +85,25 @@ export class UserService {
     return UserRepositary.validateLoginUser(email , password);
 }
 
+async resendOtp(email: any): Promise<boolean> {
+  try {
+
+    console.log("service resend otp email");
+    
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await redisClient.setEx(email, 60, otp);
+
+    sendEmailOtp(email, otp);
+
+    console.log("Resend generated OTP:", otp);
+
+    return true;
+  } catch (error : any) {
+    console.error("Error during OTP resend:", error.message);
+    throw new Error(error.message);
+  }
+}
+
+
 }

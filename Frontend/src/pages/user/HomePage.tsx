@@ -37,15 +37,7 @@ const Home: React.FC = () => {
         <Banner />
       </div>
       <div className="bg-spotify-white min-h-screen">
-        <div className="flex justify-center md:justify-start md:ml-36 mt-6">
-          <button
-            type="submit"
-            className="w-36 md:w-44 bg-spotify-green font-poppins text-white py-2 rounded font-bold text-start pl-5 text-sm md:text-base"
-          >
-            JOIN THE COMMUNITY
-          </button>
-        </div>
-        <Banner />
+       
       </div>
       <Footer />
     </>

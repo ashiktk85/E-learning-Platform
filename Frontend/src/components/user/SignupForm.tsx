@@ -3,63 +3,93 @@ import UserButton from "../common/user/UserButton";
 import { useNavigate } from "react-router-dom";
 import GoogleButton from "../common/user/googleButton";
 import { validateSignUp } from "../../validation/user/signUpValidation";
-import { Toaster, toast } from 'sonner';
+import { Toaster, toast } from "sonner";
 import { registerUser } from "../../redux/actions/userAction";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
+
+interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 const SignupForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [referal, setReferal] = useState<string>('');
-  const [errors, setErrors] = useState<{
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
+  let [firstName, setFirstName] = useState<string>("");
+  let [lastName, setLastName] = useState<string>("");
+  let [email, setEmail] = useState<string>("");
+  let [phone, setPhone] = useState<string>("");
+  let [password, setPassword] = useState<string>("");
+  let [confirmPassword, setConfirmPassword] = useState<string>("");
+  let [referal, setReferal] = useState<string>("");
+  let [errors, setErrors] = useState<ValidationErrors>({});
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const validationErrors = validateSignUp(firstName, lastName, email, phone, password, confirmPassword);
+    firstName = firstName.trim();
+    lastName = lastName.trim();
+    email = email.trim();
+    phone = phone.trim();
+    password = password.trim();
+    confirmPassword = confirmPassword.trim();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-
-      Object.values(validationErrors).forEach(error => {
-        if (error) {
-          toast.error(error);
-        }
-      });
+    if (
+      !firstName &&
+      !lastName &&
+      !email &&
+      !phone &&
+      !password &&
+      !confirmPassword
+    ) {
+      toast.error("All fields are required.");
     } else {
-      const registrationResult = await dispatch(registerUser({
+      const validationErrors: ValidationErrors = validateSignUp(
         firstName,
         lastName,
         email,
         phone,
         password,
         confirmPassword
-      }) as any);
+      );
 
-      if(registrationResult === false ) {
-        toast.error("Email already in use.")
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+
+        const firstErrorKey = Object.keys(validationErrors)[0] as keyof ValidationErrors;
+        const firstError = validationErrors[firstErrorKey];
+
+        if (firstError) {
+          toast.error(firstError);
+        }
+      } else {
+        const registrationResult = await dispatch(
+          registerUser({
+            firstName,
+            lastName,
+            email,
+            phone,
+            password,
+            confirmPassword,
+          }) as any
+        );
+
+        if (registrationResult === false) {
+          toast.error("Email already in use.");
+        }
+
+        if (registrationResult === true) {
+          console.log("getting to otp");
+
+          navigate("/otp");
+        }
       }
-
-      if (registrationResult === true) {
-        console.log("getting t otp");
-        
-        navigate('/otp');
-      } 
     }
   };
 
@@ -69,7 +99,9 @@ const SignupForm: React.FC = () => {
         <Toaster position="top-center" richColors />
         <div className="flex flex-wrap bg-spotify-grey p-8 rounded-md shadow-md w-full max-w-4xl mx-auto mt-20 mb-64">
           <div className="w-full md:w-1/2 p-4 mt-5 mb-0">
-            <h2 className="text-white text-2xl mb-3 font-semibold font-poppins">Register</h2>
+            <h2 className="text-white text-2xl mb-3 font-semibold font-poppins">
+              Register
+            </h2>
             <p className="text-spotify-lightgrey text-xs mb-4">
               Already have an Account?{" "}
               <a
