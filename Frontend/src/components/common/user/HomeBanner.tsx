@@ -21,7 +21,7 @@ const images = [
 
 const Banner: React.FC = () => {
   return (
-    <div className="relative overflow-hidden w-full h-64 bg-black mt-10 shadow-md">
+    <div className="relative overflow-hidden w-full h-48 bg-black mt-28 shadow-md">
     <div className="flex absolute top-0 left-0 animate-scrollLeft whitespace-nowrap">
       {images.map((src, index) => (
         <img

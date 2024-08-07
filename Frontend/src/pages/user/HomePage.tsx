@@ -1,14 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Footer from "../../components/common/user/Footer";
 import Navbar from "../../components/common/user/Navbar";
 import Banner from "../../components/common/user/HomeBanner";
+import { useLocation } from "react-router-dom";
+import { toast } from "sonner";
+import bannerVector from '../../assets/userbanner/freepik-export-20240804125951Lu85.jpeg'
 
 const Home: React.FC = () => {
+  const locatin = useLocation();
+
+  useEffect(() => {
+    if (locatin?.state) {
+      toast.success(locatin.state.message);
+    }
+  }, []);
   return (
     <>
       <Navbar />
       <div className="bg-black min-h-screen flex flex-col">
-        <div className="px-4 md:px-20 lg:px-36 pt-20 text-center md:text-left">
+        <div className="px-4 md:px-20 lg:px-36 pt-20 text-center md:text-left flex">
+          <div>
           <h1 className="text-white font-poppins font-bold text-3xl md:text-5xl mb-2">
             LEARN FROM THE
           </h1>
@@ -20,8 +31,12 @@ const Home: React.FC = () => {
           </h2>
           <h4 className="text-white text-sm md:text-base">
             Get unlimited access to thousands of courses.
-          </h4>
-          
+          </h4> 
+          </div>
+         
+          <div className="h-20 bg-black justify-items-end w-96 ml-96 mb-20 mt-0 ">
+              <img className= " rounded-xl" src={bannerVector} alt="" />
+          </div>
         </div>
 
         <div className="flex justify-center md:justify-start md:ml-36 mt-6">
@@ -31,14 +46,11 @@ const Home: React.FC = () => {
           >
             JOIN THE COMMUNITY
           </button>
-          
         </div>
-       
+
         <Banner />
       </div>
-      <div className="bg-spotify-white min-h-screen">
-       
-      </div>
+      <div className="bg-spotify-white min-h-screen"></div>
       <Footer />
     </>
   );

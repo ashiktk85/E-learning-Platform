@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import UserButton from "../common/user/UserButton";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoBanner from "../../assets/userbanner/loginBanner.png";
 import GoogleButton from "../common/user/googleButton";
 import { loginValidation } from "../../validation/user/loginValidation";
 import { toast, Toaster } from "sonner";
 import { login } from "../../redux/actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../redux/store";
-import { Rootstate } from "../../redux/rootReducer";
+
+
 
 const LoginForm = () => {
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<any>()
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errors , setErrors] = useState<{email ?: string; password ?: string}>({})
-  const {loading , error } = useSelector((state : Rootstate) => state.user)
+ 
 
   const handleLogin  = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -53,6 +53,7 @@ const LoginForm = () => {
   const goToSignUp = () => {
     navigate("/signup");
   };
+
   return (
     <>
       <Toaster position="top-center" richColors />
@@ -72,15 +73,17 @@ const LoginForm = () => {
               </a>
             </p>
             <form className="space-y-4" onSubmit={handleLogin}>
+            <p className="text-spotify-white font-poppins mb-1.5">Email</p>
               <input
                 type="text"
-                placeholder="Email"
+                placeholder="Enter your email"
                 className="w-full p-2 rounded bg-spotify-black text-white"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              <p className="text-spotify-white font-poppins mb-1">Password</p>
               <input
-                type="password"
+                type="Enter your password"
                 placeholder="Password"
                 className="w-full p-2 rounded bg-spotify-black text-white"
                 value={password}
@@ -91,12 +94,12 @@ const LoginForm = () => {
                 <label className="text-spotify-white flex items-center">
                   <input type="checkbox" className="mr-2" /> Keep me logged in
                 </label>
-                <a  className="text-spotify-white hover:underline">
+                <Link to= '/forgotPass' className="text-spotify-white hover:underline">
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <UserButton name={"Login"} />
-              <GoogleButton name={"Login"} />
+              {/* <GoogleButton name={"Login"} /> */}
             </form>
           </div>
           <div className="w-full md:w-1/2 p-4 bg-spotify-black rounded-md flex items-center justify-center">

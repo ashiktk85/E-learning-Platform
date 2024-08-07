@@ -6,6 +6,8 @@ import redisClient from "../helper/redisCache";
 import jwt, { Secret } from "jsonwebtoken";
 
 export class UserService {
+  
+  
   async signUp(userData: any) {
     try {
       const existUser = await UserRepositary.existUser(userData.email);
@@ -81,29 +83,64 @@ export class UserService {
     }
   }
 
-  async verifyLogin (email : string , password : string) : Promise<{userInfo : {firstName : string ; email : string}; token : string} | any | null> {
-    return UserRepositary.validateLoginUser(email , password);
-}
-
-async resendOtp(email: any): Promise<boolean> {
-  try {
-
-    console.log("service resend otp email");
-    
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await redisClient.setEx(email, 60, otp);
-
-    sendEmailOtp(email, otp);
-
-    console.log("Resend generated OTP:", otp);
-
-    return true;
-  } catch (error : any) {
-    console.error("Error during OTP resend:", error.message);
-    throw new Error(error.message);
+  async verifyLogin(
+    email: string,
+    password: string
+  ): Promise<
+    | {
+        userInfo: { firstName: string; lastName: string; email: string };
+        token: string;
+      }
+    | any
+    | null
+  > {
+    return UserRepositary.validateLoginUser(email, password);
   }
-}
 
+  async resendOtp(email: any): Promise<boolean> {
+    try {
+      console.log("service resend otp email");
 
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      await redisClient.setEx(email, 60, otp);
+
+      sendEmailOtp(email, otp);
+
+      console.log("Resend generated OTP:", otp);
+
+      return true;
+    } catch (error: any) {
+      console.error("Error during OTP resend:", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async editUserService(
+    firstName: string,
+    lastName: string,
+    phone: string,
+    userid: string
+  ): Promise<{ firstName: string; lastName: string; phone: string } | undefined> {
+    try {
+      const newInfo = { firstName, lastName, phone };
+  
+      console.log("userid in service", userid);
+  
+   
+      const updatedUser = await UserRepositary.editUserRepository(userid, newInfo);
+  
+      console.log("data sent to repo from service");
+  
+      if (!updatedUser) {
+        console.log("no change");
+        throw new Error("No changes found");
+      }
+  
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 }

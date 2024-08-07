@@ -59,16 +59,32 @@ export class UserController {
     }
   }
 
-  async resendOtp (req: Request, res: Response) {
+  async resendOtp(req: Request, res: Response) {
     try {
-       const {email} = req.body
-        console.log("resend getting here");
-        console.log("controller email resend" , email);
-        
-        
-        const result = await this.userService.resendOtp(email)
-    } catch (error) {
-        
+      const { email } = req.body;
+      console.log("resend getting here");
+      console.log("controller email resend", email);
+      const result = await this.userService.resendOtp(email);
+    } catch (error) {}
+  }
+
+  async editUser(req : Request ,  res : Response) {
+    try {
+      console.log("edit user controller datat" , req.body)
+      const {firstName , lastName, phone ,userId} = req.body
+      const updatedUser = await this.userService.editUserService(firstName, lastName, phone, userId);
+
+      if (updatedUser) {
+        res.status(200).json({ message: 'User updated successfully', data: updatedUser });
+      } else {
+        res.status(400).json({ message: 'No changes found' });
+      }
+    } catch (error : any) {
+      if (error.message === "No changes founded") {
+        res.status(304).json({ message: "No changes founded" });
+     } else {
+        res.status(500).json({ message: 'Internal Server Error' });
+     }
     }
   }
 }

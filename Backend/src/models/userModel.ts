@@ -52,7 +52,7 @@ const userSchema = new Schema<IUser>({
   },
   roles: {
      type: [String], 
-     default: ["user"]
+     default: ["Student"]
  },
   subscriptionId: {
      type: String, 

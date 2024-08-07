@@ -2,7 +2,8 @@ import UserModel, { IUser } from "../models/userModel";
 import { MongoServerError } from "mongodb";
 import bcrypt from "bcrypt";
 import { error } from "console";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import userModel from "../models/userModel";
 
 export class UserRepositary {
   static async existUser(email: string): Promise<IUser | null> {
@@ -47,7 +48,9 @@ export class UserRepositary {
           _id: 0,
           userId: 1,
           firstName: 1,
+          lastName: 1,
           email: 1,
+          phone: 1,
           passwordHash: 1,
           isBlocked: 1,
         }
@@ -63,33 +66,57 @@ export class UserRepositary {
         throw new Error("Invalid password");
       }
 
-      if(user.isBlocked === true) {
-        throw new Error("User blocked.")
+      if (user.isBlocked === true) {
+        throw new Error("User blocked.");
       }
 
       const accessToken = jwt.sign(
-        { id : user.userId , email : user.email},
+        { id: user.userId, email: user.email },
         process.env.SECRET_KEY!,
-        { expiresIn : '1h' }
+        { expiresIn: "1h" }
       );
 
       const refreshToken = jwt.sign(
-        { id : user.userId , email : user.email},
+        { id: user.userId, email: user.email },
         process.env.SECRET_KEY!,
-        { expiresIn : '7d'}
-      )
+        { expiresIn: "7d" }
+      );
 
       const userInfo = {
-        firstName : user.firstName,
-        email : user.email,
-        userid : user.userId
-      }
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userid: user.userId,
+        phone: user.phone,
+        isBlocked: user.isBlocked,
+      };
 
-      return { userInfo , accessToken , refreshToken}
-
-
+      return { userInfo, accessToken, refreshToken };
     } catch (error: any) {
       throw new Error(error.message);
+    }
+  }
+  static async editUserRepository(
+    userid: string,
+    newUserInfo: { firstName: string; lastName: string; phone: string }
+  ): Promise<{ firstName: string; lastName: string; phone: string } | null> {
+    try {
+      console.log("getting here repo");
+      console.log(userid);
+
+      const updatedUser = await userModel
+        .findOneAndUpdate(
+          { userId: userid },
+          { $set: newUserInfo },
+          { new: true, runValidators: true }
+        )
+        .select("firstName lastName phone userId -_id email");
+
+      console.log("updated user:", updatedUser);
+
+      return updatedUser ? updatedUser.toObject() : null;
+    } catch (error) {
+      throw error;
     }
   }
 }

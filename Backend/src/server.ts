@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import userRoute from './routes/userRoutes'
 import ConnectDB from './config/database';
 const mongoose = require('mongoose')
-// const user = require('../src/Modules/User/routes')
+
 import { errorHandler } from './helper/errorHandleMiddleware';
 
 import dotenv from 'dotenv'

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
 
@@ -15,13 +15,8 @@ const Navbar = () => {
       }
     })
 
-    const login = () => {
-      navigate('/login')
-    }
 
-    const goToProfile = () => {
-      navigate('/profile')
-    }
+   
 
     const goToHome = () => {
       navigate('/')
@@ -37,7 +32,7 @@ const Navbar = () => {
              <a href="" className="hover:underline font-poppins font-medium text-sm">Plans</a>
              <a href="" className="hover:underline font-poppins font-medium text-sm">Courses</a>
              <a href="" className="hover:underline font-poppins font-medium text-sm">Be a Tutor</a>
-             <a href="" className="hover:underline font-poppins font-medium text-sm" onClick={goToProfile}>Profile</a>
+             <Link to="/profile" className="hover:underline font-poppins font-medium text-sm" >Profile</Link>
             </> 
             
           ) : 
@@ -46,7 +41,7 @@ const Navbar = () => {
             <a href="" className="hover:underline font-poppins font-medium text-sm">Plans</a>
              <a href="" className="hover:underline font-poppins font-medium text-sm">Courses</a>
              <a href="" className="hover:underline font-poppins font-medium text-sm">Be a Tutor</a>
-             <a href="" className="hover:underline font-poppins font-bold text-sm text-spotify-green " onClick={login}>Log In</a>
+             <Link to = '/login' className="hover:underline font-poppins font-bold text-sm text-spotify-green " >Log In</Link>
             </>
           )
           }

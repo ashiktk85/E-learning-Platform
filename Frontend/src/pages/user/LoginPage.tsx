@@ -10,7 +10,7 @@ const UserLogin: React.FC = () => {
   return (
     <>
     <div className="h-screen bg-#dee1ea-900 text-wh">
-    <Navbar />
+   
     <LoginForm />
     <Footer />
     </div>

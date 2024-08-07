@@ -2,3 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add this CSS to your styles.css or a similar global stylesheet */
+
+.edit-button:hover .edit-button-label {
+    display: block;
+    padding-right: 10px;
+    font-size: 13px;
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  
+  .edit-button:hover svg {
+    width: 20px;
+    transform: translateY(60%) rotate(360deg);
+  }
+  

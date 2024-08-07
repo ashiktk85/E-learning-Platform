@@ -2,7 +2,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+import { User } from '../../Types/user';
+
 const url = 'http://localhost:7000';
+
+interface UpdateUserInfoPayload {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
 
 export const registerUser = (userData: {
   firstName: string;
@@ -62,8 +71,12 @@ export const login = createAsyncThunk(
     try {
       const response = await axios.post(`${url}/verifyLogin`, { email, password });
       console.log("ressss",response.data)
-      return response.data.result; 
+     
+        return  response.data.result
+      
+ 
     } catch (error: any) {
+      console.error("Login thunk error:", error.response.data);
       return thunkAPI.rejectWithValue(error.response.data); 
     }
   }
@@ -77,19 +90,42 @@ export const resendOtp = () => {
 
       const response = await axios.post(`${url}/resendOtp`, { email });
       if (response.status === 200) {
-        // Handle successful response
+        
         return true;
       } else {
-        // Handle unexpected response status
+        
         throw new Error("Failed to resend OTP");
       }
     } catch (error  :any) {
-      // Handle error
+     
       console.error("Error resending OTP:", error.message);
       return false;
     }
   };
 };
+
+
+
+export const updateUserInfo = createAsyncThunk<User | 'no change', UpdateUserInfoPayload>(
+  'user/updateUserInfo',
+  async (userData, { rejectWithValue }) => {
+    try {
+      console.log(userData, 'thhunk user');
+      
+      const response = await axios.put(`${url}/edituser`, userData);
+      console.log('ress data', response.data.data);
+
+      if (response.data.message === 'No changes founded') {
+        console.log()
+        return 'no change';
+      }
+      
+      return response.data.data as User; 
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
  
    
 

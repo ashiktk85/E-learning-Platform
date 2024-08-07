@@ -22,11 +22,15 @@ export const validateSignUp = (
 
   if (!firstName) {
     errors.firstName = "First name is required";
+  } else if(!/^[A-Z][a-zA-Z]*$/.test(firstName)) {
+    errors.firstName = "Invalid First name"
   }
 
 
   if (!lastName) {
     errors.lastName = "Last name is required";
+  } else if(!/^[A-Z][a-zA-Z]*$/.test(lastName)) {
+    errors.firstName = "Invalid Last name"
   }
 
 

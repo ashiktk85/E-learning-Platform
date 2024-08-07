@@ -16,6 +16,11 @@ module.exports = {
           white: '#FFFFFF',
           lightgrey : "#B3B3B3"
         },
+        admin : {
+          primary : "#1e1e2c",
+          secondary : "#f29f67"
+        },
+        backgorund: '#f4f5f6'
       },
       keyframes: {
         scrollLeft: {

@@ -113,6 +113,7 @@ const SignupForm: React.FC = () => {
             </p>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="flex space-x-3">
+             
                 <input
                   type="text"
                   placeholder="First Name"
@@ -120,6 +121,7 @@ const SignupForm: React.FC = () => {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
+               
                 <input
                   type="text"
                   placeholder="Last Name"
@@ -128,6 +130,7 @@ const SignupForm: React.FC = () => {
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
+            
               <input
                 type="text"
                 placeholder="Enter your email"
@@ -135,6 +138,7 @@ const SignupForm: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+             
               <input
                 type="text"
                 placeholder="Enter your Phone number"
@@ -142,6 +146,7 @@ const SignupForm: React.FC = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
+              
               <input
                 type="password"
                 placeholder="Password"
@@ -149,6 +154,7 @@ const SignupForm: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+           
               <input
                 type="password"
                 placeholder="Confirm password"
@@ -164,12 +170,12 @@ const SignupForm: React.FC = () => {
                 onChange={(e) => setReferal(e.target.value)}
               />
               <UserButton name={"Sign Up"} />
-              <GoogleButton name={"Sign In"} />
+              {/* <GoogleButton name={"Sign In"} /> */}
             </form>
           </div>
           <div className="w-full md:w-1/2 bg-spotify-black rounded-md flex items-center justify-center">
             <div className="bg-spotify-green w-full mr-10 rounded-md pt-48 pb-48">
-              {/* Any additional content */}
+             
             </div>
           </div>
         </div>
