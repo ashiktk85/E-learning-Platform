@@ -1,7 +1,7 @@
 import React from 'react';
-import Navbar from "../../components/common/user/Navbar";
+import Navbar from "../../components/common/UserCommon/Navbar";
 import LoginForm from "../../components/user/LoginForm";
-import Footer from '../../components/common/user/Footer';
+import Footer from '../../components/common/UserCommon/Footer';
 
 const UserLogin: React.FC = () => {
 

@@ -1,5 +1,5 @@
 import React from "react";
-import UserButton from "../common/user/UserButton";
+import UserButton from "../common/UserCommon/UserButton";
 
 const AdminloginForm = () => {
   return (

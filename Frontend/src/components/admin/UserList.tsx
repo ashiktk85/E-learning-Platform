@@ -1,7 +1,7 @@
 import React from 'react';
 import AdminAside from './AdminAside';
 import UserTable from './UserTable';
-import Search from '../common/admin/Search';
+import Search from '../common/AdminCommon/Search';
 
 const UserList = () => {
     return (

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import UserButton from "../common/user/UserButton";
+import UserButton from "../common/UserCommon/UserButton";
 import { useNavigate } from "react-router-dom";
-import GoogleButton from "../common/user/googleButton";
+import GoogleButton from "../common/UserCommon/googleButton";
 import { validateSignUp } from "../../validation/user/signUpValidation";
 import { Toaster, toast } from "sonner";
 import { registerUser } from "../../redux/actions/userAction";

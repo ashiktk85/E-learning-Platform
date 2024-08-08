@@ -7,10 +7,11 @@ import OtpPage from './pages/user/OtpPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AdminLogin from './pages/admin/AdminloginPage';
 
-import TVScreen from './components/common/user/404';
+import TVScreen from './components/common/UserCommon/404';
 import UserList from './components/admin/UserList';
 import UserRoutes from './Routes/userRoutes';
 import AdminRoutes from './Routes/adminRoutes';
+import TutorRoutes from './Routes/tutorRoutes';
 
 function App() {
   return (
@@ -23,7 +24,10 @@ function App() {
         <Route path = '/*' element = {<UserRoutes />} />
 
         // Admin Routes
-        <Route path = '/admin*' element={<AdminRoutes />} />
+        <Route path = '/admin/*' element={<AdminRoutes />} />
+
+        //Tutor Routes 
+        <Route path = '/tutor/*' element = {<TutorRoutes />} />
         
       </Routes>
     </Router>

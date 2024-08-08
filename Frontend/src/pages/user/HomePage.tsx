@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Footer from "../../components/common/user/Footer";
-import Navbar from "../../components/common/user/Navbar";
-import Banner from "../../components/common/user/HomeBanner";
+import Footer from "../../components/common/UserCommon/Footer";
+import Navbar from "../../components/common/UserCommon/Navbar";
+import Banner from "../../components/common/UserCommon/HomeBanner";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import bannerVector from '../../assets/userbanner/freepik-export-20240804125951Lu85.jpeg'

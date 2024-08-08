@@ -20,7 +20,11 @@ module.exports = {
           primary : "#1e1e2c",
           secondary : "#f29f67"
         },
-        backgorund: '#f4f5f6'
+        backgorund: '#f4f5f6',
+        tutor : {
+          background : '#1fcd9c'
+        }
+
       },
       keyframes: {
         scrollLeft: {

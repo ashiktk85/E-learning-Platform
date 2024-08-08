@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Footer from "../../components/common/user/Footer";
+import Footer from "../../components/common/UserCommon/Footer";
 import axios from "axios";
 import proBanner from "../../assets/userbanner/windows-11-bloom-collection-green-background-green-abstract-3840x2160-8989.png";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -25,9 +25,9 @@ const ProfilePage = () => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const handleLogout = () => {
-    // Perform logout logic, such as clearing local storage and redirecting to login
+
     localStorage.removeItem('accessToken');
-    // Redirect to login page or perform any other necessary action
+
     window.location.href = '/login';
   };
 
@@ -112,7 +112,7 @@ const ProfilePage = () => {
                 Cancel
               </button>
               <button
-                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg"
+                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg align-middle"
                 onClick={handleLogout}
               >
                 Logout

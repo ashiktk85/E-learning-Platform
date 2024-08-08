@@ -1,7 +1,7 @@
 import React  from "react";
 import SignupForm from "../../components/user/SignupForm";
-import Navbar from '../../components/common/user/Navbar'
-import Footer from "../../components/common/user/Footer";
+import Navbar from '../../components/common/UserCommon/Navbar'
+import Footer from "../../components/common/UserCommon/Footer";
 import { Toaster, toast } from 'sonner'
 
 const SignUp : React.FC = () => {

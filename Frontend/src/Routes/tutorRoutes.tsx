@@ -1,9 +1,16 @@
 import React from 'react';
+import {Navigate ,Route , Routes ,Router } from 'react-router-dom'
+import UserProtector from '../services/UserProtector';
+import TutorHome from '../pages/tutor/TutorHome';
+import TutorApplicationPage from '../pages/tutor/TutorApplicationPage';
 
 const TutorRoutes = () => {
     return (
         <div>
-            
+            <Routes>
+                <Route path = '' element = {<UserProtector> <TutorHome /> </UserProtector>} />
+                <Route path = '/application' element = {<UserProtector > <TutorApplicationPage /> </UserProtector>} />
+            </Routes>
         </div>
     );
 }

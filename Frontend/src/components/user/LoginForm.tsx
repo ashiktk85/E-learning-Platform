@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import UserButton from "../common/user/UserButton";
+import UserButton from "../common/UserCommon/UserButton";
 import { Link, useNavigate } from "react-router-dom";
 import logoBanner from "../../assets/userbanner/loginBanner.png";
-import GoogleButton from "../common/user/googleButton";
+import GoogleButton from "../common/UserCommon/googleButton";
 import { loginValidation } from "../../validation/user/loginValidation";
 import { toast, Toaster } from "sonner";
 import { login } from "../../redux/actions/userAction";
