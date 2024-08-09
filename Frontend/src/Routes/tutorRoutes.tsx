@@ -1,8 +1,8 @@
 import React from 'react';
 import {Navigate ,Route , Routes ,Router } from 'react-router-dom'
 import UserProtector from '../services/UserProtector';
-import TutorHome from '../pages/tutor/TutorHome';
-import TutorApplicationPage from '../pages/tutor/TutorApplicationPage';
+import TutorHome from '../pages/TutorPages/TutorHome';
+import TutorApplicationPage from '../pages/TutorPages/TutorApplicationPage';
 
 const TutorRoutes = () => {
     return (

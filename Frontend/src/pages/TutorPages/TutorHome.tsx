@@ -4,8 +4,8 @@ import Footer from "../../components/common/UserCommon/Footer";
 import TutorNav from "../../components/common/TutorCommon/TutorNav";
 import { FaHome } from "react-icons/fa";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
-import HomeAbout from "../../components/tutor/HomeAbout";
-import HomeTutorComment from "../../components/tutor/HomeTutorComment";
+import HomeAbout from "../../components/TutorComponent/HomeAbout";
+import HomeTutorComment from "../../components/TutorComponent/HomeTutorComment";
 import { useNavigate } from "react-router-dom";
 
 const TutorHome = () => {

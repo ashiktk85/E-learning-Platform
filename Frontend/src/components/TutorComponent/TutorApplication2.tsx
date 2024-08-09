@@ -1,27 +1,27 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState } from 'react';
 
 interface FormData {
     address: string;
     phone: string;
 }
 
-interface StepTwoFormProps {
+interface TutorApplicationPage2 {
     nextStep: (data: FormData) => void;
     previousStep: () => void;
     formData: FormData;
 }
 
-const StepTwoForm: React.FC<StepTwoFormProps> = ({ nextStep, previousStep, formData }) => {
+const TutorApplicationPage2: React.FC<TutorApplicationPage2> = ({ nextStep, previousStep, formData }) => {
     const [formDetails, setFormDetails] = useState<FormData>({
         address: formData.address || '',
         phone: formData.phone || '',
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormDetails({ ...formDetails, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         nextStep(formDetails);
     };
@@ -67,4 +67,4 @@ const StepTwoForm: React.FC<StepTwoFormProps> = ({ nextStep, previousStep, formD
     );
 };
 
-export default StepTwoForm;
+export default TutorApplicationPage2;

@@ -6,9 +6,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, Toaster } from "sonner";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
-import UserDetails from "../../components/user/UserDetails";
-import ProfileCourses from "../../components/user/ProfileCourses";
-import ProfileTutors from "../../components/user/ProfileTutors";
+import UserDetails from "../../components/UserComponent/UserDetails";
+import ProfileCourses from "../../components/UserComponent/ProfileCourses";
+import ProfileTutors from "../../components/UserComponent/ProfileTutors";
 
 const ProfilePage = () => {
   const data: any = useSelector((state: RootState) => state.user);

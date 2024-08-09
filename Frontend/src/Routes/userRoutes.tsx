@@ -1,11 +1,11 @@
 import React from 'react';
 import {Navigate ,Route , Routes ,Router } from 'react-router-dom'
-import Home from '../pages/user/HomePage';
-import OtpForm from '../components/user/OtpForm';
-import OtpPage from '../pages/user/OtpPage';
-import UserLogin from '../pages/user/LoginPage';
-import ProfilePage from '../pages/user/ProfilePage';
-import SignUp from '../pages/user/SignupPage';
+import Home from '../pages/UserPages/HomePage';
+import OtpForm from '../components/UserComponent/OtpForm';
+import OtpPage from '../pages/UserPages/OtpPage';
+import UserLogin from '../pages/UserPages/LoginPage';
+import ProfilePage from '../pages/UserPages/ProfilePage';
+import SignUp from '../pages/UserPages/SignupPage';
 import UserProtector from '../services/UserProtector';
 
 const UserRoutes = () => {

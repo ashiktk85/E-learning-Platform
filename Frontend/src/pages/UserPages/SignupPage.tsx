@@ -1,5 +1,5 @@
 import React  from "react";
-import SignupForm from "../../components/user/SignupForm";
+import SignupForm from "../../components/UserComponent/SignupForm";
 import Navbar from '../../components/common/UserCommon/Navbar'
 import Footer from "../../components/common/UserCommon/Footer";
 import { Toaster, toast } from 'sonner'

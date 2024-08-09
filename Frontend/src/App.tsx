@@ -1,14 +1,14 @@
-import Home from './pages/user/HomePage';
-import SignUp from './pages/user/SignupPage'
-import UserLogin from "./pages/user/LoginPage";
+import Home from './pages/UserPages/HomePage';
+import SignUp from './pages/UserPages/SignupPage'
+import UserLogin from "./pages/UserPages/LoginPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import OtpPage from './pages/user/OtpPage';
-import ProfilePage from './pages/user/ProfilePage';
-import AdminLogin from './pages/admin/AdminloginPage';
+import OtpPage from './pages/UserPages/OtpPage';
+import ProfilePage from './pages/UserPages/ProfilePage';
+import AdminLogin from './pages/AdminPages/AdminloginPage';
 
 import TVScreen from './components/common/UserCommon/404';
-import UserList from './components/admin/UserList';
+import UserList from './components/AdminComponent/UserList';
 import UserRoutes from './Routes/userRoutes';
 import AdminRoutes from './Routes/adminRoutes';
 import TutorRoutes from './Routes/tutorRoutes';

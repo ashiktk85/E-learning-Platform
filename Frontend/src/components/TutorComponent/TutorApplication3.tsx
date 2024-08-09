@@ -1,18 +1,18 @@
 import React from 'react';
 
 interface FormData {
-    name: string;
-    email: string;
+    tutorRole: string;
+    age: string;
     address: string;
     phone: string;
 }
 
-interface StepThreeFormProps {
+interface TutorApplicationSubmit {
     previousStep: () => void;
     formData: FormData;
 }
 
-const StepThreeForm: React.FC<StepThreeFormProps> = ({ previousStep, formData }) => {
+const TutorApplicationSubmit: React.FC<TutorApplicationSubmit> = ({ previousStep, formData }) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Final form data:', formData);
@@ -22,8 +22,8 @@ const StepThreeForm: React.FC<StepThreeFormProps> = ({ previousStep, formData })
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Review Your Details</h2>
-            <p className="mb-2">Name: {formData.name}</p>
-            <p className="mb-2">Email: {formData.email}</p>
+            <p className="mb-2">Name: {formData.tutorRole}</p>
+            <p className="mb-2">Email: {formData.age}</p>
             <p className="mb-2">Address: {formData.address}</p>
             <p className="mb-4">Phone: {formData.phone}</p>
 
@@ -46,4 +46,4 @@ const StepThreeForm: React.FC<StepThreeFormProps> = ({ previousStep, formData })
     );
 };
 
-export default StepThreeForm;
+export default TutorApplicationSubmit;

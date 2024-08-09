@@ -1,6 +1,6 @@
 import React from 'react';
-import AdminCard from '../../components/admin/AdminCard';
-import AdminAside from '../../components/admin/AdminAside';
+import AdminCard from '../../components/AdminComponent/AdminCard';
+import AdminAside from '../../components/AdminComponent/AdminAside';
 import Search from '../../components/common/AdminCommon/Search';
 
 const Dashboard = () => {
