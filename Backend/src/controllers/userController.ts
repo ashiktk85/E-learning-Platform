@@ -8,6 +8,7 @@ export class UserController {
   constructor(userService: UserService) {
     this.userService = userService;
   }
+  
   async createUser(req: Request, res: Response): Promise<void> {
     try {
       const data = req.body;

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import userRoute from './routes/userRoutes'
 import ConnectDB from './config/database';
 const mongoose = require('mongoose')
+import tutorRoute from './routes/tutorRoutes'
 
 import { errorHandler } from './helper/errorHandleMiddleware';
 
@@ -24,6 +25,7 @@ const corsOptions = {
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use('/' ,userRoute)
+app.use('/tutor',tutorRoute)
 
 app.use(errorHandler)
 
