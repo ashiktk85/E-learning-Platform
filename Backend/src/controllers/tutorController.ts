@@ -25,6 +25,10 @@ export class TutorContoller {
 
             console.log("Form data:", req.body);
 
+            const data = req.body
+
+            await this.tutorServices.tutorApplicationService(files , data)
+
             
 
             res.status(200).send({ success: true, message: "Application received" });

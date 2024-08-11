@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { TutorContoller } from "../controllers/tutorController";
-import { UserService } from "../services/userServices";
+
 import multer from "multer";
+import { TutorServices } from "../services/tutorServices";
 
 const route = Router();
 
-const tutorServices = new UserService();
+const tutorServices = new TutorServices();
 const tutorController = new TutorContoller(tutorServices);
 
 const storage = multer.memoryStorage();
@@ -17,6 +18,8 @@ const multerFields = [
     { name: 'profilePhoto', maxCount: 1 },
     { name: 'certifications', maxCount: 10 },
 ];
+
+
 
 route.post("/tutorapplication",upload.fields(multerFields),tutorController.tutorApplication.bind(tutorController));
 

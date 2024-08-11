@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModel";
 
 export class UserRepositary {
+  
   static async existUser(email: string): Promise<IUser | null> {
     try {
       const existUser = await UserModel.findOne({ email });

@@ -1,6 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 const url = 'http://localhost:7000';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from '../../redux/store';
+import { userInfo } from 'os';
 
 interface FormData {
     tutorRole: string;
@@ -28,6 +33,10 @@ interface TutorApplicationSubmitProps {
 }
 
 const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previousStep, formData }) => {
+
+    const data: any = useSelector((state: RootState) => state.user);
+
+    const navigate = useNavigate()
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -56,6 +65,8 @@ const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previou
                 }
             }
 
+            toast.success("Form submitted.")
+            formDataToSend.append("email" , data.userInfo.email)
             
             console.log("ljbkjvkjvjhvkjvbjh",formDataToSend)
 
@@ -67,9 +78,13 @@ const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previou
             }
         );
 
-           
-            console.log('Form submitted successfully:', response.data);
-            alert("Form submitted successfully!");
+         
+            console.log('Form submitted successfully:', response.data.message);
+
+            if(response.data.message === "Application received") {
+                navigate('/tutor/applicationcompleted')
+            }
+         
 
         } catch (error) {
             console.error('Error submitting form:', error);
