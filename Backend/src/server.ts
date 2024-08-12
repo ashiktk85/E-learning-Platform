@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
-import userRoute from './routes/userRoutes'
-import ConnectDB from './config/database';
-const mongoose = require('mongoose')
-import tutorRoute from './routes/tutorRoutes'
 
+import userRoute from './routes/userRoutes'
+import tutorRoute from './routes/tutorRoutes'
+import adminRoute from './routes/adminRoutes'
+
+import ConnectDB from './config/database';
 import { errorHandler } from './helper/errorHandleMiddleware';
 
 import dotenv from 'dotenv'
@@ -26,10 +27,11 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use('/' ,userRoute)
 app.use('/tutor',tutorRoute)
+app.use('/admin',adminRoute)
 
 app.use(errorHandler)
 
-// Routes
+
 
 
 

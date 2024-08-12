@@ -20,7 +20,7 @@ export interface ITutorApplication extends Document {
   teachingExperience: string;
   subjectsOfExpertise: string;
   socialLinks: Map<string, string>;
-  profilePhoto: string;
+  // profilePhoto: string;
   files: FileUrl[];
 }
 
@@ -85,10 +85,10 @@ const tutorApplicationSchema = new Schema<ITutorApplication>(
       of: String,
       default: {} 
     },
-    profilePhoto: {
-      type: String,
-      default: '' 
-    },
+    // profilePhoto: {
+    //   type: String,
+    //   default: '' 
+    // },
     files: [
       {
         type: {

@@ -5,8 +5,12 @@ import Banner from "../../components/common/UserCommon/HomeBanner";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import bannerVector from '../../assets/userbanner/freepik-export-20240804125951Lu85.jpeg'
+import BlockChecker from "../../services/BlockChecker";
 
 const Home: React.FC = () => {
+
+  BlockChecker();
+
   const locatin = useLocation();
 
   useEffect(() => {

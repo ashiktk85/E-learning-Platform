@@ -1,27 +1,24 @@
-// store.ts
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import userSlice from './slices/userSlice';
 import storage from 'redux-persist/lib/storage';
-import { persistStore , persistReducer } from 'redux-persist';
-
-
- 
+import { persistStore, persistReducer } from 'redux-persist';
+import userSlice from './slices/userSlice';
+import adminSlice from './slices/adminSlice';
 
 const persistConfig = {
-  key : 'root',
-  storage
-}
+  key: 'root',
+  storage,
+};
 
-const rootReducer =  combineReducers({
-  user : userSlice,
-})
+const rootReducer = combineReducers({
+  user: userSlice,
+  admin: adminSlice,
+});
 
-const persist = persistReducer(persistConfig ,rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-
-const store = configureStore ({
-  reducer : persist
-})
+const store = configureStore({
+  reducer: persistedReducer,
+});
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

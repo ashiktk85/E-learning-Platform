@@ -87,7 +87,7 @@ export class UserRepositary {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        userid: user.userId,
+        userId: user.userId,
         phone: user.phone,
         isBlocked: user.isBlocked,
       };
@@ -97,6 +97,7 @@ export class UserRepositary {
       throw new Error(error.message);
     }
   }
+
   static async editUserRepository(
     userid: string,
     newUserInfo: { firstName: string; lastName: string; phone: string }
@@ -116,8 +117,60 @@ export class UserRepositary {
       console.log("updated user:", updatedUser);
 
       return updatedUser ? updatedUser.toObject() : null;
-    } catch (error) {
+    } catch (error : any) {
       throw error;
     }
   }
+
+  static async getUsersRepo(): Promise< any> {
+    try {
+      const data = await UserModel.find({}, 
+        {
+          _id : 0, 
+          firstName : 1, 
+          lastName : 1,
+          email :1,
+          phone: 1,
+          createdAt : 1,
+          roles : 1,
+          isBlocked : 1
+      }
+    )
+      
+      console.log(data);
+      return data
+      
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
+  static async blockUser(email : string) : Promise<boolean | void> {
+    try {
+      const response = await UserModel.findOneAndUpdate(
+        { email: email },               
+        { isBlocked: true }
+      );
+      
+      return true;
+      
+    } catch (error : any) {
+      console.error('Error in blocking user in  repo:', error);
+    }
+  }
+
+  static async unblockUserRepo(email : string) : Promise<boolean | void> {
+    try {
+      const response = await UserModel.findOneAndUpdate(
+        { email: email },               
+        { isBlocked: false }
+      );
+      
+      return true;
+      
+    } catch (error : any) {
+      console.error('Error in blocking user in  repo:', error);
+    }
+  }
+  
 }

@@ -9,8 +9,12 @@ import { useSelector } from "react-redux";
 import UserDetails from "../../components/UserComponent/UserDetails";
 import ProfileCourses from "../../components/UserComponent/ProfileCourses";
 import ProfileTutors from "../../components/UserComponent/ProfileTutors";
+import BlockChecker from "../../services/BlockChecker";
 
 const ProfilePage = () => {
+
+  BlockChecker();
+  
   const data: any = useSelector((state: RootState) => state.user);
 
   const menuItems = [

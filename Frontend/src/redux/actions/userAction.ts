@@ -1,17 +1,17 @@
-// userThunks.ts
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
 import { User } from '../../Types/user';
 
 const url = 'http://localhost:7000';
 
 interface UpdateUserInfoPayload {
   userId: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
 }
+
+
 
 export const registerUser = (userData: {
   firstName: string;
@@ -42,7 +42,6 @@ export const registerUser = (userData: {
     }
   };
 };
-
 export const verifyOtp = (otp : string) => {
   return async () => {
     try {
@@ -64,69 +63,44 @@ export const verifyOtp = (otp : string) => {
     }
   } 
 }
-
-export const login = createAsyncThunk(
+export const login = createAsyncThunk<{ accessToken: string; refreshToken: string; userInfo: User }, { email: string; password: string }>(
   'user/authLogin',
-  async ({ email, password }: { email: string; password: string }, thunkAPI) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${url}/verifyLogin`, { email, password });
-      console.log("ressss",response.data)
-     
-        return  response.data.result
-      
- 
+      return response.data.result;
     } catch (error: any) {
-      console.error("Login thunk error:", error.response.data);
-      return thunkAPI.rejectWithValue(error.response.data); 
+      return rejectWithValue(error.response?.data || 'Login failed');
     }
   }
 );
 
-export const resendOtp = () => {
-  return async () => {
+export const resendOtp = createAsyncThunk<boolean>(
+  'user/resendOtp',
+  async (_, { rejectWithValue }) => {
     try {
-      const email = localStorage.getItem('userEmail')
-      if (!email) throw new Error("No email found in localStorage");
+      const email = localStorage.getItem('userEmail');
+      if (!email) throw new Error('No email found in localStorage');
 
       const response = await axios.post(`${url}/resendOtp`, { email });
-      if (response.status === 200) {
-        
-        return true;
-      } else {
-        
-        throw new Error("Failed to resend OTP");
-      }
-    } catch (error  :any) {
-     
-      console.error("Error resending OTP:", error.message);
-      return false;
+      return response.status === 200;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to resend OTP');
     }
-  };
-};
-
-
+  }
+);
 
 export const updateUserInfo = createAsyncThunk<User | 'no change', UpdateUserInfoPayload>(
   'user/updateUserInfo',
   async (userData, { rejectWithValue }) => {
     try {
-      console.log(userData, 'thhunk user');
-      
       const response = await axios.put(`${url}/edituser`, userData);
-      console.log('ress data', response.data.data);
-
-      if (response.data.message === 'No changes founded') {
-        console.log()
+      if (response.data.message === 'No changes found') {
         return 'no change';
       }
-      
-      return response.data.data as User; 
+      return response.data.data as User;
     } catch (error: any) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || 'Update failed');
     }
   }
 );
- 
-   
-
-

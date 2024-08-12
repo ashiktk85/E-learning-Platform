@@ -8,7 +8,7 @@ interface FormData {
     birthday: string;
     gender: string;
     resume: File | null;
-    profilePhoto: File | null; 
+    // profilePhoto: File | null; 
     age?: number;
 }
 
@@ -52,19 +52,19 @@ const validationSchema = Yup.object({
             'fileSize',
             'File size must be less than 5MB',
             (value) => !value || (value && (value as File).size <= 5 * 1024 * 1024)
-        ),
-    profilePhoto: Yup.mixed()
-        .required('Profile photo is required')
-        .test(
-            'fileType',
-            'Only JPG or PNG files are allowed',
-            (value) => !value || ['image/jpeg', 'image/png'].includes((value as File).type)
         )
-        .test(
-            'fileSize',
-            'File size must be less than 2MB',
-            (value) => !value || (value && (value as File).size <= 2 * 1024 * 1024)
-        ),
+    // profilePhoto: Yup.mixed()
+    //     .required('Profile photo is required')
+    //     .test(
+    //         'fileType',
+    //         'Only JPG or PNG files are allowed',
+    //         (value) => !value || ['image/jpeg', 'image/png'].includes((value as File).type)
+    //     )
+        // .test(
+        //     'fileSize',
+        //     'File size must be less than 2MB',
+        //     (value) => !value || (value && (value as File).size <= 2 * 1024 * 1024)
+        // ),
 });
 
 const TutorApplicationPage1: React.FC<TutorApplicationPage1Props> = ({ nextStep, formData }) => {
@@ -149,7 +149,7 @@ const TutorApplicationPage1: React.FC<TutorApplicationPage1Props> = ({ nextStep,
                             </Field>
                             <ErrorMessage name="gender" component="div" className="text-red-500 text-xs sm:text-sm" />
                         </div>
-
+{/* 
                         <div className="mb-4">
                             <label className="text-sm sm:text-base font-medium text-gray-700 flex">
                                 Profile Photo
@@ -195,7 +195,7 @@ const TutorApplicationPage1: React.FC<TutorApplicationPage1Props> = ({ nextStep,
                                 )}
                             </div>
                             <ErrorMessage name="profilePhoto" component="div" className="text-red-500 text-xs sm:text-sm" />
-                        </div>
+                        </div> */}
 
                         <div className="mb-4">
                             <label className="text-sm sm:text-base font-medium text-gray-700 flex">

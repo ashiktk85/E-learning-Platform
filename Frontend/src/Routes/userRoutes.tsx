@@ -13,7 +13,7 @@ const UserRoutes = () => {
        <>
         <Routes >
                 <Route path = '' element = {<Home />} />
-                <Route path='/otp' element = {<UserProtector><OtpPage /></UserProtector> } />
+                <Route path='/otp' element = {<OtpPage /> } />
                 <Route path="/login" element ={<UserLogin />} />
                 <Route path= '/profile' element = {<UserProtector><ProfilePage /></UserProtector>} />
                 <Route path= '/signup' element = {<SignUp />} />

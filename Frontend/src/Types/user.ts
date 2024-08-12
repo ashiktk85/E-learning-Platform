@@ -1,9 +1,10 @@
 
-export interface User {
-    userId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  }
+export 
+interface User {
+  userId: string;
+  firstName: string;
+  email: string;
+  isBlocked: boolean;
+}
+
   

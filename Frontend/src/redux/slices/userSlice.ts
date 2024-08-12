@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { login, updateUserInfo } from '../actions/userAction';
+import { updateUserBlockStatus } from '../actions/adminActions';
 import { toast } from 'sonner';
 
 interface User {
   userId: string;
   firstName: string;
   email: string;
+  isBlocked: boolean;
 }
 
 interface UserState {
@@ -66,19 +68,33 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(updateUserInfo.fulfilled, (state, action: PayloadAction<User | 'no change'>) => {
-        console.log('payload', action.payload);
-
         if (action.payload === 'no change') {
           toast.warning('No changes made.');
         } else {
           state.userInfo = action.payload;
           state.loading = false;
-          toast.success('Details updated.');
+          
         }
       })
-      .addCase(updateUserInfo.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(updateUserInfo.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload as string;
+      })
+      .addCase(updateUserBlockStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserBlockStatus.fulfilled, (state, action: PayloadAction<{ email: string; isBlocked: boolean }>) => {
+        const { email, isBlocked } = action.payload;
+        if (state.userInfo && state.userInfo.email === email) {
+          state.userInfo.isBlocked = isBlocked;
+        }
+        state.loading = false;
+        toast.success(`User ${isBlocked ? 'blocked' : 'unblocked'} successfully.`);
+      })
+      .addCase(updateUserBlockStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

@@ -15,7 +15,7 @@ const upload = multer({ storage });
 const multerFields = [
     { name: 'idProof', maxCount: 1 },
     { name: 'resume', maxCount: 1 },
-    { name: 'profilePhoto', maxCount: 1 },
+    // { name: 'profilePhoto', maxCount: 1 },
     { name: 'certifications', maxCount: 10 },
 ];
 

@@ -5,7 +5,8 @@ import editButton from "../../assets/svgs/edit.png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { userInfo } from "os";
+import { toast } from "sonner";
+
 
 const UserDetails = () => {
   const data: any = useSelector((state: RootState) => state.user);
@@ -32,9 +33,10 @@ const UserDetails = () => {
       const response = await dispatch(updateUserInfo(values));
       if (response.meta.requestStatus === "fulfilled") {
         console.log("User information updated successfully:", response.payload);
+        toast.success("Details updated")
         closeEditModal();
       } else if (response.meta.requestStatus === "rejected") {
-        console.log("No changes made:", response.payload);
+        toast.info("No changes made")
       }
     } catch (error) {
       console.error("Failed to update user", error);

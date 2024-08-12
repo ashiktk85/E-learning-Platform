@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaUser, FaTachometerAlt, FaChalkboardTeacher, FaBook, FaWallet, FaFlag } from "react-icons/fa"; // Importing React Icons
 
 const AdminAside = () => {
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [activeItem, setActiveItem] = useState<string>("Dashboard");
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
 
-  const goToUsers = () => {
-    navigate("/admin/users");
+  const handleNavigation = (item: string, path: string) => {
+    setActiveItem(item);
+    navigate(path);
   };
-  const goToDashboard = () => {
-    navigate("/admin/dashboard");
-  };
+
+  const navItems = [
+    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin/dashboard" },
+    { name: "Users", icon: <FaUser />, path: "/admin/users" },
+    { name: "Tutors", icon: <FaChalkboardTeacher />, path: "/admin/tutors" },
+    { name: "Tutor Applications", icon: <FaChalkboardTeacher />, path: "/admin/tutorapplications" },
+    { name: "Course List", icon: <FaBook />, path: "/admin/courses" },
+    { name: "Category", icon: <FaBook />, path: "/admin/category" },
+    { name: "Wallet", icon: <FaWallet />, path: "/admin/wallet" },
+    { name: "Report", icon: <FaFlag />, path: "/admin/reports" },
+  ];
 
   return (
     <div className="grid col-span-3">
@@ -22,68 +33,31 @@ const AdminAside = () => {
         <aside
           className={`bg-black text-white transition-all duration-300 rounded-md m-2 ${
             isCollapsed ? "w-16" : "w-64"
-          } flex flex-col items-center p-4`}
+          } flex flex-col p-4`}
         >
-         <div className="flex flex-wrap justify-center">
-  <div className="w-20 sm:w-4/12 px-4">
-    <img src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg" alt="..." className="shadow rounded-full max-w-full h-auto align-middle border-none" />
-  </div>
-</div>
           <nav className="flex flex-col w-full">
-            <a className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center hover:bg-admin-secondary rounded-md hover:cursor-pointer "
-              onClick={goToDashboard}
-            >
-              <span className="material-icons font-poppins font-semibold">
-                Dashboard
-              </span>
-            
-            </a>
-            <a
-              className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center  hover:bg-admin-secondary rounded-md hover:cursor-pointer"
-              onClick={goToUsers}
-            >
-              <span className="material-icons font-poppins font-semibold ">
-                Users
-              </span>
-            </a>
-            <a
-             
-              className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center  hover:bg-admin-secondary rounded-md hover:cursor-pointer"
-            >
-              <span className="material-icons font-poppins font-semibold">
-                Tutors
-              </span>
-            </a>
-            <a
-              
-              className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center  hover:bg-admin-secondary rounded-md hover:cursor-pointer"
-            >
-              <span className="material-icons font-poppins font-semibold">
-                Course List
-              </span>
-            </a>
-            <a
-             
-              className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center  hover:bg-admin-secondary rounded-md hover:cursor-pointer"
-            >
-              <span className="material-icons font-poppins font-semibold">
-                Wallet
-              </span>
-            </a>
-            <a
-              
-              className="w-full p-2 mt-4 hover:scale-105 transition-transform duration-200 flex items-center  hover:bg-admin-secondary rounded-md hover:cursor-pointer"
-            >
-              <span className="material-icons font-poppins font-semibold">
-                Report
-              </span>
-            </a>
+            {navItems.map((item) => (
+              <div
+                key={item.name}
+                onClick={() => handleNavigation(item.name, item.path)}
+                className={`w-full p-2 mt-4 transition-transform duration-200 flex items-center cursor-pointer rounded-md hover:bg-gray-700 ${
+                  activeItem === item.name ? "bg-gray-700" : ""
+                }`}
+              >
+                <div className="text-xl">{item.icon}</div>
+                {!isCollapsed && (
+                  <span className="ml-4 font-poppins font-semibold">
+                    {item.name}
+                  </span>
+                )}
+              </div>
+            ))}
           </nav>
           <button
             onClick={toggleSidebar}
             className="mt-auto text-2xl transform transition-transform duration-300"
           >
-            {isCollapsed ? ">=" : "=<"}
+            {isCollapsed ? ">" : "<"}
           </button>
         </aside>
       </div>

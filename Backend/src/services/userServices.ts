@@ -91,7 +91,7 @@ export class UserService {
         userInfo: { firstName: string; lastName: string; email: string };
         token: string;
       }
-    | any
+    | any 
     | null
   > {
     return UserRepositary.validateLoginUser(email, password);

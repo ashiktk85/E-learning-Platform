@@ -35,10 +35,10 @@ export class TutorServices {
             }
         }
 
-        if (files.profilePhoto) {
-            const url = await this.uploadFileToS3(bucketName, 'tutorApplication/profilePhoto/', files.profilePhoto[0]);
-            fileUrls.push({ type: 'profilePhoto', url });
-        }
+        // if (files.profilePhoto) {
+        //     const url = await this.uploadFileToS3(bucketName, 'tutorApplication/profilePhoto/', files.profilePhoto[0]);
+        //     fileUrls.push({ type: 'profilePhoto', url });
+        // }
 
         const applicationId = uuidv4()
         const combinedData = {
