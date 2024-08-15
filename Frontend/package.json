@@ -12,7 +12,9 @@
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "@mui/material": "^5.16.6",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@reduxjs/toolkit": "^2.2.6",
     "@types/redux-thunk": "^2.1.0",
     "axios": "^1.7.2",
@@ -25,7 +27,9 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
+    "shadcn": "^1.0.0",
     "sonner": "^1.5.0",
+    "styled-components": "^6.1.12",
     "thunk": "^0.0.1",
     "yup": "^1.4.0"
   },

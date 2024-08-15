@@ -55,4 +55,27 @@ export class AdminController {
             res.status(500).json({ message: error.message });
         }
     } 
+
+    async getApplicationsController(req : Request , res : Response) : Promise<any | void> {
+        try {
+
+            const getApplications = await this.adminService.getApplicationService()
+
+            // console.log("user list contriller", getApplications);
+            res.status(200).json(getApplications)
+            
+        } catch (error : any ) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async getOneApplication(req : Request , res : Response) : Promise<any | void> {
+        try {
+            const {id} =  req.params;
+            const applicant = await this.adminService.getOneApplicationService(id)
+            res.status(200).json(applicant)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }

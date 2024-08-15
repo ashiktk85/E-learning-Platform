@@ -1,6 +1,13 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
 import { TutorRepositary } from "../repository/tutorRepositary";
 import { v4 as uuidv4 } from "uuid";
+import { S3Client, PutObjectCommand , GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { AwsConfig } from "../config/awsFileConfigs";
+
+import * as crypto from 'crypto';
+
+require('dotenv').config();
 
 
 const s3Client = new S3Client({
@@ -11,11 +18,13 @@ const s3Client = new S3Client({
     },
 });
 
+const aws = new AwsConfig()
+
 export class TutorServices {
     
     async tutorApplicationService(files: any, data: any): Promise<void> {
         const bucketName = "learn-sphere";
-       
+
         const fileUrls: { type: string, url: string }[] = [];
 
         if (files.idProof) {
@@ -40,21 +49,23 @@ export class TutorServices {
         //     fileUrls.push({ type: 'profilePhoto', url });
         // }
 
-        const applicationId = uuidv4()
+        const applicationId = uuidv4();
         const combinedData = {
             applicationId,
             ...data,
             files: fileUrls,
         };
 
-        await TutorRepositary.saveApplication(combinedData as any)
-        
+        await TutorRepositary.saveApplication(combinedData as any);
     }
 
     private async uploadFileToS3(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
+        
+        const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname;
+
         const params = {
             Bucket: bucketName,
-            Key: `${folderPath}${file.originalname}`,
+            Key: `${folderPath}${uniqueName}`,
             Body: file.buffer,
             ContentType: file.mimetype,
         };
@@ -62,7 +73,8 @@ export class TutorServices {
         const command = new PutObjectCommand(params);
         await s3Client.send(command);
 
-        const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${folderPath}${file.originalname}`;
+        const fileUrl = uniqueName;
         return fileUrl;
     }
 }
+

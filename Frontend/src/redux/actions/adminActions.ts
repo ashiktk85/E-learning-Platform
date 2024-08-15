@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { clearAdmin } from '../slices/adminSlice'
 
 const url = 'http://localhost:7000';
 
@@ -34,3 +35,15 @@ export const updateUserBlockStatus = createAsyncThunk(
       }
     }
   );
+
+  export const logout = createAsyncThunk<void, void>(
+    'admin/logout',
+    async (_, { dispatch }) => {
+      dispatch(clearAdmin());
+     
+    }
+  );
+
+
+
+

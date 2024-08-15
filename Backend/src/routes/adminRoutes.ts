@@ -11,5 +11,7 @@ route.post('/adminlogin', adminController.adminLogin.bind(adminController))
 route.get('/getusers' , adminController.getUsers.bind(adminController))
 route.patch('/blockuser/:email' , adminController.blockUser.bind(adminController))
 route.patch('/unblockuser/:email', adminController.unblockUser.bind(adminController));
+route.get('/getapplications', adminController.getApplicationsController.bind(adminController))
+route.get('/applicationview/:id' , adminController.getOneApplication.bind(adminController))
 
 export default route;

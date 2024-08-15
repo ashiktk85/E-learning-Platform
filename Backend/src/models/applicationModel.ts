@@ -98,6 +98,9 @@ const tutorApplicationSchema = new Schema<ITutorApplication>(
         url: {
           type: String,
           required: true 
+        },
+        signedUrl: {
+          type: String,
         }
       }
     ]

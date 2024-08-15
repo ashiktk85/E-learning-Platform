@@ -36,15 +36,12 @@ const adminSlice = createSlice({
         state.error = null; 
       })
       .addCase(adminLogin.fulfilled, (state, action: PayloadAction<Admin>) => {
-        console.log("Admin info: ", action.payload);
-
         state.adminInfo = action.payload;
         state.loading = false;
       })
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string || 'Login failed'; 
-        console.error("Admin login failed: ", action.payload);
       });
   },
 });

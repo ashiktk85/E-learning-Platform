@@ -2,8 +2,13 @@ import React from 'react';
 import AdminCard from '../../components/AdminComponent/AdminCard';
 import AdminAside from '../../components/AdminComponent/AdminAside';
 import Search from '../../components/common/AdminCommon/Search';
+import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 const Dashboard = () => {
+  const data : any = useSelector((state : RootState) => state.admin)
+ 
   return (
     <div className="grid grid-cols-12">
       <AdminAside />

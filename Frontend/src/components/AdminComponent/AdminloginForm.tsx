@@ -47,7 +47,7 @@ const AdminloginForm = () => {
        
         }
       } else if (adminLogin.fulfilled.match(resultAction)) {
-        // Handle successful login
+        
         toast.success("Login successful");
         setTimeout(() => {
           navigate('/admin/dashboard');
@@ -106,7 +106,7 @@ const AdminloginForm = () => {
                         placeholder="Enter your password"
                         className="w-72 p-2 rounded bg-spotify-black text-white"
                       />
-                      <div
+                       <button
                         className="absolute right-2 top-9 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -115,9 +115,11 @@ const AdminloginForm = () => {
                         ) : (
                           <AiOutlineEyeInvisible className="text-white" />
                         )}
-                      </div>
+                      </button>
+                     
                       <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
                     </div>
+                    
 
                     {generalError && (
                       <div className="text-red-500 text-sm">{generalError}</div>
