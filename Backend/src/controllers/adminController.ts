@@ -78,4 +78,15 @@ export class AdminController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async acceptApplication(req : Request , res : Response) {
+        try {
+            const { id } = req.params
+            console.log("id " , id);
+            const response = await this.adminService.acceptApplicaiton(id)
+            
+        } catch (error) {
+            
+        }
+    }
 }

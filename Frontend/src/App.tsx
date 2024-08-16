@@ -12,9 +12,11 @@ import UserList from './components/AdminComponent/UserList';
 import UserRoutes from './Routes/userRoutes';
 import AdminRoutes from './Routes/adminRoutes';
 import TutorRoutes from './Routes/tutorRoutes';
+import {NextUIProvider} from "@nextui-org/react";
 
 function App() {
   return (
+    <NextUIProvider>
   
     <Router>
       <Routes>
@@ -31,6 +33,7 @@ function App() {
         
       </Routes>
     </Router>
+    </NextUIProvider>
   
   );
 }

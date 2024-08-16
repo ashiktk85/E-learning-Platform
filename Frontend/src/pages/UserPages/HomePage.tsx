@@ -6,6 +6,8 @@ import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import bannerVector from '../../assets/userbanner/freepik-export-20240804125951Lu85.jpeg'
 import BlockChecker from "../../services/BlockChecker";
+import Home2 from "../../components/UserComponent/Home2nd";
+import HomeCard from "../../components/UserComponent/Card";
 
 const Home: React.FC = () => {
 
@@ -54,7 +56,12 @@ const Home: React.FC = () => {
 
         <Banner />
       </div>
-      <div className="bg-spotify-white min-h-screen"></div>
+      <div className="bg-spotify-white min-h-screen">
+        
+        <HomeCard />
+        <HomeCard />
+        <HomeCard />
+      </div>
       <Footer />
     </>
   );

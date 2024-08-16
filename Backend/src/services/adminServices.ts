@@ -139,4 +139,19 @@ export class AdminService {
                 throw new Error(`Unknown file type: ${fileType}`);
         }
     }
+
+    async acceptApplicaiton(id : string) {
+        try {
+
+            const data = await TutorRepositary.getOneApplication(id)
+
+
+          
+
+            
+        } catch (error : any) {
+            console.error("Error during admin accepting  applicant services:", error.message);
+            throw new Error(error.message);
+        }
+    }
 }
