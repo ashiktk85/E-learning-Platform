@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AdminAside from "./AdminAside";
 import {
   Modal,
@@ -11,16 +11,37 @@ import {
 } from "@nextui-org/react";
 import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import axios from "axios";
+import { toast, Toaster } from "sonner";
+
 const url = 'http://localhost:7000';
 
 const ApplicantDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmModal, setConfirmationModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [isTutor, setIsTutor] = useState<boolean | null>(null); 
   const { applicationData } = location.state;
-  console.log(applicationData);
-  
+
+  useEffect(() => {
+
+    const checkTutorStatus = async () => {
+      try {
+        const response = await axios.get(`${url}/admin/checktutorstatus/${applicationData.email}`);
+        const tutorStatus = response?.data;
+        setIsTutor(tutorStatus);
+
+        console.log(tutorStatus, "fhsajiofhsadfjkhji");
+        
+      } catch (error) {
+        console.error("Error checking tutor status:", error);
+        toast.error("Failed to check tutor status. Please try again.");
+      }
+    };
+
+    checkTutorStatus();
+  }, [applicationData.applicationId]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -41,25 +62,31 @@ const ApplicantDetails = () => {
   };
 
   const acceptApplication = async () => {
-        try {
-          alert("dd")
-          const applicationId = applicationData.applicationId;
-          const response = axios.post(`${url}/admin/acceptapplication/${applicationId}`)
-        } catch (error : any) {
-          console.log(error);
-          
-        }
-  }
+    try {
+      const applicationId = applicationData.applicationId;
+      const response = await axios.post(`${url}/admin/acceptapplication/${applicationId}`);
+      const tutorStatus = response?.data?.tutor;
+      setIsTutor(tutorStatus);
+      toast.success("Tutor Applicant Approved.");
+      setConfirmationModal(false);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Failed to accept application. Please try again.");
+    }
+  };
+
+  
+  
 
   return (
     <div className="grid grid-cols-12 mb-32 font-poppins">
       <AdminAside />
+      <Toaster richColors position="top-center" />
       <div className="col-span-8 p-6 bg-gray-100 shadow-lg rounded-lg mt-10">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">
           Application Details
         </h1>
 
-        {/* Personal Details */}
         <div className="grid grid-cols-2 gap-4">
           <section className="bg-gray-50 p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">
@@ -84,7 +111,6 @@ const ApplicantDetails = () => {
             </ul>
           </section>
 
-          {/* Educational Background */}
           <section className="bg-gray-50 p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">
               Educational Background
@@ -107,7 +133,6 @@ const ApplicantDetails = () => {
           </section>
         </div>
 
-        {/* Professional Background */}
         <section className="bg-gray-50 p-6 rounded-lg shadow-sm mt-4">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">
             Professional Background
@@ -119,7 +144,6 @@ const ApplicantDetails = () => {
           </p>
         </section>
 
-        {/* Relevant Documents */}
         <section className="bg-gray-50 p-6 rounded-lg shadow-sm mt-4">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">
             Relevant Documents
@@ -151,21 +175,21 @@ const ApplicantDetails = () => {
           </div>
         </section>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end">
-          <button
-            className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"
-            onClick={openConfirmationModal}
-          >
-            Accept
-          </button>
-          <button className="h-12 w-24 bg-red-500 mt-10 rounded-md hover:bg-red-700 mr-10 text-white font-semibold">
-            Reject
-          </button>
-        </div>
+        {!isTutor && (
+          <div className="flex justify-end">
+            <Button
+              className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"
+              onClick={openConfirmationModal}
+            >
+              Accept
+            </Button>
+            <Button className="h-12 w-24 bg-red-500 mt-10 rounded-md hover:bg-red-700 mr-10 text-white font-semibold">
+              Reject
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Document Preview Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -190,34 +214,34 @@ const ApplicantDetails = () => {
         </ModalContent>
       </Modal>
 
-      {/* Confirmation Modal */}
       <Modal
         isOpen={confirmModal}
         onClose={closeConfirmationModal}
-        className="bg-white rounded-lg mb-96 "
+        className="bg-white rounded-lg mb-96"
         aria-labelledby="confirmation-modal"
       >
         <ModalContent>
-          <ModalHeader className="text-center font-bold justify-center">Confirm Action</ModalHeader>
+          <ModalHeader className="text-center font-bold justify-center">
+            Confirm Action
+          </ModalHeader>
           <ModalBody>
-            <p className="text-gray-700">Are you sure you want to accept this application?</p>
+            <p className="text-gray-700">
+              Are you sure you want to accept this application?
+            </p>
           </ModalBody>
           <ModalFooter className="flex justify-center">
-            
-          <button
-            className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"
-            onClick={acceptApplication}
-          >
-            Confirm
-          </button>
-
-          <button className="h-12 w-24 bg-gray-400 mt-10 rounded-md hover:bg-red-700 mr-10 text-white font-semibold"
-        onClick={closeConfirmationModal}
-        >
-            Close
-          </button>
-
-
+            <Button
+              className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"
+              onClick={acceptApplication}
+            >
+              Confirm
+            </Button>
+            <Button
+              className="h-12 w-24 bg-gray-400 mt-10 rounded-md hover:bg-gray-600 mr-10 text-white font-semibold"
+              onClick={closeConfirmationModal}
+            >
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -10,7 +10,7 @@ const SignUp : React.FC = () => {
            <Toaster position="top-center" richColors  />
             
           <SignupForm />
-           <Footer />
+          
         </div>
     )
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AdminService } from "../services/adminServices";
+import { emitKeypressEvents } from "readline";
 
 export class AdminController {
     private adminService : AdminService;
@@ -83,10 +84,31 @@ export class AdminController {
         try {
             const { id } = req.params
             console.log("id " , id);
-            const response = await this.adminService.acceptApplicaiton(id)
+            const response  = await this.adminService.acceptApplicaiton(id)
+
+            if(response) {
+                res.status(200).json(response)
+            }
             
         } catch (error) {
             
         }
     }
+
+    async checkTutorStatus(req : Request , res : Response) : Promise<boolean | void> {
+        try {
+            const { email } = req.params
+            console.log("id " , email);
+            const response  = await this.adminService.checkStatus(email)
+            console.log(response , "controller");
+            
+            if(response) {
+                res.status(200).json(response)
+            }
+            
+        } catch (error) {
+            
+        }
+    }
+
 }

@@ -76,7 +76,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="grid grid-cols-12 h-96 bg-background mt-20 mb-32 ml-8 mr-8">
-          <div className="h-96 col-span-3 bg-spotify-white m-3 rounded-2xl p-4">
+          <div className="h-96 col-span-3 bg-spotify-green m-3 rounded-2xl p-4">
             {menuItems.map((item, index) => (
               <h2
                 key={index}

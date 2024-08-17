@@ -3,11 +3,12 @@ import { Schema, model, Document } from 'mongoose';
 interface FileUrl {
   type: string;
   url: string;
+  signedUrl?: string; // Optional signed URL
 }
 
 export interface ITutorApplication extends Document {
-    applicationId : string;
-    email : string;
+  applicationId: string;
+  email: string;
   tutorRole: string;
   age: string;
   birthday: Date;
@@ -20,22 +21,20 @@ export interface ITutorApplication extends Document {
   teachingExperience: string;
   subjectsOfExpertise: string;
   socialLinks: Map<string, string>;
-  // profilePhoto: string;
   files: FileUrl[];
+  status: 'pending' | 'accepted' | 'rejected'; // Status field with possible values
 }
 
 const tutorApplicationSchema = new Schema<ITutorApplication>(
   {
-    
-    applicationId : {
-        type : String,
-        required : true
+    applicationId: {
+      type: String,
+      required: true,
     },
-    email : {
-        type : String,
-        required : true
-    }
-    ,
+    email: {
+      type: String,
+      required: true,
+    },
     tutorRole: {
       type: String,
       required: true,
@@ -83,27 +82,28 @@ const tutorApplicationSchema = new Schema<ITutorApplication>(
     socialLinks: {
       type: Map,
       of: String,
-      default: {} 
+      default: {}, 
     },
-    // profilePhoto: {
-    //   type: String,
-    //   default: '' 
-    // },
     files: [
       {
         type: {
           type: String,
-          required: true 
+          required: true,
         },
         url: {
           type: String,
-          required: true 
+          required: true,
         },
         signedUrl: {
           type: String,
-        }
-      }
-    ]
+        },
+      },
+    ],
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending', 
+    },
   },
   {
     timestamps: true, 

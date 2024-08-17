@@ -54,6 +54,7 @@ export class UserRepositary {
           phone: 1,
           passwordHash: 1,
           isBlocked: 1,
+          tutor : 1
         }
       );
 
@@ -170,6 +171,33 @@ export class UserRepositary {
       
     } catch (error : any) {
       console.error('Error in blocking user in  repo:', error);
+    }
+  }
+
+  static async addTutorToUserModel( email : string) : Promise <any | void> {
+    try {
+      
+      const updateUser = await UserModel.findOneAndUpdate(
+        { email : email },
+        {$set : {
+          tutor : true
+        }}, 
+        {
+          _id : 0,
+          tutor : 1,
+          email : 1,
+          firstName : 1,
+          lastName : 1,
+          isBlocked : 1
+        }
+      )
+
+    
+
+      return updateUser;
+
+    } catch ( err : any) {
+      
     }
   }
   

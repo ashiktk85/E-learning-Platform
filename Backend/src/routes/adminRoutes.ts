@@ -14,5 +14,6 @@ route.patch('/unblockuser/:email', adminController.unblockUser.bind(adminControl
 route.get('/getapplications', adminController.getApplicationsController.bind(adminController))
 route.get('/applicationview/:id' , adminController.getOneApplication.bind(adminController))
 route.post('/acceptapplication/:id', adminController.acceptApplication.bind(adminController) )
+route.get('/checktutorstatus/:email', adminController.checkTutorStatus.bind(adminController))
 
 export default route;

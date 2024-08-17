@@ -9,7 +9,7 @@ export interface IUser extends Document {
    passwordHash: string;
    createdAt: Date;
    lastLogin: Date;
-   roles: string[];
+   tutor?: Boolean;
    subscriptionId?: string;
    following: string[];
    followers: string[];
@@ -55,9 +55,9 @@ export interface IUser extends Document {
    lastLogin: {
       type: Date 
    },
-   roles: {
-      type: [String], 
-      default: ["Student"]
+   tutor : {
+      type : Boolean,
+      default : false
    },
    subscriptionId: {
       type: String, 

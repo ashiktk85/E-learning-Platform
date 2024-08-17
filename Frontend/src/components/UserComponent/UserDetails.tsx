@@ -66,7 +66,7 @@ const UserDetails = () => {
   });
   return (
     <>
-      <div className="h-96 bg-spotify-white col-span-7 m-3 rounded-2xl font-poppins">
+      <div className="h-96 bg-gray-white col-span-7 m-3 rounded-2xl font-poppins">
         <h1 className="ml-8 mr-5 mt-5 font-bold text-lg">
           Your personal Dashboard
         </h1>

@@ -12,12 +12,12 @@ import { IoMdLogOut } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/actions/adminActions";
 import { AppDispatch } from "../../redux/store";
-
 import List from "@mui/material/List";
 import ListSubheader from "@mui/material/ListSubheader";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Badge from '../common/AdminCommon/Badge'
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }: any) => {
   if (!isOpen) return null;
@@ -52,9 +52,21 @@ const AdminAside = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [activeItem, setActiveItem] = useState<string>("");
+  const [notifications, setNotifications] = useState({
+    users: 5, // Example value
+    tutors: 2, // Example value
+    applications: 8, // Example value
+    courses: 0, // Example value
+    wallet: 1, // Example value
+    reports: 3, // Example value
+  });
 
-  // Retrieve the active item from localStorage when the component mounts
+  // Retrieve sidebar state from localStorage
   useEffect(() => {
+    const storedCollapsedState = localStorage.getItem("isCollapsed");
+    if (storedCollapsedState) {
+      setIsCollapsed(JSON.parse(storedCollapsedState));
+    }
     const storedActiveItem = localStorage.getItem("activeItem");
     if (storedActiveItem) {
       setActiveItem(storedActiveItem);
@@ -62,7 +74,9 @@ const AdminAside = () => {
   }, []);
 
   const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+    const newCollapsedState = !isCollapsed;
+    setIsCollapsed(newCollapsedState);
+    localStorage.setItem("isCollapsed", JSON.stringify(newCollapsedState));
   };
 
   const handleNavigation = (path: string) => {
@@ -91,10 +105,10 @@ const AdminAside = () => {
   };
 
   return (
-    <div className="grid col-span-3">
+    <div className="grid col-span-3 h-full">
       <div className="flex h-screen">
         <aside
-          className={`bg-black text-white transition-all duration-300 rounded-md ${
+          className={`bg-black text-white transition-all duration-300 rounded-md h-full ${
             isCollapsed ? "w-16" : "w-64"
           } flex flex-col p-4`}
         >
@@ -116,9 +130,9 @@ const AdminAside = () => {
               onClick={() => handleNavigation("/admin/dashboard")}
               sx={{
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/dashboard" ? "#374151" : "transparent", // bg-gray-700
+                backgroundColor: activeItem === "/admin/dashboard" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
@@ -132,14 +146,16 @@ const AdminAside = () => {
               onClick={() => handleNavigation("/admin/users")}
               sx={{
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/users" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/users" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaUser className="text-white" />
+                <Badge count={notifications.users} />
               </ListItemIcon>
               <ListItemText primary="Users" />
             </ListItemButton>
@@ -147,16 +163,17 @@ const AdminAside = () => {
             <ListItemButton
               onClick={() => handleNavigation("/admin/tutors")}
               sx={{
-                borderRadius : 1,
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/tutors" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/tutors" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaChalkboardTeacher className="text-white" />
+                <Badge count={notifications.tutors} />
               </ListItemIcon>
               <ListItemText primary="Tutors" />
             </ListItemButton>
@@ -164,16 +181,17 @@ const AdminAside = () => {
             <ListItemButton
               onClick={() => handleNavigation("/admin/tutorapplications")}
               sx={{
-                borderRadius : 1,
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/tutorapplications" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/tutorapplications" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaChalkboardTeacher className="text-white" />
+                <Badge count={notifications.applications} />
               </ListItemIcon>
               <ListItemText primary="Tutor Applications" />
             </ListItemButton>
@@ -181,33 +199,35 @@ const AdminAside = () => {
             <ListItemButton
               onClick={() => handleNavigation("/admin/courses")}
               sx={{
-                borderRadius : 1,
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/courses" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/courses" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaBook className="text-white" />
+                <Badge count={notifications.courses} />
               </ListItemIcon>
-              <ListItemText primary="Course List" />
+              <ListItemText primary="Courses" />
             </ListItemButton>
 
             <ListItemButton
               onClick={() => handleNavigation("/admin/wallet")}
               sx={{
-                borderRadius : 1,
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/wallet" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/wallet" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaWallet className="text-white" />
+                <Badge count={notifications.wallet} />
               </ListItemIcon>
               <ListItemText primary="Wallet" />
             </ListItemButton>
@@ -215,27 +235,28 @@ const AdminAside = () => {
             <ListItemButton
               onClick={() => handleNavigation("/admin/reports")}
               sx={{
-                borderRadius : 1,
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/reports" ? "#374151" : "transparent", // bg-gray-700
+                position: "relative",
+                backgroundColor: activeItem === "/admin/reports" ? "#374151" : "transparent",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
               <ListItemIcon sx={{ minWidth: 32 }}>
                 <FaFlag className="text-white" />
+                <Badge count={notifications.reports} />
               </ListItemIcon>
-              <ListItemText primary="Report" />
+              <ListItemText primary="Reports" />
             </ListItemButton>
 
             <ListItemButton
               onClick={() => handleNavigation("/admin/logout")}
               sx={{
                 paddingLeft: 1,
-                backgroundColor: activeItem === "/admin/logout" ? "#374151" : "transparent", // bg-gray-700
+                backgroundColor: "#374151",
                 "&:hover": {
-                  backgroundColor: "#4B5563", // bg-gray-600
+                  backgroundColor: "#4B5563",
                 },
               }}
             >
@@ -245,49 +266,14 @@ const AdminAside = () => {
               <ListItemText primary="Logout" />
             </ListItemButton>
           </List>
-          <button
-            onClick={toggleSidebar}
-            className="text-white mt-auto focus:outline-none"
-          >
-            {isCollapsed ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6 mx-auto"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 12h-15"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6 mx-auto"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
-            )}
-          </button>
         </aside>
+
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleLogout}
+        />
       </div>
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleLogout}
-      />
     </div>
   );
 };

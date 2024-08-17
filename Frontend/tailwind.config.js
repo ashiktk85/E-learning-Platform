@@ -51,6 +51,12 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        spotify: {
+          white: "#FFFFFF",
+          black: "#191414",
+          gray: "#B3B3B3",
+          green: "#1DB954",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

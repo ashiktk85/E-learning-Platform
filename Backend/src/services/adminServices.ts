@@ -1,4 +1,6 @@
 import { AwsConfig } from "../config/awsFileConfigs";
+import { createTutorId, createUniquePass } from "../helper/tutorCredentials";
+import sendTutorCredential from "../helper/tutorLoginMail";
 import userModel from "../models/userModel";
 import { TutorRepositary } from "../repository/tutorRepositary";
 import { UserRepositary } from "../repository/userRepository";
@@ -146,11 +148,45 @@ export class AdminService {
             const data = await TutorRepositary.getOneApplication(id)
 
 
-          
+            const user = await UserRepositary.existUser(data.email)
 
+            const firstName = user?.firstName;
+
+            const uniqueId = createTutorId(firstName as string)
+
+            const uniquePass = createUniquePass()
+
+
+            console.log(uniqueId , uniquePass);
+
+            sendTutorCredential(data.email as string , uniqueId as string, uniquePass as string)
+
+            const updateUser = await UserRepositary.addTutorToUserModel(data.email as string)
+            
+            return updateUser;
             
         } catch (error : any) {
             console.error("Error during admin accepting  applicant services:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async checkStatus(email : string) : Promise <boolean | void> {
+        try {
+            
+            const response = await UserRepositary.existUser(email)
+
+            console.log(response, "checking status");
+
+            if(response?.tutor === true) {
+                return true
+            } else {
+                return false
+            }
+            
+
+        } catch (error : any) {
+            console.error("Error during admin checking tutor status:", error.message);
             throw new Error(error.message);
         }
     }

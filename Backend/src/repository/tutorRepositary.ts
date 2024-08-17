@@ -28,7 +28,7 @@ export class TutorRepositary {
   static async getApplicationsRepo() : Promise<any | void> {
     try {
 
-      const applications = await TutorApplication.find({}
+      const applications = await TutorApplication.find({status : 'pending'}
         , {
           _id : 0,
           applicationId : 1,
@@ -40,7 +40,8 @@ export class TutorRepositary {
           degree : 1,
           fieldOfStudy : 1,
           institution : 1,
-          graduationYear : 1
+          graduationYear : 1,
+          status : 1
         }
       )
 
