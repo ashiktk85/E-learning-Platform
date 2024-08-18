@@ -143,11 +143,15 @@ const LoginForm: React.FC = () => {
     },
   });
 
+  const goToHome = () => {
+    navigate('/')
+  }
+
   return (
     <div className="w-full h-screen flex">
       <Toaster position="top-center" richColors />
 
-      {/* Left Image Section */}
+    
       <div className="relative w-1/2 h-full flex flex-col">
         <div className="absolute top-[20%] left-[10%] flex flex-col">
           <h1 className="text-4xl text-white font-bold my-4">
@@ -164,9 +168,9 @@ const LoginForm: React.FC = () => {
         />
       </div>
 
-      {/* Right Form Section */}
+
       <div className="w-1/2 h-full bg-[#f5f5f5] flex flex-col justify-center pl-40">
-        <h1 className="text-3xl text-green-500 font-bold mb-10">Learn Sphere</h1>
+        <h1 className="text-3xl text-green-500 font-bold mb-10 cursor-pointer" onClick={goToHome}>Learn Sphere</h1>
 
         <div className="w-full max-w-[450px]">
           <div className="w-full flex flex-col mb-8">
@@ -224,7 +228,7 @@ const LoginForm: React.FC = () => {
                 Log in
               </button>
 
-              <Link to="/register">
+              <Link to="/signup">
                 <button
                   type="button"
                   className="w-full text-[#060606] my-2 bg-white border-[1.5px] border-black/40 rounded-md p-4 text-center flex items-center justify-center"

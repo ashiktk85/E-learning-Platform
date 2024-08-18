@@ -1,9 +1,12 @@
 import UserModel, { IUser } from "../models/userModel";
+
 import { MongoServerError } from "mongodb";
 import bcrypt from "bcrypt";
 import { error } from "console";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel";
+import sendTutorCredential from "../helper/tutorLoginMail";
+import TutorApplication from "../models/applicationModel";
 
 export class UserRepositary {
   
@@ -54,7 +57,8 @@ export class UserRepositary {
           phone: 1,
           passwordHash: 1,
           isBlocked: 1,
-          tutor : 1
+          tutor : 1,
+          
         }
       );
 
@@ -91,6 +95,9 @@ export class UserRepositary {
         userId: user.userId,
         phone: user.phone,
         isBlocked: user.isBlocked,
+        tutor : user.tutor,
+        
+
       };
 
       return { userInfo, accessToken, refreshToken };
@@ -174,31 +181,132 @@ export class UserRepositary {
     }
   }
 
-  static async addTutorToUserModel( email : string) : Promise <any | void> {
+  static async addTutorToUserModel(
+    email: string,
+    uniqueId: string,
+    uniquePass: any
+  ): Promise<any | void> {
     try {
-      
-      const updateUser = await UserModel.findOneAndUpdate(
-        { email : email },
-        {$set : {
-          tutor : true
-        }}, 
+      const user = await UserModel.findOneAndUpdate(
+        { email: email },
         {
-          _id : 0,
+          $set: {
+            tutor: true,
+            tutorCredentials: {
+              tutorId: uniqueId,
+              passwordHash: uniquePass,
+            },
+          },
+        },
+        {
+          new: true, 
+          projection: {
+            _id: 0,
+          userId: 1,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          phone: 1,
+          passwordHash: 1,
+          isBlocked: 1,
           tutor : 1,
-          email : 1,
-          firstName : 1,
-          lastName : 1,
-          isBlocked : 1
+          
+          },
+        }
+      );
+  
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      const userInfo = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userId: user.userId,
+        phone: user.phone,
+        isBlocked: user.isBlocked,
+        tutor: user.tutor,
+        tutorCredential: user.tutorCredentials,
+        
+      };
+
+      await TutorApplication.findOneAndUpdate({email : email} ,
+        {
+          $set : {
+            status : 'accepted'
+          }
         }
       )
-
-    
-
-      return updateUser;
-
-    } catch ( err : any) {
-      
+  
+      return userInfo;
+    } catch (err: any) {
+      console.error('Error in addTutorToUserModel:', err.message);
+      throw err; 
     }
   }
+
+  static async verifyTutor(applicationId :string , passcode :any) {
+    try {
+      
+      const user = await UserModel.findOne({ 'tutorCredentials.tutorId': applicationId },
+        {
+          _id: 0,
+          userId: 1,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          phone: 1,
+          passwordHash: 1,
+          isBlocked: 1,
+          tutor : 1,
+          tutorCredentials : 1
+        }
+      );
+
+      if(!user) {
+        throw new Error("Tutor dosen't exist.")
+      }
+
+      
+
+      // const mismatch = await bcrypt.compare(passcode, user.tutorCredentials?.passwordHash as any)
+      // console.log(passcode, user.tutorCredentials?.passwordHash);
+      
+
+      // console.log("type of passcode" , typeof(passcode) , "type of hash" , typeof(user.tutorCredentials?.passwordHash));
+      
+
+      // console.log(mismatch, "pass");
+      
+
+      // if(!mismatch) {
+      //   throw new Error("Wrong passcode")
+      // }
+
+      if(passcode !== user.tutorCredentials?.passwordHash) {
+        throw new Error("Wrong passcode")
+      }
+
+      const userInfo = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userId: user.userId,
+        phone: user.phone,
+        isBlocked: user.isBlocked,
+        tutor : user.tutor,
+        tutorCredential: user.tutorCredentials,
+      };
+
+      return userInfo
+
+    } catch (error : any) {
+      console.log("Error in verifying tutor login in tutor repo", error.message);
+      
+      throw new Error(error.message);
+    }
+  }
+
   
 }

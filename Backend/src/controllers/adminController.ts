@@ -85,7 +85,8 @@ export class AdminController {
             const { id } = req.params
             console.log("id " , id);
             const response  = await this.adminService.acceptApplicaiton(id)
-
+            console.log(response , "contoleer");
+                
             if(response) {
                 res.status(200).json(response)
             }
@@ -100,7 +101,7 @@ export class AdminController {
             const { email } = req.params
             console.log("id " , email);
             const response  = await this.adminService.checkStatus(email)
-            console.log(response , "controller");
+            // console.log(response , "controller");
             
             if(response) {
                 res.status(200).json(response)

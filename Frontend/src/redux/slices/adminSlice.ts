@@ -43,6 +43,8 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string || 'Login failed'; 
       });
+
+      
   },
 });
 

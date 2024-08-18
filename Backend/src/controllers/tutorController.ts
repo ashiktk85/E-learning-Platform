@@ -37,4 +37,23 @@ export class TutorContoller {
             res.status(500).send({ success: false, message: "Internal Server Error" });
         }
     }
+
+    async verifyLogin(req : Request , res : Response) : Promise <any | void> {
+        try {
+            
+            const {applicationId , passcode} = req.body;
+
+            console.log(applicationId , passcode);
+            const response = await this.tutorServices.verifyLoginService(applicationId as string, passcode as string)
+
+            if(response) {
+                res.status(200).json(response)
+            }
+            
+
+        } catch (error : any) {
+            console.error(error.message);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }

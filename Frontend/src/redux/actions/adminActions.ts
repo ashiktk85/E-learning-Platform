@@ -36,6 +36,23 @@ export const updateUserBlockStatus = createAsyncThunk(
     }
   );
 
+  export const acceptApplicaitonThunk = createAsyncThunk(
+    'user/tutorIsTrue',
+    async (applicationId: any, thunkAPI) => {
+      try {
+        
+        
+        const response = await axios.post(`${url}/admin/acceptapplication/${applicationId}`);
+        console.log("thunk ", response.data);
+        
+        return response.data;
+      } catch (err: any) {
+        console.error(err);
+        return thunkAPI.rejectWithValue(err.response?.data || "Something went wrong");
+      }
+    }
+  );
+
   export const logout = createAsyncThunk<void, void>(
     'admin/logout',
     async (_, { dispatch }) => {

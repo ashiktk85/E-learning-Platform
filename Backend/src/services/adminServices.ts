@@ -4,6 +4,7 @@ import sendTutorCredential from "../helper/tutorLoginMail";
 import userModel from "../models/userModel";
 import { TutorRepositary } from "../repository/tutorRepositary";
 import { UserRepositary } from "../repository/userRepository";
+import bcrypt from "bcrypt";
 
 require('dotenv').config();
 
@@ -157,11 +158,17 @@ export class AdminService {
             const uniquePass = createUniquePass()
 
 
-            console.log(uniqueId , uniquePass);
+           
 
-            sendTutorCredential(data.email as string , uniqueId as string, uniquePass as string)
+            // sendTutorCredential(data.email as string , uniqueId as string, uniquePass as string)
+            // const saltRounds: number = 10;
+            // const hashedPassword =await bcrypt.hash(uniquePass as string, saltRounds)
 
-            const updateUser = await UserRepositary.addTutorToUserModel(data.email as string)
+            console.log(uniquePass , data.email , uniqueId);
+            
+
+            const updateUser = await UserRepositary.addTutorToUserModel(data.email as string , uniqueId as string, uniquePass as any)
+            console.log(updateUser , "services");
             
             return updateUser;
             

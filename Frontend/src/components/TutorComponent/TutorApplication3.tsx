@@ -36,6 +36,7 @@ interface TutorApplicationSubmitProps {
 const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previousStep, formData }) => {
 
     const data: any = useSelector((state: RootState) => state.user);
+    console.log("store ",data.userInfo.email)
 
     const navigate = useNavigate()
     const handleSubmit = async (e: React.FormEvent) => {
@@ -67,7 +68,7 @@ const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previou
             }
 
             toast.success("Form submitted.")
-            formDataToSend.append("email" , data.userInfo.email)
+            formDataToSend.append("email" , data.userInfo?.email)
             
             console.log("ljbkjvkjvjhvkjvbjh",formDataToSend)
 

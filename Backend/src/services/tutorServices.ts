@@ -6,6 +6,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { AwsConfig } from "../config/awsFileConfigs";
 
 import * as crypto from 'crypto';
+import { UserRepositary } from "../repository/userRepository";
 
 require('dotenv').config();
 
@@ -75,6 +76,19 @@ export class TutorServices {
 
         const fileUrl = uniqueName;
         return fileUrl;
+    }
+
+    async verifyLoginService(applicationId : string , passcode : string) : Promise<any | void> {
+        try {
+            
+            const response = await UserRepositary.verifyTutor(applicationId , passcode)
+
+           return response;
+
+        } catch (error : any) {
+            console.error("Error verifying tutor login in services", error.message);
+            throw new Error(error.message);
+        }
     }
 }
 

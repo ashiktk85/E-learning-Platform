@@ -28,7 +28,7 @@ export class TutorRepositary {
   static async getApplicationsRepo() : Promise<any | void> {
     try {
 
-      const applications = await TutorApplication.find({status : 'pending'}
+      const applications = await TutorApplication.find({}
         , {
           _id : 0,
           applicationId : 1,

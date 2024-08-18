@@ -12,20 +12,30 @@ import {
 import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { acceptApplicaitonThunk } from "../../redux/actions/adminActions";
 
 const url = 'http://localhost:7000';
 
 const ApplicantDetails = () => {
+ 
+  
+ 
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmModal, setConfirmationModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [isTutor, setIsTutor] = useState<boolean | null>(null); 
+  const [isTutor, setIsTutor] = useState<boolean | any>(); 
   const { applicationData } = location.state;
 
-  useEffect(() => {
 
+ 
+
+ 
+  useEffect(() => {
     const checkTutorStatus = async () => {
       try {
         const response = await axios.get(`${url}/admin/checktutorstatus/${applicationData.email}`);
@@ -64,19 +74,21 @@ const ApplicantDetails = () => {
   const acceptApplication = async () => {
     try {
       const applicationId = applicationData.applicationId;
-      const response = await axios.post(`${url}/admin/acceptapplication/${applicationId}`);
-      const tutorStatus = response?.data?.tutor;
-      setIsTutor(tutorStatus);
-      toast.success("Tutor Applicant Approved.");
+      alert(applicationId);
+      const response = await dispatch(acceptApplicaitonThunk(applicationId));
       setConfirmationModal(false);
+      if (response) {
+        toast.success("Tutor Applicant Approved.");
+        setTimeout(() => {
+          navigate("/admin/tutorapplications");
+        }, 1500);
+      }
+      
     } catch (error: any) {
       console.error(error);
       toast.error("Failed to accept application. Please try again.");
     }
   };
-
-  
-  
 
   return (
     <div className="grid grid-cols-12 mb-32 font-poppins">
@@ -231,16 +243,16 @@ const ApplicantDetails = () => {
           </ModalBody>
           <ModalFooter className="flex justify-center">
             <Button
-              className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"
               onClick={acceptApplication}
+              className="bg-green-500 hover:bg-green-700 text-white font-semibold rounded-md"
             >
               Confirm
             </Button>
             <Button
-              className="h-12 w-24 bg-gray-400 mt-10 rounded-md hover:bg-gray-600 mr-10 text-white font-semibold"
               onClick={closeConfirmationModal}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md ml-4"
             >
-              Close
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>

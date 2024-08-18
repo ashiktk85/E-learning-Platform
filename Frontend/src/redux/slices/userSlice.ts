@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { login, updateUserInfo } from '../actions/userAction';
-import { updateUserBlockStatus } from '../actions/adminActions';
+import { acceptApplicaitonThunk, updateUserBlockStatus } from '../actions/adminActions';
 import { toast } from 'sonner';
 
 interface User {
@@ -8,6 +8,9 @@ interface User {
   firstName: string;
   email: string;
   isBlocked: boolean;
+  tutor ?: boolean;
+  tutorCredential ?: {};
+
 }
 
 interface UserState {
@@ -73,7 +76,6 @@ const userSlice = createSlice({
         } else {
           state.userInfo = action.payload;
           state.loading = false;
-          
         }
       })
       .addCase(updateUserInfo.rejected, (state, action) => {
@@ -95,7 +97,15 @@ const userSlice = createSlice({
       .addCase(updateUserBlockStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+
+      .addCase(acceptApplicaitonThunk.fulfilled, (state, action: PayloadAction<User>) => {
+        console.log(action.payload, "action payload userinfo");
+        
+        state.userInfo = action.payload;
+        localStorage.setItem('userInfo', JSON.stringify(action.payload));
+    })
+    
   },
 });
 

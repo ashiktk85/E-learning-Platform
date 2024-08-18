@@ -6,7 +6,7 @@ import { Toaster, toast } from 'sonner'
 
 const SignUp : React.FC = () => {
     return (
-        <div className='h-screen bg-#dee1ea-900'>
+        <div className='h-screen bg-[#f5f5f5]'>
            <Toaster position="top-center" richColors  />
             
           <SignupForm />
