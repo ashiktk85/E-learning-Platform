@@ -90,5 +90,28 @@ export class TutorServices {
             throw new Error(error.message);
         }
     }
+
+    async getApplicationDataService(email : string) : Promise<any> {
+        try {
+
+            const response = await UserRepositary.getApplicantDataRepo(email as string)
+
+            return response;
+            
+        } catch (error : any) {
+            console.error("Error getting applicant data for tutor profile in services", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async editProfileService(data : any) {
+        try {
+            const res = await TutorRepositary.editProfileRepo(data as any)
+            return res;
+        } catch (error :any) {
+            console.error("Error getting applicant data for tutor profile in services", error.message);
+            throw new Error(error.message);
+        }
+    }
 }
 

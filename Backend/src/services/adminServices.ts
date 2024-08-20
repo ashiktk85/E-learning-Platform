@@ -1,9 +1,11 @@
 import { AwsConfig } from "../config/awsFileConfigs";
 import { createTutorId, createUniquePass } from "../helper/tutorCredentials";
 import sendTutorCredential from "../helper/tutorLoginMail";
+import Category from "../models/categoryModel";
 import userModel from "../models/userModel";
 import { TutorRepositary } from "../repository/tutorRepositary";
 import { UserRepositary } from "../repository/userRepository";
+import { adminRepository } from "../repository/adminRepository";
 import bcrypt from "bcrypt";
 
 require('dotenv').config();
@@ -194,6 +196,29 @@ export class AdminService {
 
         } catch (error : any) {
             console.error("Error during admin checking tutor status:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async createCategoryService(categoryName : string, description :string) : Promise<any> {
+        try {
+
+            const response = await adminRepository.createCategory(categoryName as string ,description as string) 
+            return response;
+        } catch (error : any) {
+            console.error("Error during admin creating category in service:", error.message);
+            throw(error.message);
+        }
+    }
+
+    async getCategoriesService() : Promise<any> {
+        try {
+            
+            const response = await adminRepository.getCategoriesRepo()
+            return response;
+
+        } catch (error : any) {
+            console.error("Error during admin getting categories in service:", error.message);
             throw new Error(error.message);
         }
     }

@@ -14,7 +14,9 @@ const AdminNewTutorApplications = () => {
           <Search />
           </div>
          
-          <ApplicationList />
+          <ApplicationList setApplicationCount={function (count: number): void {
+            throw new Error('Function not implemented.');
+          } } />
           
         </div>
       </div>

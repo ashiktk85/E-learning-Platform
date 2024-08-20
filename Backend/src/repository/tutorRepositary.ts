@@ -1,6 +1,9 @@
 import TutorApplication, {
   ITutorApplication,
 } from "../models/applicationModel";
+import TutorProfile from "../models/tutorProfileModel";
+
+import userModel from "../models/userModel";
 
 export class TutorRepositary {
 
@@ -14,6 +17,25 @@ export class TutorRepositary {
         ...data,
         socialLinks: typeof data.socialLinks === 'string' ? JSON.parse(data.socialLinks) : data.socialLinks
       };
+
+      const user = await userModel.findOne({email : data.email})
+
+       
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const updateData = {
+        userId: user._id, 
+        bio: data.subjectsOfExpertise,
+        education: data.degree, 
+        experience: data.experience,
+        email : user.email,
+        role : data.tutorRole
+      };
+
+      const profileCreation =  new TutorProfile(updateData)
+      profileCreation.save()
   
       const tutorApplication = new TutorApplication(formattedData);
 
@@ -67,6 +89,43 @@ export class TutorRepositary {
       
     } catch (error : any) {
       console.error("Error getting one tutor applications repo:", error);
+      throw error;
+    }
+  }
+
+  static async editProfileRepo(data : any) {
+    try {
+      const { email, values } = data;
+
+      const user = await userModel.findOne({ email: email });
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      const updateData = {
+        userId: user._id, 
+        bio: values.bio,
+        education: values.degree, 
+        country: values.country,
+        language: values.language,
+        experience: values.experience,
+        email : email,
+        role : values.role
+      };
+  
+     
+      const updatedProfile = await TutorProfile.findOneAndUpdate(
+        { userId: user._id }, 
+        { $set: updateData }, 
+        { new: true, upsert: true } 
+      );
+      console.log('Profile updated or created:', updatedProfile);
+      return true;
+      
+      
+    } catch (error : any) {
+      console.error("Error editing tutor profile repo:", error);
       throw error;
     }
   }

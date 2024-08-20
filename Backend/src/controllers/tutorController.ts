@@ -48,9 +48,36 @@ export class TutorContoller {
 
             if(response) {
                 res.status(200).json(response)
-            }
-            
+            }  
+        } catch (error : any) {
+            console.error(error.message);
+            res.status(500).json({ message: error.message });
+        }
+    }
 
+    async getTutorDetails(req : Request, res : Response) : Promise <any > {
+        try {
+
+            const { email } = req.params;
+            const response = await this.tutorServices.getApplicationDataService(email as string)
+
+            res.status(200).json(response)
+            
+        } catch (error : any) {
+            console.error(error.message);
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async editProfile (req :Request , res : Response) :  Promise<any | void>{
+        try {
+            
+            const data = req.body;
+            console.log(data);
+            
+            const response = await this.tutorServices.editProfileService(data as any)
+
+            res.status(200).json(response)
         } catch (error : any) {
             console.error(error.message);
             res.status(500).json({ message: error.message });

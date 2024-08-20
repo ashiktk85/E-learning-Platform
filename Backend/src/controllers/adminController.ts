@@ -84,13 +84,10 @@ export class AdminController {
         try {
             const { id } = req.params
             console.log("id " , id);
-            const response  = await this.adminService.acceptApplicaiton(id)
-            console.log(response , "contoleer");
-                
+            const response  = await this.adminService.acceptApplicaiton(id)       
             if(response) {
                 res.status(200).json(response)
-            }
-            
+            }   
         } catch (error) {
             
         }
@@ -101,14 +98,34 @@ export class AdminController {
             const { email } = req.params
             console.log("id " , email);
             const response  = await this.adminService.checkStatus(email)
-            // console.log(response , "controller");
-            
+            if(response) {
+                res.status(200).json(response)
+            }      
+        } catch (error :any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async createCategory(req : Request , res :Response) : Promise<any> {
+        try {
+            const {categoryName , description} = req.body
+            const response = await this.adminService.createCategoryService(categoryName as string , description as string)
             if(response) {
                 res.status(200).json(response)
             }
-            
-        } catch (error) {
-            
+        } catch ( error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async getCategories(req : Request , res : Response) : Promise<any> {
+        try {
+            const response = await this.adminService.getCategoriesService()
+             if(response) {
+                res.status(200).json(response)
+            }
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
         }
     }
 

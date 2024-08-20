@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModel";
 import sendTutorCredential from "../helper/tutorLoginMail";
 import TutorApplication from "../models/applicationModel";
+import TutorProfile from "../models/tutorProfileModel";
 
 export class UserRepositary {
   
@@ -268,8 +269,6 @@ export class UserRepositary {
         throw new Error("Tutor dosen't exist.")
       }
 
-      
-
       // const mismatch = await bcrypt.compare(passcode, user.tutorCredentials?.passwordHash as any)
       // console.log(passcode, user.tutorCredentials?.passwordHash);
       
@@ -299,14 +298,34 @@ export class UserRepositary {
         tutorCredential: user.tutorCredentials,
       };
 
-      return userInfo
+      return userInfo;
 
     } catch (error : any) {
       console.log("Error in verifying tutor login in tutor repo", error.message);
-      
       throw new Error(error.message);
     }
   }
-
   
+
+  static  async getApplicantDataRepo (email : string) {
+    try { 
+      const tutorData = await TutorProfile.findOne({email : email},
+        {
+          _id : 0,
+          applicationId : 1,
+          tutorRole :1,
+          education : 1,
+          experience :1,
+          bio : 1,
+          role : 1,
+          language : 1,
+          country : 1
+        }
+      )
+      return tutorData;
+    } catch (error : any) {
+      console.log("Error in getting applicant data user repo", error.message); 
+      throw new Error(error.message);
+    }
+  }  
 }

@@ -80,7 +80,6 @@ const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previou
             }
         );
 
-         
             console.log('Form submitted successfully:', response.data.message);
 
             if(response.data.message === "Application received") {

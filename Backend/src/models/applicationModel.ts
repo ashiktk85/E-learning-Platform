@@ -22,7 +22,7 @@ export interface ITutorApplication extends Document {
   subjectsOfExpertise: string;
   socialLinks: Map<string, string>;
   files: FileUrl[];
-  status: 'pending' | 'accepted' | 'rejected'; // Status field with possible values
+  status: 'pending' | 'accepted' | 'rejected'; 
 }
 
 const tutorApplicationSchema = new Schema<ITutorApplication>(

@@ -28,8 +28,11 @@ const ApplicantDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmModal, setConfirmationModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [isTutor, setIsTutor] = useState<boolean | any>(); 
+  const [isTutor, setIsTutor] = useState<boolean>(); 
   const { applicationData } = location.state;
+
+  console.log(isTutor);
+  
 
 
  
@@ -74,7 +77,7 @@ const ApplicantDetails = () => {
   const acceptApplication = async () => {
     try {
       const applicationId = applicationData.applicationId;
-      alert(applicationId);
+      // alert(applicationId);
       const response = await dispatch(acceptApplicaitonThunk(applicationId));
       setConfirmationModal(false);
       if (response) {

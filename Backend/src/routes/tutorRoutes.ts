@@ -23,5 +23,7 @@ const multerFields = [
 
 route.post("/tutorapplication",upload.fields(multerFields),tutorController.tutorApplication.bind(tutorController));
 route.post('/login', tutorController.verifyLogin.bind(tutorController))
+route.get('/applicationdata/:email' , tutorController.getTutorDetails.bind(tutorController))
+route.post('/editprofile' , tutorController.editProfile.bind(tutorController))
 
 export default route;

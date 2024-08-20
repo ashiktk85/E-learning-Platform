@@ -115,10 +115,10 @@ const LoginForm: React.FC = () => {
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string()
+      email: Yup.string().trim()
         .email("Invalid email address")
         .required("Email is required"),
-      password: Yup.string()
+      password: Yup.string().trim()
         .min(8, "Password must be at least 8 characters")
         .required("Password is required"),
     }),

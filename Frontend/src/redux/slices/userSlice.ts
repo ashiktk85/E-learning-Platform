@@ -2,10 +2,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { login, updateUserInfo } from '../actions/userAction';
 import { acceptApplicaitonThunk, updateUserBlockStatus } from '../actions/adminActions';
 import { toast } from 'sonner';
+import { SrvRecord } from 'dns';
 
 interface User {
   userId: string;
   firstName: string;
+  lastName : String;
+  phone : string;
   email: string;
   isBlocked: boolean;
   tutor ?: boolean;
