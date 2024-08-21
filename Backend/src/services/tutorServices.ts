@@ -60,6 +60,58 @@ export class TutorServices {
         await TutorRepositary.saveApplication(combinedData as any);
     }
 
+    async createCourseService(files: any, courseData: any, email: string) {
+        try {
+            const bucketName = "learn-sphere";
+            const fileUrls: { type: string, url: string }[] = [];
+            let courseId = uuidv4();
+    
+            // Convert courseData to a regular JavaScript object
+            courseData = Object.assign({}, courseData);
+    
+            console.log(courseData, "course");
+    
+            courseId = courseId + `-${courseData.courseName}`;
+    
+            // Generate folder path using the tutor's email
+            const tutorFolderPath = `tutors/${email}/courses/${courseId}/`;
+    
+            // Upload videos for each section
+            for (const file of files) {
+                if (file.fieldname.startsWith('sections')) {
+                    let sectionIndex = file.fieldname.match(/sections\[(\d+)\]/)?.[1];
+                    sectionIndex = sectionIndex + `-${file.originalname}`;
+                    const videoIndex = file.fieldname.match(/videos\[(\d+)\]/)?.[1];
+    
+                    const folderPath = `${tutorFolderPath}sections/${sectionIndex}/videos/`;
+    
+                    const url = await this.uploadFileToS3(bucketName, folderPath, file);
+                    fileUrls.push({ type: 'video', url });
+                } else if (file.fieldname === 'thumbnail') {
+                    const folderPath = `${tutorFolderPath}thumbnail/`;
+    
+                    const url = await this.uploadFileToS3(bucketName, folderPath, file);
+                    fileUrls.push({ type: 'thumbnail', url });
+                }
+            }
+    
+            // Add the file URLs to course data and save the course
+            const combinedData = {
+                courseId,
+                ...courseData,
+                files: fileUrls,
+            };
+    
+            // Save the course data to the repository
+            const res = await TutorRepositary.saveCourse(combinedData as any, email as string);
+            return  res;
+        } catch (error) {
+            console.error('Error creating course:', error);
+        }
+    }
+    
+    
+
     private async uploadFileToS3(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
         
         const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname;
@@ -113,5 +165,24 @@ export class TutorServices {
             throw new Error(error.message);
         }
     }
+
+    async getCoursesSerice (email : string) {
+        try {
+
+            const user =  await UserRepositary.existUser(email)
+
+            if(!user) {
+                throw new Error("User doesn't exist");
+            }
+
+            const tutorCourses = await TutorRepositary.getTutorCourses(email)
+            
+        } catch (error : any) {
+            console.error("Error getting all tutor courses in services", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    
 }
 

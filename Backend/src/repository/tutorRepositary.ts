@@ -1,9 +1,27 @@
 import TutorApplication, {
   ITutorApplication,
 } from "../models/applicationModel";
+import { Course , Section , Video } from "../models/courseModel";
 import TutorProfile from "../models/tutorProfileModel";
 
 import userModel from "../models/userModel";
+
+interface CourseData {
+  courseId: string;
+  courseName: string;
+  description: string;
+  language: string;
+  tags: string[];
+  selectedCategory: string;
+  sections: {
+    name: string;
+    description: string;
+    videos: { title: string; videoUrl: string }[];
+  }[];
+  additionalDetail1: string;
+  price: string;
+  files: { type: string; url: string }[];
+}
 
 export class TutorRepositary {
 
@@ -129,4 +147,72 @@ export class TutorRepositary {
       throw error;
     }
   }
+
+  static async saveCourse(data: CourseData, email: string) {
+    try {
+     
+      const videoFiles = data.files.filter((file) => file.type === 'video');
+      const thumbnail = data.files.find((file) => file.type === 'thumbnail')?.url || '';
+
+      console.log(data.sections , "sections");
+      
+      const sections = await Promise.all(
+        data.sections.map(async (sectionData, sectionIndex) => {
+          const videos = await Promise.all(
+            sectionData.videos.map(async (video, videoIndex) => {
+              
+              const videoDoc = new Video({
+                title: video.title || `Video ${videoIndex + 1}`, 
+                description: sectionData.description,
+                videoUrl: videoFiles[videoIndex]?.url || '', 
+              });
+              await videoDoc.save();
+              return videoDoc._id;
+            })
+          );
+
+          const section = new Section({
+            title: sectionData.name,
+            description: sectionData.description,
+            videos: videos,
+          });
+          await section.save();
+          return section._id;
+        })
+      );
+
+      
+      const newCourse = new Course({
+        courseId: data.courseId,
+        email: email,
+        name: data.courseName,
+        description: data.description,
+        sections: sections,
+        tags: data.tags,
+        language: data.language,
+        thumbnail: thumbnail,
+        category : data.courseName
+      });
+
+      await newCourse.save();
+      return true;
+    } catch (error: any) {
+      console.error("Error creating course:", error);
+      throw error;
+    }
+  }
+
+  static async getTutorCourses(email : string) {
+    try {
+
+      const courses = await Course.find({email : email})  
+      console.log(courses , "tutor courses");
+      
+      
+    } catch (error : any) {
+      console.error("Error in getting tutor  course:", error);
+      throw error;
+    }
+  }
 }
+

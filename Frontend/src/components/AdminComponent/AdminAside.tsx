@@ -58,7 +58,7 @@ const AdminAside = () => {
     { icon: <FaFlag />, label: "Reports", path: "/admin/reports" },
   ];
 
-  // Set active item based on the current path
+
   const getActiveItemKey = () => {
     const currentPath = location.pathname;
     const activeItem = menuItems.findIndex(item => item.path === currentPath);

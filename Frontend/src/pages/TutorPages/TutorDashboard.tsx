@@ -1,36 +1,63 @@
-import React, { useState } from "react";
-import { FaHome, FaBook, FaPlusCircle, FaSignOutAlt } from "react-icons/fa";
-import { IoPersonSharp } from "react-icons/io5";
-import TutorMainPage from "../../components/TutorComponent/TutorMainPage";
-import TutorProfile from "../../components/TutorComponent/TutorProfile";
-import CourseCreation1 from "../../components/TutorComponent/CourseCreation1";
+import React, { useState } from 'react';
+import { FaHome, FaBook, FaPlusCircle, FaSignOutAlt } from 'react-icons/fa';
+import { IoPersonSharp } from 'react-icons/io5';
+import TutorMainPage from '../../components/TutorComponent/TutorMainPage';
+import TutorProfile from '../../components/TutorComponent/TutorProfile';
+import CourseCreation1 from '../../components/TutorComponent/CourseCreation1';
+import AddSection from '../../components/TutorComponent/CourseAddsection';
+import { useCourseContext } from "../../context/courseContext";
+import MoreDetails from '../../components/TutorComponent/MoreDetails';
+import CourseList from '../../components/TutorComponent/CourseList';
 
-const TutorDashboard = () => {
-  const [selectedItem, setSelectedItem] = useState(() => {
-    return sessionStorage.getItem("selectedItem") || "Dashboard";
-  });
-
-  const menuItems = [
-    { name: "Dashboard", icon: <FaHome size={24} />, Component: <TutorMainPage /> },
-    { name: "Profile", icon: <IoPersonSharp size={24} />, Component: <TutorProfile /> },
-    { name: "Courses", icon: <FaBook size={24} />, Component: <div>Courses Content</div> },
-    { name: "Add Course", icon: <FaPlusCircle size={24} />, Component: <CourseCreation1 /> },
-    { name: "Logout", icon: <FaSignOutAlt size={24} /> },
-  ];
+const TutorDashboard: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState<string>(() => sessionStorage.getItem("selectedItem") || "Dashboard");
+  const [currentStep, setCurrentStep] = useState<string>("Dashboard"); 
+  const { courseData } = useCourseContext();
 
   const handleItemClick = (itemName: string) => {
     setSelectedItem(itemName);
     sessionStorage.setItem("selectedItem", itemName);
+
+    if (itemName === "Add Course") {
+      setCurrentStep("Add Section"); 
+    } else {
+      setCurrentStep(itemName);
+    }
+  };
+
+  const handleNext = (nextStep: string) => {
+    setCurrentStep(nextStep);
+  };
+
+  const menuItems = [
+    { name: "Dashboard", icon: <FaHome size={24} />, Component: <TutorMainPage /> },
+    { name: "Profile", icon: <IoPersonSharp size={24} />, Component: <TutorProfile /> },
+    { name: "Courses", icon: <FaBook size={24} />, Component: <CourseList onNext={handleNext} /> },
+    { name: "Add Course", icon: <FaPlusCircle size={24} />, Component: <CourseCreation1 onNext={handleNext} /> },
+    { name: "Logout", icon: <FaSignOutAlt size={24} /> },
+  ];
+
+  const getCurrentStepComponent = () => {
+    if (currentStep === "Add Section") {
+      return <AddSection onNext={handleNext} />;
+    }
+    if (currentStep === "More Details") {
+      return <MoreDetails onNext={handleNext}/>; 
+    }
+    return null;
   };
 
   const renderContent = () => {
+    if (currentStep === "Add Section" || currentStep === "More Details") {
+      return getCurrentStepComponent();
+    }
+    
     const selected = menuItems.find((item) => item.name === selectedItem);
     return selected?.Component || null;
   };
 
   return (
     <div className="min-h-screen w-full flex bg-gray-100 font-poppins gap-2">
-      {/* Sidebar */}
       <div className="bg-white flex-shrink-0 w-1/6 rounded-md shadow-lg flex flex-col">
         <h1 className="p-5 text-green-500 font-extrabold text-2xl">Learn Sphere</h1>
         <p className="pl-5 pt-6 font-medium text-xl">Overview</p>
@@ -44,6 +71,7 @@ const TutorDashboard = () => {
                   : ""
               }`}
               onClick={() => handleItemClick(item.name)}
+              aria-current={selectedItem === item.name ? "page" : undefined}
             >
               <div className="pt-1">{item.icon}</div>
               <p>{item.name}</p>
@@ -52,8 +80,7 @@ const TutorDashboard = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-green-300 flex-grow rounded-md shadow-lg p-10 flex flex-col">
+      <div className="bg-gray-50 flex-grow rounded-md shadow-lg p-10 flex flex-col">
         <div className="relative">
           <div className="absolute top-0 left-0 p-10">
             <h1 className="text-4xl text-white font-bold my-4 pl-10">Start your Learning Journey.</h1>
@@ -61,7 +88,7 @@ const TutorDashboard = () => {
           </div>
           <img
             src="https://images.pexels.com/photos/18069363/pexels-photo-18069363/free-photo-of-an-artist-s-illustration-of-artificial-intelligence-ai-this-image-depicts-how-ai-could-help-understand-ecosystems-and-identify-species-it-was-created-by-nidia-dias-as-part-of-the-visua.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt=""
+            alt="Illustration of AI"
             className="w-full h-40 rounded-lg object-cover"
           />
         </div>
@@ -69,9 +96,6 @@ const TutorDashboard = () => {
         <div className="h-[1px] w-full pl-10 pr-10 bg-gray-500"></div>
         <div className="flex-grow mt-5">{renderContent()}</div>
       </div>
-
-      {/* Right Sidebar */}
-      <div className="bg-white flex-shrink-0 w-1/6 rounded-md shadow-lg flex flex-col"></div>
     </div>
   );
 };
