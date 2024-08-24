@@ -31,6 +31,7 @@ const ProfilePage = () => {
   const handleLogout = () => {
 
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('userInfo')
 
     window.location.href = '/login';
   };

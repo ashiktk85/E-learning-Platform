@@ -15,13 +15,13 @@ const MoreDetails:React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
 
   const { courseData, setCourseData } = useCourseContext();
   const [additionalDetail1, setAdditionalDetail1] = useState("");
-  const [thumbnail, setThumbnail] = useState<File | null>(null); // Store file object
+  const [thumbnail, setThumbnail] = useState<File | null>(null); 
   const [price, setPrice] = useState<number | "">("");
   const [isFree, setIsFree] = useState<boolean>(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setThumbnail(e.target.files[0]); // Store the file object
+      setThumbnail(e.target.files[0]); 
     }
   };
 
@@ -49,19 +49,24 @@ const MoreDetails:React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
     console.log("More details added:", updatedData);
   
     try {
-      const response = await axios.post(`${url}/tutor/create-course/${userInfo?.email}`, updatedData ,
-         {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-            }
-      );
-      console.log('Course created successfully:', response.data);
-      if(response) {
-        toast.success("Course Added.")
+      
+      toast.success("Course Added.")
        
-        onNext("Courses")
-      }
+      setTimeout(async () => {
+      onNext("Courses")
+    }, 1500);
+
+        const response = await axios.post(`${url}/tutor/create-course/${userInfo?.email}`, updatedData ,
+          {
+                     headers: {
+                         'Content-Type': 'multipart/form-data',
+                     },
+             }
+       );
+       console.log('Course created successfully:', response.data);
+     
+      
+      
      
     } catch (error: any) {
       console.error('Error creating course:', error.message);

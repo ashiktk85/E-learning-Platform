@@ -8,25 +8,44 @@ import AddSection from '../../components/TutorComponent/CourseAddsection';
 import { useCourseContext } from "../../context/courseContext";
 import MoreDetails from '../../components/TutorComponent/MoreDetails';
 import CourseList from '../../components/TutorComponent/CourseList';
+import tutorAuth from '../../services/TutorChecker';
+import ConfirmModal from '../../components/common/TutorCommon/ConfirmModal';
+import { useNavigate } from 'react-router-dom';
 
 const TutorDashboard: React.FC = () => {
+  tutorAuth()
+
+  const navigae = useNavigate()
   const [selectedItem, setSelectedItem] = useState<string>(() => sessionStorage.getItem("selectedItem") || "Dashboard");
   const [currentStep, setCurrentStep] = useState<string>("Dashboard"); 
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
   const { courseData } = useCourseContext();
 
   const handleItemClick = (itemName: string) => {
-    setSelectedItem(itemName);
-    sessionStorage.setItem("selectedItem", itemName);
-
-    if (itemName === "Add Course") {
-      setCurrentStep("Add Section"); 
+    if (itemName === "Logout") {
+      setIsLogoutModalOpen(true); 
     } else {
-      setCurrentStep(itemName);
+      setSelectedItem(itemName);
+      sessionStorage.setItem("selectedItem", itemName);
+
+      if (itemName === "Add Course") {
+        setCurrentStep("Add Section"); 
+      } else {
+        setCurrentStep(itemName);
+      }
     }
   };
 
   const handleNext = (nextStep: string) => {
     setCurrentStep(nextStep);
+  };
+
+  const handleLogoutConfirm = () => {
+    setIsLogoutModalOpen(false);
+    localStorage.removeItem('tutorCredentials');
+
+    navigae('/tutor/login')
+    
   };
 
   const menuItems = [
@@ -48,7 +67,7 @@ const TutorDashboard: React.FC = () => {
   };
 
   const renderContent = () => {
-    if (currentStep === "Add Section" || currentStep === "More Details") {
+    if (currentStep === "Add Section" || currentStep === "More Details" ) {
       return getCurrentStepComponent();
     }
     
@@ -58,7 +77,7 @@ const TutorDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex bg-gray-100 font-poppins gap-2">
-      <div className="bg-white flex-shrink-0 w-1/6 rounded-md shadow-lg flex flex-col">
+      <div className="bg-white flex-shrink-0 w-1/6 rounded-md shadow-lg flex flex-col fixed h-full z-50">
         <h1 className="p-5 text-green-500 font-extrabold text-2xl">Learn Sphere</h1>
         <p className="pl-5 pt-6 font-medium text-xl">Overview</p>
         <div className="flex-grow">
@@ -80,7 +99,7 @@ const TutorDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-gray-50 flex-grow rounded-md shadow-lg p-10 flex flex-col">
+      <div className="bg-[#f8f9fa] flex-grow rounded-md shadow-lg p-10 flex flex-col ml-64 ">
         <div className="relative">
           <div className="absolute top-0 left-0 p-10">
             <h1 className="text-4xl text-white font-bold my-4 pl-10">Start your Learning Journey.</h1>
@@ -94,8 +113,15 @@ const TutorDashboard: React.FC = () => {
         </div>
         <h2 className="pb-2 pt-6 font-bold text-xl">{selectedItem}</h2>
         <div className="h-[1px] w-full pl-10 pr-10 bg-gray-500"></div>
-        <div className="flex-grow mt-5">{renderContent()}</div>
+        <div className="flex-grow mt-5" >{renderContent()}</div>
       </div>
+
+      <ConfirmModal 
+        isOpen={isLogoutModalOpen} 
+        onClose={() => setIsLogoutModalOpen(false)} 
+        onConfirm={handleLogoutConfirm} 
+        message="Are you sure you want to logout?"
+      />
     </div>
   );
 };

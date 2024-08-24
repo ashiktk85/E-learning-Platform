@@ -27,7 +27,7 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
   
 
   useEffect(() => {
-    // Mock API call to fetch categories, replace with your API call
+  
     const fetchCategories = async () => {
       const response = await fetch(`${url}/admin/categories`);
       const data = await response.json();
@@ -71,7 +71,7 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
     setCourseData(newCourseData);
     console.log("Course data set to context:", newCourseData);
   
-    onNext("Add Section"); // This should navigate to "Add Section"
+    onNext("Add Section"); 
   };
   
   
@@ -175,7 +175,7 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
         <div className="flex justify-end">
           <button
             type="button"
-            className="bg-green-600 text-white px-4 py-2 rounded mr-2 font-semibold"
+            className="bg-gradient-to-r from-teal-500 to-green-500 text-white px-4 py-2 rounded mr-2 font-semibold"
             onClick={handleNextClick}
           >
             Next
@@ -193,17 +193,17 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
             />
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-start mt-4">
               <button
                 type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                className="bg-white text-black hover:bg-black border-2 border-black hover:text-white px-4 py-2 rounded mr-2"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="bg-gradient-to-r from-teal-500 to-green-500 text-white px-4 py-2 rounded"
                 onClick={handleAddTag}
               >
                 Save
@@ -212,6 +212,8 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
           </div>
         </div>
       )}
+
+      
     </div>
   );
 };

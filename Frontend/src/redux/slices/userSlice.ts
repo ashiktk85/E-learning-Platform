@@ -54,15 +54,15 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<{ accessToken: string; refreshToken: string; userInfo: User }>) => {
-        const { accessToken, refreshToken, userInfo } = action.payload;
+      .addCase(login.fulfilled, (state, action: PayloadAction<{ accessToken: string;  userInfo: User }>) => {
+        const { accessToken, userInfo } = action.payload;
         state.userInfo = userInfo;
         state.accessToken = accessToken;
-        state.refreshToken = refreshToken;
+        // state.refreshToken = refreshToken;
         state.loading = false;
 
         localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        // localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
       })
       .addCase(login.rejected, (state, action) => {

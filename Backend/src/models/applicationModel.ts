@@ -3,7 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 interface FileUrl {
   type: string;
   url: string;
-  signedUrl?: string; // Optional signed URL
+  signedUrl?: string; 
 }
 
 export interface ITutorApplication extends Document {

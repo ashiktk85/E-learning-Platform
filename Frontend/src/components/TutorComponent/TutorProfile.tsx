@@ -24,6 +24,8 @@ interface ProfileData {
 const TutorProfile = () => {
   const user = useSelector((state: RootState) => state.user);
   const userInfo = user.userInfo;
+  console.log("user" , userInfo);
+  
   const getTutorDataRef = useRef<() => Promise<void>>();
 
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -155,7 +157,7 @@ const TutorProfile = () => {
           </label>
         </div>
 
-        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10 relative">
+        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10 relative blur-sm">
           <div className="flex">
             <h3 className="font-bold pb-2">Name:</h3>
             <p className="pl-5 font-medium">
@@ -318,13 +320,13 @@ const TutorProfile = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
               >
                 Save
               </button>
               <button
                 onClick={closeProfileModal}
-                className="bg-gray-500 text-white px-3 py-1 rounded"
+                className="bg-gray-500 text-white px-4 py-2 rounded"
               >
                 Cancel
               </button>

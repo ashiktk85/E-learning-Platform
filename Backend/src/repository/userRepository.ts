@@ -8,6 +8,7 @@ import userModel from "../models/userModel";
 import sendTutorCredential from "../helper/tutorLoginMail";
 import TutorApplication from "../models/applicationModel";
 import TutorProfile from "../models/tutorProfileModel";
+import { createToken } from "../config/jwtConfig";
 
 export class UserRepositary {
   
@@ -77,31 +78,14 @@ export class UserRepositary {
         throw new Error("User blocked.");
       }
 
-      const accessToken = jwt.sign(
-        { id: user.userId, email: user.email },
-        process.env.SECRET_KEY!,
-        { expiresIn: "1h" }
-      );
+      // const accessToken = jwt.sign(
+      //   { id: user.userId, email: user.email },
+      //   process.env.SECRET_KEY!,
+      //   { expiresIn: "1h" }
+      // );
 
-      const refreshToken = jwt.sign(
-        { id: user.userId, email: user.email },
-        process.env.SECRET_KEY!,
-        { expiresIn: "7d" }
-      );
-
-      const userInfo = {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        userId: user.userId,
-        phone: user.phone,
-        isBlocked: user.isBlocked,
-        tutor : user.tutor,
-        
-
-      };
-
-      return { userInfo, accessToken, refreshToken };
+      return user;
+      
     } catch (error: any) {
       throw new Error(error.message);
     }

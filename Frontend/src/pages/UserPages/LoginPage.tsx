@@ -9,7 +9,7 @@ const UserLogin: React.FC = () => {
 
   return (
     <>
-    <div className="h-screen bg-#dee1ea-900 text-wh">
+    <div className="h-screen bg-[#f5f5f5] text-wh">
    
     <LoginForm />
     <Footer />

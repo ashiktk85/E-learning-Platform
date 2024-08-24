@@ -77,10 +77,10 @@ const AddSection: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
 
   const handleSubmit = () => {
     // Validate that each section has at least 3 videos
-    const validSections = sections.every(section => section.videos.length >= 3);
+    const validSections = sections.every(section => section.videos.length >= 1);
 
     if (!validSections) {
-      toast.error("Each section must have at least 3 videos.");
+      toast.error("Each section must have at least 1 video.");
       return;
     }
 
@@ -132,7 +132,7 @@ const AddSection: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
             <button
               type="button"
               onClick={() => handleAddVideo(index)}
-              className="bg-green-500 text-white px-3 py-1 rounded-full"
+              className="bg-gradient-to-r from-teal-500 to-green-500 text-white px-3 py-1 rounded-full"
             >
               + Add Video
             </button>
@@ -185,14 +185,14 @@ const AddSection: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
           <button
             type="button"
             onClick={handleAddSection}
-            className="bg-gray-500 text-white px-4 py-2 rounded mr-2 font-semibold"
+            className="bg-white text-black border-[1.5px] border-black hover:text-white hover:bg-gradient-to-r from-stone-600 to-stone-900 py-2 rounded mr-2 font-semibold pl-5 pr-5"
           >
             + Add Section
           </button>
           <button
             type="button"
             onClick={handleSubmit}
-            className="bg-green-600 text-white px-4 py-2 rounded mr-2 font-semibold"
+            className="bg-gradient-to-r from-teal-500 to-green-500 text-white px-4 py-2 rounded mr-2 font-semibold"
           >
             Next
           </button>

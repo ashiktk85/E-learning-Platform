@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import secret_key from "../config/jwtConfig";
+import {createToken, secret_key} from "../config/jwtConfig";
 import { UserService } from "../services/userServices";
+import jwt from "jsonwebtoken";
 
 export class UserController {
   private userService: UserService;
@@ -8,6 +9,8 @@ export class UserController {
   constructor(userService: UserService) {
     this.userService = userService;
   }
+
+  
   
   async createUser(req: Request, res: Response): Promise<void> {
     try {
@@ -50,18 +53,28 @@ export class UserController {
   async verifyLogin(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-
       const result = await this.userService.verifyLogin(email, password);
-
-      res.status(200).json({ message: "Login successful", result });
+      if (!result) {
+        return res.status(401).json({ message: "Invalid login credentials" });
+      }
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict', 
+        maxAge: 30 * 24 * 60 * 60 * 1000, 
+      });
+  
+      const { accessToken, userInfo } = result;
+      const cred = {accessToken , userInfo}
+      res.status(200).json({ message: "Login successful", cred });
     } catch (error: any) {
       console.error(error.message);
       res.status(500).json({ message: error.message });
     }
   }
-
+  
   async resendOtp(req: Request, res: Response) {
-    try {
+    try { 
       const { email } = req.body;
       console.log("resend getting here");
       console.log("controller email resend", email);

@@ -13,8 +13,20 @@ import UserRoutes from './Routes/userRoutes';
 import AdminRoutes from './Routes/adminRoutes';
 import TutorRoutes from './Routes/tutorRoutes';
 import {NextUIProvider} from "@nextui-org/react";
+import { useEffect } from 'react';
+import { refreshAccessToken } from './redux/actions/authAciton';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from './redux/store';
 
 function App() {
+
+  const dispatch = useDispatch<AppDispatch>()
+
+  useEffect(() => {
+   
+    dispatch(refreshAccessToken());
+  }, [dispatch]);
+  
   return (
     <NextUIProvider>
   
@@ -39,3 +51,7 @@ function App() {
 }
 
 export default App;
+function dispatch(arg0: any) {
+  throw new Error('Function not implemented.');
+}
+

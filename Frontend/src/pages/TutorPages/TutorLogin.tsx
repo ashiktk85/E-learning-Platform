@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 
 import { useNavigate } from "react-router-dom";
+import userAxiosInstance from "../../config/axiosInstance/userInstance";
 const url = "http://localhost:7000";
 
 const TutorLogin: React.FC = () => {

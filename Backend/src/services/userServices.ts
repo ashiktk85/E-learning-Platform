@@ -4,6 +4,7 @@ import { UserRepositary } from "../repository/userRepository";
 import sendEmailOtp from "../helper/mailService";
 import redisClient from "../helper/redisCache";
 import jwt, { Secret } from "jsonwebtoken";
+import { createToken } from "../config/jwtConfig";
 
 export class UserService {
   
@@ -83,19 +84,46 @@ export class UserService {
     }
   }
 
-  async verifyLogin(
-    email: string,
-    password: string
-  ): Promise<
-    | {
-        userInfo: { firstName: string; lastName: string; email: string };
-        token: string;
-      }
-    | any 
-    | null
-  > {
-    return UserRepositary.validateLoginUser(email, password);
+  async verifyLogin(email: string, password: string): Promise<
+  | {
+      userInfo: { firstName: string; lastName: string; email: string };
+      accessToken: string;
+      refreshToken: string;
+    }
+  | null
+> {
+  try {
+    const user = await UserRepositary.validateLoginUser(email, password);
+
+    if (!user) {
+      throw new Error('Invalid login credentials');
+    }
+
+    const accessToken = createToken(user.userId as string);
+
+    const refreshToken = jwt.sign(
+      { id: user.userId, email: user.email },
+      process.env.SECRET_KEY!,
+      { expiresIn: "7d" }
+    );
+
+    const userInfo = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      userId: user.userId,
+      phone: user.phone,
+      isBlocked: user.isBlocked,
+      tutor: user.tutor,
+    };
+
+    return { userInfo, accessToken, refreshToken };
+  } catch (error: any) {
+    console.error('Error during login verification:', error.message);
+    throw new Error('Failed to verify login');
   }
+}
+
 
   async resendOtp(email: any): Promise<boolean> {
     try {

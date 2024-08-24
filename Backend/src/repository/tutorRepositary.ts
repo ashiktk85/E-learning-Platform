@@ -16,7 +16,9 @@ interface CourseData {
   sections: {
     name: string;
     description: string;
-    videos: { title: string; videoUrl: string }[];
+    videos: {
+      description: string; title: string; videoUrl: string 
+}[];
   }[];
   additionalDetail1: string;
   price: string;
@@ -148,7 +150,7 @@ export class TutorRepositary {
     }
   }
 
-  static async saveCourse(data: CourseData, email: string) {
+  static async saveCourse(data: CourseData, email: string) : Promise<boolean> {
     try {
      
       const videoFiles = data.files.filter((file) => file.type === 'video');
@@ -202,15 +204,15 @@ export class TutorRepositary {
     }
   }
 
-  static async getTutorCourses(email : string) {
+  static async getCoursesByTutor(email: string) {
     try {
-
-      const courses = await Course.find({email : email})  
-      console.log(courses , "tutor courses");
-      
-      
-    } catch (error : any) {
-      console.error("Error in getting tutor  course:", error);
+      const courses = await Course.find({ email }).populate({
+        path: 'sections',
+        populate: { path: 'videos' }  
+      });
+      return courses;
+    } catch (error) {
+      console.error('Error fetching courses:', error);
       throw error;
     }
   }
