@@ -17,6 +17,11 @@ route.post('/resendOtp' ,userController.resendOtp.bind(userController))
 route.put('/editUser',verifyToken ,userController.editUser.bind(userController) )
 route.post('/refresh-token', refreshTokenHandler);
 
+// courses 
+
+route.get('/get-courses',userController.getCourses.bind(userController))
+route.get("/getCourse/:id", userController.getCourseDetail.bind(userController))
+
 export default route;
 
 

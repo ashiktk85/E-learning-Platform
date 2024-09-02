@@ -114,7 +114,7 @@ export class TutorContoller {
         const {email} = req.params
         const response = await this.tutorServices.getCoursesWithSignedUrls(email)
 
-        console.log(response, "res");
+        // console.log(response, "res");
 
         res.status(200).json(response);
         

@@ -58,6 +58,9 @@ module.exports = {
           green: "#1DB954",
         },
       },
+      fontFamily: {
+        sans: ['Roboto', 'ui-sans-serif', 'system-ui'], 
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -80,4 +83,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};

@@ -1,24 +1,55 @@
-import React from 'react';
+import React from "react";
+import blog from "../../assets/userbanner/blog-3_1296x.webp";
+import overlayImage1 from "../../assets/userbanner/Web_Photo_Editor.jpg";
+import overlayImage2 from "../../assets/userbanner/Web_Photo_Editor.jpg";
 
 const About = () => {
-    return (
-        <section className='container mx-auto mb-8' id="about"  >
-            <h2 className='mb-8 text-center text-3xl tracking-tighter lg:text-4xl'>
-                About Us
-            </h2>
-            <div className='flex flex-wrap'>
-
-                <div className='w-full p-4 lg:w-1/2'>
-                    <img src="https://img.freepik.com/free-photo/student-class-taking-notes_23-2148888811.jpg?size=626&ext=jpg&uid=R138448332&ga=GA1.1.462934507.1724409785&semt=ais_hybrid"
-                     alt=""
-                     className='rounded-3xl lg:rotate-3' />
-                </div>
-
+  return (
+    <section className="relative flex h-screen items-center justify-center bg-black px-4 py-16">
+      <div className="container mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
+        {/* Image Section */}
+        <div className="relative flex flex-col items-center justify-center gap-6">
+          {/* Main Image */}
+          <div className="relative w-[500px] h-[300px] transition-transform duration-500 transform hover:scale-105 hover:translate-y-[-10px] z-10">
+            <img
+              src={blog}
+              alt="E-Learning Illustration"
+              className="w-full h-full object-cover rounded-xl shadow-lg"
+            />
+            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
+              <p className="text-sm font-semibold text-[#17171a]">
+                Explore Our Courses
+              </p>
             </div>
-        </section>
+          </div>
 
+          
+        </div>
 
-    );
-}
+        {/* Content Section */}
+        <div className="flex flex-col justify-center text-center md:text-left gap-8">
+          <h1 className="text-4xl font-extrabold text-[#7BC74D] md:text-5xl">
+            About Us
+          </h1>
+          <p className="text-lg text-gray-400 md:text-xl">
+            Welcome to our e-learning platform, where education meets innovation.
+            We provide a vast range of courses to help you learn at your own pace,
+            anywhere and anytime. Our mission is to empower learners worldwide by
+            providing accessible, engaging, and high-quality education.
+          </p>
+          <p className="text-md text-gray-400 md:text-lg">
+            Our dedicated team of experts and educators work tirelessly to bring you
+            the latest knowledge and best practices across various fields. Whether
+            you're looking to advance your career, pick up a new skill, or simply
+            explore your passions, we have something for everyone.
+          </p>
+
+          {/* Call to Action Buttons */}
+         
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default About;

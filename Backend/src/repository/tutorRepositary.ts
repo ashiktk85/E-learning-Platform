@@ -189,11 +189,12 @@ export class TutorRepositary {
         email: email,
         name: data.courseName,
         description: data.description,
+        price : data.price,
         sections: sections,
         tags: data.tags,
         language: data.language,
         thumbnail: thumbnail,
-        category : data.courseName
+        category : data.selectedCategory
       });
 
       await newCourse.save();

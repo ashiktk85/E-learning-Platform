@@ -11,6 +11,7 @@ import HomeCard from "../../components/UserComponent/Card";
 import HeroSection from "../../components/UserComponent/HeroSection";
 import CoursesHome from "../../components/UserComponent/CoursesHome";
 import About from "../../components/UserComponent/About";
+import Mission from "../../components/UserComponent/mission";
 
 const Home: React.FC = () => {
 
@@ -18,11 +19,15 @@ const Home: React.FC = () => {
  
 
   return (
-    <main className="overflow-y-hidden text-neutral-200 antialiased">
+    <main className="overflow-y-hidden  antialiased relative">
      <HeroSection />
      <Navbar />
+     <About />
+    
+    
     <CoursesHome />
-    <About />
+    <Footer />
+   
     </main>
   );
 };

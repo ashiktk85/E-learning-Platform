@@ -5,6 +5,8 @@ import sendEmailOtp from "../helper/mailService";
 import redisClient from "../helper/redisCache";
 import jwt, { Secret } from "jsonwebtoken";
 import { createToken } from "../config/jwtConfig";
+import { AwsConfig } from "../config/awsFileConfigs";
+import { Course, ICourse } from "../models/courseModel";
 
 export class UserService {
   
@@ -170,5 +172,68 @@ export class UserService {
       throw error;
     }
   }
+
+  async getCoursesService() {
+    try {
+      const response = await UserRepositary.getCourses()
+
+      const awsConfig = new AwsConfig();
+
+      const coursesWithUrls = await Promise.all(
+        response.map(async (course : ICourse) => {
+          const thumbnails = course.thumbnail ? await awsConfig.getfile(course.thumbnail, `tutors/${course.email}/courses/${course.courseId}/thumbnail`)
+          : null;
+          return { ...course, thumbnail: thumbnails };
+        })
+      )
+      return coursesWithUrls
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getCourseDetail(id: string) {
+    try {
+      
+      const response = await UserRepositary.getCourse(id);
+  
+      
+      const awsConfig = new AwsConfig();
+  
+      
+      const thumbnailUrl = await awsConfig.getfile(
+        response?.thumbnail as string,
+        `tutors/${response.email}/courses/${response.courseId}/thumbnail`
+      );
+  
+      
+      const sectionsWithUrls = await Promise.all(
+        response.sections.map(async (section: any) => {
+          const videosWithUrls = await Promise.all(
+            section.videos.map(async (video: any) => {
+              const videoUrl = await awsConfig.getfile(
+                video.videoUrl,
+                `tutors/${response.email}/courses/${response.courseId}/sections/${section._id}/videos`
+              );
+              return { ...video.toObject(), url: videoUrl };
+            })
+          );
+          return { ...section.toObject(), videos: videosWithUrls };
+        })
+      );
+  
+      
+      return {
+        ...response,
+        thumbnailUrl,
+        sections: sectionsWithUrls,
+      };
+    } catch (error: any) {
+      
+      console.error("Error fetching course details:", error.message);
+      throw new Error(`Failed to fetch course details: ${error.message}`);
+    }
+  }
+  
   
 }

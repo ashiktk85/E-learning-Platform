@@ -1,65 +1,71 @@
-import { useState } from "react";
-import { LINKS } from './index';
+import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsmobileMenuOpen] = useState<any>(false);
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const toggleMobileMenu = () => {
-    setIsmobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleScroll = (
-    event: { preventDefault: () => void },
-    targetId: string
-  ) => {
-    event.preventDefault();
-    const targetElement = document.getElementById(targetId);
-    if (targetElement) {
-      const offsetTop = targetElement.offsetTop - 80;
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth",
-      });
-    }
-    setIsmobileMenuOpen(false);
+  const LINKS = [
+    { text: "Plans", path: "/plans" },
+    { text: "Courses", path: "/courses" },
+    { text: "Be a Tutor", path: "/tutor" },
+    { text: "About", path: "/about" },
+    { text: "Contact", path: "/contact" },
+    { text: "Profile", path: "/profile" },
+  ];
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMobileMenuOpen(false); // Close the mobile menu after navigation
   };
+
   return (
-    <nav className="fixed top-4 z-50 flex w-full flex-col items-center justify-center">
-      <div
-        className="flex w-full items-center justify-between overflow-y-hidden p-4 backdrop-blur-lg lg:m-2 lg:w-[50rem]
-            lg:rounded-full lg:shadow-lg"
-      >
-        <h2 className="w-[100px] h-[22px] font-bold cursor-pointer">Learn Sphere</h2>
-        <div className="hidden space-x-6 lg:flex">
-          {LINKS.map((link, index) => (
-            <a
-              key={index}
-              href={`#${link.targetId}`}
-              className={`text-sm ${
-                index !== 0 ? "border-l-2 border-neutral-300/20 pl-2" : ""
-              } hover:opacity-50`}
-              onClick={(e) => handleScroll(e, link.targetId)}
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black shadow-md">
+      <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
+        <div
+          className="text-2xl font-bold cursor-pointer text-[#7BC74D]"
+          onClick={() => navigate("/")}
+        >
+          E-Learn
+        </div>
+        <div className="hidden md:flex space-x-6">
+          {LINKS.map((link) => (
+            <button
+              key={link.text}
+              onClick={() => handleNavigation(link.path)}
+              className="text-white font-sans hover:text-[#7BC74D]  "
             >
               {link.text}
-            </a>
+            </button>
           ))}
         </div>
-        <div className="lg:hidden">
-          <button onClick={toggleMobileMenu}>
+        <div className="md:hidden">
+          <button onClick={toggleMobileMenu} className="text-2xl">
             {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="w-full backdrop-blur-lg lg:hidden">
-            {LINKS.map((link , index) => (
-                <a key={index} href={`#${link.targetId}`} 
-                className="block p-4 uppercase tracking-tighter"
-                onClick={(e) => handleScroll(e, link.targetId)}>
-                    {link.text}
-                </a>
+        <div className="absolute top-full left-0 right-0 bg-white shadow-md md:hidden">
+          <ul className="flex flex-col items-center space-y-4 py-4">
+            {LINKS.map((link) => (
+              <li key={link.text}>
+                <button
+                  onClick={() => handleNavigation(link.path)}
+                  className="block text-gray-700 hover:text-blue-600"
+                >
+                  {link.text}
+                </button>
+              </li>
             ))}
+          </ul>
         </div>
       )}
     </nav>

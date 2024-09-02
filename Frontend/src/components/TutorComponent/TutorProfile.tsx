@@ -157,7 +157,7 @@ const TutorProfile = () => {
           </label>
         </div>
 
-        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10 relative blur-sm">
+        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10 relative ">
           <div className="flex">
             <h3 className="font-bold pb-2">Name:</h3>
             <p className="pl-5 font-medium">

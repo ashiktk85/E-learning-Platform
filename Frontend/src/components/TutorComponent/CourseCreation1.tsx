@@ -11,10 +11,11 @@ interface Category {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  
 }
 
 const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }) => {
+  
+  
   const { courseData, setCourseData } = useCourseContext();
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
@@ -24,14 +25,20 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
   const [tags, setTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
-  
 
   useEffect(() => {
-  
     const fetchCategories = async () => {
-      const response = await fetch(`${url}/admin/categories`);
-      const data = await response.json();
-      setCategories(data);
+      try {
+        const response = await fetch(`${url}/admin/categories`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories.");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Failed to load categories. Please try again.");
+      }
     };
 
     fetchCategories();
@@ -55,25 +62,24 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
       toast.error("Please fill in all fields.");
       return;
     }
-  
+
     if (tags.length < 3) {
       toast.warning("Add at least 3 tags.");
       return;
     }
-  
-    const newCourseData: IcourseData = { 
-      courseName, 
-      description, 
-      language, 
-      tags, 
-      selectedCategory  
+
+    const newCourseData: IcourseData = {
+      courseName,
+      description,
+      language,
+      tags,
+      selectedCategory
     };
     setCourseData(newCourseData);
     console.log("Course data set to context:", newCourseData);
-  
-    onNext("Add Section"); 
+
+    onNext("Add Section");
   };
-  
   
   
 

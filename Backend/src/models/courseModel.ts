@@ -17,6 +17,7 @@ interface ICourse extends Document {
   email: string;
   name: string;
   description: string;
+  price : number | string;
   category: string;
   sections: Types.ObjectId[]; 
   tags: string[];
@@ -24,6 +25,8 @@ interface ICourse extends Document {
   ratings?: Types.ObjectId[]; 
   comments?: Types.ObjectId[];
   thumbnail?: string;
+  isBlocked : boolean;
+  createdAt : Date;
 }
 
 const videoSchema = new Schema<IVideo>({
@@ -68,6 +71,10 @@ const courseSchema = new Schema<ICourse>({
     type: String,
     required: true,
   },
+  price : {
+    type: Schema.Types.Mixed,
+    required : true,
+  },
   category: {
     type: String,
     required: true,
@@ -83,6 +90,14 @@ const courseSchema = new Schema<ICourse>({
   thumbnail: {
     type: String,
   },
+  isBlocked : {
+    type : Boolean,
+    default : false,
+  },
+  createdAt: {
+    type: Date, 
+    default: Date.now 
+ }
 });
 
 const Course = mongoose.model<ICourse>('Course', courseSchema);

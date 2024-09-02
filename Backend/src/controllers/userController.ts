@@ -10,8 +10,6 @@ export class UserController {
     this.userService = userService;
   }
 
-  
-  
   async createUser(req: Request, res: Response): Promise<void> {
     try {
       const data = req.body;
@@ -101,4 +99,28 @@ export class UserController {
      }
     }
   }
+
+  async getCourses(req : Request , res : Response ) {
+    try {
+      const courses = await this.userService.getCoursesService()
+      res.status(200).json(courses)
+    } catch ( error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getCourseDetail(req : Request, res : Response) {
+    try {
+      const {id} = req.params
+      const courseData =  await this.userService.getCourseDetail(id as string)
+      res.status(200).json(courseData)
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  
 }
+

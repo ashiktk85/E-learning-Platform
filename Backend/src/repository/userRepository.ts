@@ -9,6 +9,8 @@ import sendTutorCredential from "../helper/tutorLoginMail";
 import TutorApplication from "../models/applicationModel";
 import TutorProfile from "../models/tutorProfileModel";
 import { createToken } from "../config/jwtConfig";
+import { Course } from "../models/courseModel";
+import Category from "../models/categoryModel";
 
 export class UserRepositary {
   
@@ -311,5 +313,69 @@ export class UserRepositary {
       console.log("Error in getting applicant data user repo", error.message); 
       throw new Error(error.message);
     }
-  }  
+  }
+  
+  static async getCourses() {
+    try {
+      const Courses = await Course.find({})
+      return Courses;
+    } catch (error : any) {
+      console.log("Error in getting courses user repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  static async getCourse(id : string) {
+    try {
+        const course = await Course.findOne({courseId : id}).populate({
+          path: 'sections',
+          populate: { path: 'videos' }  
+        });
+
+        console.log(course , "sss");
+        
+        if(!course) {
+          throw new Error("Cannot find course.")
+        }
+
+        const tutor = await TutorProfile.findOne({ email : course?.email})
+        if(!tutor) {
+          throw new Error("Cannot find tutor.")
+        }
+
+        const userTutor = await UserModel.findOne({email : tutor?.email})
+        if(!userTutor) {
+          throw new Error("Cannot find userTutor.")
+        }
+
+
+        const CourseData = {
+            name : course.name,
+            description : course.description,
+            Category : course.category,
+            sections : course.sections,
+            tags : course.tags,
+            language : course.language,
+            ratings : course?.ratings,
+            comments : course?.comments,
+            thumbnail : course.thumbnail,
+            tutorName : userTutor.firstName + userTutor.lastName,
+            tutorBio : tutor.bio,
+            education : tutor.education,
+            certifications : tutor.certifications,
+            email : tutor.email,
+            courseId : course.courseId,
+            price : course.price,
+            uploadedDate : course?.createdAt
+        }
+
+        return CourseData;
+    } catch (error : any) {
+      console.log("Error in getting course detail user repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
 }
+
+
+

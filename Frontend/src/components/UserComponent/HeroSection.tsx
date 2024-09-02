@@ -1,43 +1,68 @@
-import heroSection_video from "../../assets/heroSection_video.mp4";
+import React from 'react';
+import blog from '../../assets/userbanner/blog-3_1296x.webp';
+import overlayImage1 from '../../assets/userbanner/Web_Photo_Editor.jpg';
+import overlayImage2 from '../../assets/userbanner/Web_Photo_Editor.jpg'; // Replace with the actual path of your third image
 
 const HeroSection = () => {
   return (
-    <section className="relative flex h-screen items-center">
-      <div className="absolute inset-0 -z-20 h-full w-full overflow-hidden">
-        <video
-          src={heroSection_video}
-          className="h-full w-full object-cover"
-          muted
-          autoPlay
-          loop
-          playsInline
-        ></video>
-      </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent from-70% to-black"></div>
-
-      <div className="flex justify-between w-full items-center">
-        <div className="relative z-20 flex flex-col justify-center pl-20 pb-20">
-          <h1 className="p-4 text-white font-extrabold text-[100px] font-sans">
-            LEARN WITH US
+    <section className="relative flex h-screen items-center justify-center bg-[#f5f5f7] px-4">
+      <div className="grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2">
+        {/* Text Content */}
+        <div className="flex flex-col justify-center text-center md:text-left gap-8">
+          <h1 className="text-5xl font-extrabold text-[#7BC74D] md:text-6xl">
+            Empower Your Learning Journey
           </h1>
-          <p className="p-4 text-lg tracking-tighter text-white">
-            Get access to 1000+ courses
+          <p className=" text-lg text-[#393E46] md:text-xl">
+            Access hundreds of courses and learn at your own pace. Start your journey with us today!
           </p>
-          <button className="p-5 text-white font-bold h-20 w-40 bg-gradient-to-tr from-[#FF896D] to-[#D02020] mt-5 rounded-xl ml-5">
-            Browse courses
-          </button>
+          <div className=" flex justify-center gap-4 md:justify-start">
+            <button className="rounded-full h-11 bg-[#17171a] px-6 py-2 text-white shadow-lg   focus:outline-none focus:ring-4 focus:ring-blue-300">
+              Get Started
+            </button>
+            <button className="rounded-full border h-11 bg-[#EEEEEE] border-black px-6 py-2 text-gray-800   focus:outline-none focus:ring-4 focus:ring-gray-200 cursor-pointer
+            text-center
+            ">
+              Community
+            </button>
+          </div>
         </div>
 
-        <div className="relative z-20 p-4 pr-40 pt-60 rounded-lg">
-          <div className="h-56 w-72 backdrop-blur-2xl flex  flex-col items-center  text-white text-lg font-bold ">
-            <h2 className="pt-10">Join the community</h2>
-            <p className="text-small font-normal p-5">
-              see new blogs articles , 
-              chat with tutors.
-            </p>
-            <button className="w-3/4 h-10 rounded-2xl bg-black mb-6">
-              click here
-            </button>
+        
+        <div className="relative flex items-center justify-center ">
+          
+          <div className="relative w-[500px] h-[300px] transition-transform duration-500 transform hover:scale-110 hover:translate-y-[-10px] z-10">
+            <img
+              src={blog}
+              alt="E-Learning Illustration"
+              className="w-full h-full object-cover rounded-xl shadow-lg" 
+            />
+            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
+              <p className="text-sm font-semibold text-[#17171a]">Explore Our Courses</p>
+            </div>
+          </div>
+
+          
+          <div className="relative w-[500px] h-[300px] ml-[-50px] transition-transform duration-500 transform hover:scale-110 hover:translate-y-[-20px] z-20">
+            <img
+              src={overlayImage1}
+              alt="Overlay Image 1"
+              className="w-full h-full object-cover rounded-xl shadow-xl" 
+            />
+            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
+              <p className="text-sm font-semibold text-[#17171a]">Meet Our Tutors</p>
+            </div>
+          </div>
+
+          
+          <div className="relative w-[500px] h-[300px] ml-[-50px] transition-transform duration-500 transform hover:scale-110 hover:translate-y-[-30px] z-30">
+            <img
+              src={overlayImage2}
+              alt="Overlay Image 2"
+              className="w-full h-full object-cover rounded-xl shadow-xl" 
+            />
+            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
+              <p className="text-sm font-semibold text-[#17171a]">Join Our Community</p>
+            </div>
           </div>
         </div>
       </div>
