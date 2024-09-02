@@ -14,7 +14,7 @@ route.post('/signUp' , userController.createUser.bind(userController))
 route.post('/otpVerification' ,userController.otpVerification.bind(userController))
 route.post('/verifyLogin' , userController.verifyLogin.bind(userController))
 route.post('/resendOtp' ,userController.resendOtp.bind(userController))
-route.put('/editUser',verifyToken ,userController.editUser.bind(userController) )
+route.put('/editUser' ,userController.editUser.bind(userController) )
 route.post('/refresh-token', refreshTokenHandler);
 
 // courses 

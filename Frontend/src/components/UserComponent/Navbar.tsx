@@ -21,7 +21,7 @@ const Navbar = () => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    setIsMobileMenuOpen(false); // Close the mobile menu after navigation
+    setIsMobileMenuOpen(false); 
   };
 
   return (
