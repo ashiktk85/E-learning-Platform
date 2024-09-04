@@ -27,6 +27,7 @@ interface ICourse extends Document {
   thumbnail?: string;
   isBlocked : boolean;
   createdAt : Date;
+  users ?: []
 }
 
 const videoSchema = new Schema<IVideo>({
@@ -97,7 +98,11 @@ const courseSchema = new Schema<ICourse>({
   createdAt: {
     type: Date, 
     default: Date.now 
- }
+ },
+ users : {
+  type : [String],
+  default:[]
+}
 });
 
 const Course = mongoose.model<ICourse>('Course', courseSchema);

@@ -19,6 +19,7 @@ export interface IUser extends Document {
      tutorId: string;
      passwordHash: string;
    };
+   courses ?: [];
  }
  
 
@@ -82,6 +83,10 @@ export interface IUser extends Document {
      tutorId: { type: String, unique: true },
      passwordHash: { type: String },
    },
+   courses : {
+      type : [String],
+      default:[]
+   }
  });
  
  const userModel = model<IUser>("User", userSchema);

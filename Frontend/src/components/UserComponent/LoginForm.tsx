@@ -77,7 +77,7 @@ const LoginForm: React.FC = () => {
         ></video>
       </div>
 
-      <div className="w-1/2 h-full bg-[#f5f5f5] flex flex-col pl-64 pr-0 pt-10 ">
+      <div className="w-1/2 h-full bg-[#f5f5f5] flex flex-col pl-64 pr-0 pt-2">
         <h1 className="text-3xl text-green-500 font-bold mb-5 cursor-pointer" onClick={goToHome}>Learn Sphere</h1>
 
         <div className="w-full max-w-[450px]">

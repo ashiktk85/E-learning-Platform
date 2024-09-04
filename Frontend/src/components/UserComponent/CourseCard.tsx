@@ -13,7 +13,7 @@ interface IcourseData {
   lessons?: number;
 }
 
-const CourseCard: React.FC<IcourseData> = ({
+const  CourseCard: React.FC<IcourseData> = ({
   name,
   thumbnail,
   id,
@@ -48,7 +48,7 @@ const CourseCard: React.FC<IcourseData> = ({
           </div>
         </div>
 
-        {/* Course Details */}
+      
         <div className="flex items-center justify-between text-gray-600 mb-2 text-sm">
           <div className="flex items-center gap-1">
             <FaRegUser className="w-4 h-4" />
@@ -68,4 +68,4 @@ const CourseCard: React.FC<IcourseData> = ({
   );
 };
 
-export default CourseCard;
+export default React.memo(CourseCard);

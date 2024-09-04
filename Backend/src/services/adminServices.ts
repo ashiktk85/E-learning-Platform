@@ -157,7 +157,7 @@ export class AdminService {
 
             const uniqueId = createTutorId(firstName as string)
 
-            const uniquePass = createUniquePass()
+            const uniquePass = createUniquePass(6)
 
 
            

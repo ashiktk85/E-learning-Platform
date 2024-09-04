@@ -15,10 +15,10 @@ export const createTutorId = (firstName: string) => {
   }
 };
 
-export const createUniquePass = (length: number = 6)  => {
+export const createUniquePass = (length: number)  => {
     try {
 
-        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let password = '';
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charset.length);

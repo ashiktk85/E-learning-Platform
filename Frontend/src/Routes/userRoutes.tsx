@@ -9,6 +9,7 @@ import SignUp from '../pages/UserPages/SignupPage';
 import UserProtector from '../services/UserProtector';
 import AllCourses from '../pages/UserPages/AllCourses';
 import CourseDetailsPage from '../pages/UserPages/CourseDetailsPage';
+import Checkout from '../pages/UserPages/Checkout';
 
 const UserRoutes = () => {
     return (
@@ -19,8 +20,9 @@ const UserRoutes = () => {
                 <Route path="/login" element ={<UserLogin />} />
                 <Route path= '/profile' element = {<UserProtector><ProfilePage /></UserProtector>} />
                 <Route path= '/signup' element = {<SignUp />} />
-                <Route path = '/courses' element = {<AllCourses />} />
+                <Route path = '/coursesPage' element = {<AllCourses />} />
                 <Route path = '/courseDetails/:id' element = {<CourseDetailsPage />} />
+                <Route path = '/checkout/:id' element = {<Checkout />} />
         </Routes>
        </>
     );

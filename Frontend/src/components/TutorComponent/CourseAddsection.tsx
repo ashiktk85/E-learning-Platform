@@ -3,6 +3,7 @@ import { Toaster, toast } from "sonner";
 import { useCourseContext } from "../../context/courseContext";
 import VideoModal from "./AddVideo";
 
+
 interface Video {
   id: string;
   name: string;
@@ -76,7 +77,7 @@ const AddSection: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
   };
 
   const handleSubmit = () => {
-    // Validate that each section has at least 3 videos
+ 
     const validSections = sections.every(section => section.videos.length >= 1);
 
     if (!validSections) {
@@ -88,14 +89,11 @@ const AddSection: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
       const completeData = { ...courseData, sections };
       setCourseData(completeData);
       console.log("Complete data:", completeData);
-      // Proceed to the next step
+
       onNext('More Details');
     }
   };
 
-  if (!courseData) {
-    return <div>No course data available</div>;
-  }
 
   return (
     <div className="font-poppins">

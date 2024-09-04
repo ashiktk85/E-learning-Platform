@@ -32,6 +32,8 @@ const CoursesHome = () => {
         // return () => clearInterval(intervalId);
     }, [fetchCourses]);
 
+    const displayedCourses = courses.slice(0, 8);
+
     return (
         <section className='container pl-10 py-16 bg-[#f2f2f2]' id="courses">
             <h2 className='mb-8 text-center text-3xl tracking-tighter lg:text-4xl font-sans'>
@@ -39,7 +41,7 @@ const CoursesHome = () => {
             </h2>
             <div className='grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4'>
                 {
-                    courses.map((course) => (
+                    displayedCourses.map((course) => (
                         <CourseCard 
                             key={course._id} 
                             name={course._doc.name as string} 

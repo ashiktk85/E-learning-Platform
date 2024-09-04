@@ -27,9 +27,10 @@ const TutorDashboard: React.FC = () => {
     } else {
       setSelectedItem(itemName);
       sessionStorage.setItem("selectedItem", itemName);
-
+  
+     
       if (itemName === "Add Course") {
-        setCurrentStep("Add Section"); 
+        setCurrentStep("Add Course");
       } else {
         setCurrentStep(itemName);
       }
@@ -63,14 +64,27 @@ const TutorDashboard: React.FC = () => {
     if (currentStep === "More Details") {
       return <MoreDetails onNext={handleNext}/>; 
     }
+    
     return null;
   };
 
   const renderContent = () => {
-    if (currentStep === "Add Section" || currentStep === "More Details" ) {
-      return getCurrentStepComponent();
+    
+    if (currentStep === "Add Course") {
+      return <CourseCreation1 onNext={handleNext} />;
     }
     
+   
+    if (currentStep === "Add Section") {
+      return <AddSection onNext={handleNext} />;
+    }
+  
+
+    if (currentStep === "More Details") {
+      return <MoreDetails onNext={handleNext} />;
+    }
+  
+
     const selected = menuItems.find((item) => item.name === selectedItem);
     return selected?.Component || null;
   };

@@ -78,8 +78,8 @@ const AdminloginForm = () => {
 
         <div className="justify-center items-center min-h-screen bg-spotify-white">
           <h2 className="text-3xl font-extrabold font-poppins ml-72 mt-36">Admin Login</h2>
-          <div className="flex flex-wrap bg-spotify-grey p-8 rounded-md shadow-md w-auto ml-60 mx-auto mt-10 mb-64">
-            <div className="w-full md:w-1/2 p-4 mt-5 mb-0">
+          <div className="flex flex-wrap bg-spotify-grey p-8 rounded-md shadow-md w-auto ml-60 mx-auto mt-10 mb-64 bg-gray-300">
+            <div className="w-full md:w-1/2 p-4 mt-5 mb-0 ">
               <Formik
                 initialValues={{ email: "", password: "" }}
                 validationSchema={validationSchema}
@@ -88,23 +88,23 @@ const AdminloginForm = () => {
                 {({ errors, touched, isSubmitting }) => (
                   <Form className="space-y-4">
                     <div>
-                      <label className="text-spotify-white font-poppins mb-3">Email</label>
+                      <label className="text-black font-poppins mb-3">Email</label>
                       <Field
                         type="text"
                         name="email"
                         placeholder="Enter your email"
-                        className="w-72 p-2 rounded bg-spotify-black text-white"
+                        className="w-72 p-2 rounded border-b border-black text-white"
                       />
                       <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
                     </div>
 
                     <div className="relative">
-                      <label className="text-spotify-white font-poppins mb-3">Password</label>
+                      <label className="text-black font-poppins mb-3">Password</label>
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="password"
                         placeholder="Enter your password"
-                        className="w-72 p-2 rounded bg-spotify-black text-white"
+                        className="w-72 p-2 rounded  text-white"
                       />
                        <button
                         className="absolute right-2 top-9 cursor-pointer"

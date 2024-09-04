@@ -121,6 +121,35 @@ export class UserController {
     }
   }
 
+  async coursePayment(req : Request, res : Response) {
+    try {
+      const {amount,currency,email,courseId,} = req.body
+
+      console.log(amount);
+      
+
+      const order = await this.userService.CoursePaymentService(amount as number,currency,email,courseId)
+
+      res.status(201).json({ message: 'Order created successfully', order })
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async saveCourse (req : Request, res : Response) {
+    try {
+      const { email, courseId } = req.body
+
+      const response = await this.userService.saveCourseService(courseId as string ,email as string)
+
+      res.status(201).json(true)
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   
 }
 

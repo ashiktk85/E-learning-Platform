@@ -21,6 +21,8 @@ route.post('/refresh-token', refreshTokenHandler);
 
 route.get('/get-courses',userController.getCourses.bind(userController))
 route.get("/getCourse/:id", userController.getCourseDetail.bind(userController))
+route.post('/createorder', userController.coursePayment.bind(userController))
+route.post('/saveCourse', userController.saveCourse.bind(userController))
 
 export default route;
 

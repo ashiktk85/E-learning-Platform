@@ -7,4 +7,4 @@ interface IcourseData {
     [key: string]: any;
   }
 
-  export default IcourseData;
+  export default IcourseData

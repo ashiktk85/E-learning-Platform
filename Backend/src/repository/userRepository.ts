@@ -11,13 +11,14 @@ import TutorProfile from "../models/tutorProfileModel";
 import { createToken } from "../config/jwtConfig";
 import { Course } from "../models/courseModel";
 import Category from "../models/categoryModel";
+import orderModel from "../models/orderModel";
 
 export class UserRepositary {
   
   static async existUser(email: string): Promise<IUser | null> {
     try {
       const existUser = await UserModel.findOne({ email });
-      console.log("Existing user found ", existUser);
+      // console.log("Existing user found ", existUser);
 
       return existUser;
     } catch (error: any) {
@@ -332,7 +333,7 @@ export class UserRepositary {
           populate: { path: 'videos' }  
         });
 
-        console.log(course , "sss");
+        // console.log(course , "sss");
         
         if(!course) {
           throw new Error("Cannot find course.")
@@ -350,6 +351,7 @@ export class UserRepositary {
 
 
         const CourseData = {
+          id  : course._id,
             name : course.name,
             description : course.description,
             Category : course.category,
@@ -372,6 +374,32 @@ export class UserRepositary {
         return CourseData;
     } catch (error : any) {
       console.log("Error in getting course detail user repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  static async saveOder (orderData : any) {
+    try {
+      const order = await new orderModel(orderData)
+      await order.save()
+      return true;
+    } catch (error : any) {
+      console.log("Error in saving order data in user repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+  
+  static async saveCourse(courseId : string , email : string) {
+    try {
+      const res = await UserModel.updateOne(
+        { email : email}, 
+    {
+      $push : { courses : courseId}
+    })
+
+    return true;
+    } catch (error : any) {
+      console.log("Error in saving course data on user in user repo", error.message); 
       throw new Error(error.message);
     }
   }

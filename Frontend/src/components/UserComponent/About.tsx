@@ -7,9 +7,9 @@ const About = () => {
   return (
     <section className="relative flex h-screen items-center justify-center bg-black px-4 py-16">
       <div className="container mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
-        {/* Image Section */}
+       
         <div className="relative flex flex-col items-center justify-center gap-6">
-          {/* Main Image */}
+       
           <div className="relative w-[500px] h-[300px] transition-transform duration-500 transform hover:scale-105 hover:translate-y-[-10px] z-10">
             <img
               src={blog}
@@ -26,7 +26,7 @@ const About = () => {
           
         </div>
 
-        {/* Content Section */}
+      
         <div className="flex flex-col justify-center text-center md:text-left gap-8">
           <h1 className="text-4xl font-extrabold text-[#7BC74D] md:text-5xl">
             About Us
@@ -44,7 +44,7 @@ const About = () => {
             explore your passions, we have something for everyone.
           </p>
 
-          {/* Call to Action Buttons */}
+         
          
         </div>
       </div>

@@ -7,10 +7,12 @@ import jwt, { Secret } from "jsonwebtoken";
 import { createToken } from "../config/jwtConfig";
 import { AwsConfig } from "../config/awsFileConfigs";
 import { Course, ICourse } from "../models/courseModel";
+import razorpay from "../config/razorpay";
+import orderModel from "../models/orderModel";
+import { createUniquePass } from "../helper/tutorCredentials";
+import mongoose from "mongoose";
 
 export class UserService {
-  
-  
   async signUp(userData: any) {
     try {
       const existUser = await UserRepositary.existUser(userData.email);
@@ -86,46 +88,45 @@ export class UserService {
     }
   }
 
-  async verifyLogin(email: string, password: string): Promise<
-  | {
-      userInfo: { firstName: string; lastName: string; email: string };
-      accessToken: string;
-      refreshToken: string;
+  async verifyLogin(
+    email: string,
+    password: string
+  ): Promise<{
+    userInfo: { firstName: string; lastName: string; email: string };
+    accessToken: string;
+    refreshToken: string;
+  } | null> {
+    try {
+      const user = await UserRepositary.validateLoginUser(email, password);
+
+      if (!user) {
+        throw new Error("Invalid login credentials");
+      }
+
+      const accessToken = createToken(user.userId as string);
+
+      const refreshToken = jwt.sign(
+        { id: user.userId, email: user.email },
+        process.env.SECRET_KEY!,
+        { expiresIn: "7d" }
+      );
+
+      const userInfo = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userId: user.userId,
+        phone: user.phone,
+        isBlocked: user.isBlocked,
+        tutor: user.tutor,
+      };
+
+      return { userInfo, accessToken, refreshToken };
+    } catch (error: any) {
+      console.error("Error during login verification:", error.message);
+      throw new Error("Failed to verify login");
     }
-  | null
-> {
-  try {
-    const user = await UserRepositary.validateLoginUser(email, password);
-
-    if (!user) {
-      throw new Error('Invalid login credentials');
-    }
-
-    const accessToken = createToken(user.userId as string);
-
-    const refreshToken = jwt.sign(
-      { id: user.userId, email: user.email },
-      process.env.SECRET_KEY!,
-      { expiresIn: "7d" }
-    );
-
-    const userInfo = {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      userId: user.userId,
-      phone: user.phone,
-      isBlocked: user.isBlocked,
-      tutor: user.tutor,
-    };
-
-    return { userInfo, accessToken, refreshToken };
-  } catch (error: any) {
-    console.error('Error during login verification:', error.message);
-    throw new Error('Failed to verify login');
   }
-}
-
 
   async resendOtp(email: any): Promise<boolean> {
     try {
@@ -151,22 +152,26 @@ export class UserService {
     lastName: string,
     phone: string,
     userid: string
-  ): Promise<{ firstName: string; lastName: string; phone: string } | undefined> {
+  ): Promise<
+    { firstName: string; lastName: string; phone: string } | undefined
+  > {
     try {
       const newInfo = { firstName, lastName, phone };
-  
+
       console.log("userid in service", userid);
-  
-   
-      const updatedUser = await UserRepositary.editUserRepository(userid, newInfo);
-  
+
+      const updatedUser = await UserRepositary.editUserRepository(
+        userid,
+        newInfo
+      );
+
       console.log("data sent to repo from service");
-  
+
       if (!updatedUser) {
         console.log("no change");
         throw new Error("No changes found");
       }
-  
+
       return updatedUser;
     } catch (error) {
       throw error;
@@ -175,18 +180,22 @@ export class UserService {
 
   async getCoursesService() {
     try {
-      const response = await UserRepositary.getCourses()
+      const response = await UserRepositary.getCourses();
 
       const awsConfig = new AwsConfig();
 
       const coursesWithUrls = await Promise.all(
-        response.map(async (course : ICourse) => {
-          const thumbnails = course.thumbnail ? await awsConfig.getfile(course.thumbnail, `tutors/${course.email}/courses/${course.courseId}/thumbnail`)
-          : null;
+        response.map(async (course: ICourse) => {
+          const thumbnails = course.thumbnail
+            ? await awsConfig.getfile(
+                course.thumbnail,
+                `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+              )
+            : null;
           return { ...course, thumbnail: thumbnails };
         })
-      )
-      return coursesWithUrls
+      );
+      return coursesWithUrls;
     } catch (error) {
       throw error;
     }
@@ -194,19 +203,15 @@ export class UserService {
 
   async getCourseDetail(id: string) {
     try {
-      
       const response = await UserRepositary.getCourse(id);
-  
-      
+
       const awsConfig = new AwsConfig();
-  
-      
+
       const thumbnailUrl = await awsConfig.getfile(
         response?.thumbnail as string,
         `tutors/${response.email}/courses/${response.courseId}/thumbnail`
       );
-  
-      
+
       const sectionsWithUrls = await Promise.all(
         response.sections.map(async (section: any) => {
           const videosWithUrls = await Promise.all(
@@ -221,19 +226,77 @@ export class UserService {
           return { ...section.toObject(), videos: videosWithUrls };
         })
       );
-  
-      
+
       return {
         ...response,
         thumbnailUrl,
         sections: sectionsWithUrls,
       };
     } catch (error: any) {
-      
       console.error("Error fetching course details:", error.message);
       throw new Error(`Failed to fetch course details: ${error.message}`);
     }
   }
-  
-  
+
+  async CoursePaymentService(
+    amount: number,
+    currency: any,
+    email: string,
+    courseId: string
+  ) {
+    try {
+      const options = {
+        amount: amount * 100,
+        currency,
+        receipt: `receipt_${Math.floor(Math.random() * 1000)}`,
+      };
+      console.log(options.amount);
+
+      const user = await UserRepositary.existUser(email);
+
+      // const course = await UserRepositary.getCourse(courseId);
+
+      const paymentId = createUniquePass(10);
+      const orderId = createUniquePass(10);
+
+      const orderDetails = {
+        userId: user?._id,
+        courseId: courseId,
+        totalAmount: amount,
+        currency: currency,
+        paymentId: paymentId,
+        orderId: orderId,
+        paymentStatus: "Completed",
+      };
+
+      const saveOrder = await UserRepositary.saveOder(orderDetails);
+
+      const addCourseUser = await UserRepositary.saveCourse(courseId , email)
+
+      const order = await razorpay.orders.create(options);
+
+      return order;
+    } catch (error: any) {
+      console.error("Error in payment course :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  async saveCourseService(courseId : string, email : string)  {
+    try {
+
+      const addCourseUser = await UserRepositary.saveCourse(courseId , email)
+
+      if(addCourseUser === true) {
+        return true
+      }
+
+      console.log("user course array didnt add");
+      
+        
+    } catch (error : any) {
+      console.error("Error in saving course in serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
 }
