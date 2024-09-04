@@ -26,5 +26,5 @@ route.post('/saveCourse', userController.saveCourse.bind(userController))
 
 export default route;
 
-
+    
 

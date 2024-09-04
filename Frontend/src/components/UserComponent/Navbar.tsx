@@ -12,7 +12,7 @@ const Navbar = () => {
 
   const LINKS = [
     { text: "Plans", path: "/plans" },
-    { text: "Courses", path: "/courses" },
+    { text: "Courses", path: "/coursesPage" },
     { text: "Be a Tutor", path: "/tutor" },
     { text: "About", path: "/about" },
     { text: "Contact", path: "/contact" },

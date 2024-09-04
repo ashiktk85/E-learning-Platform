@@ -10,6 +10,7 @@ import UserProtector from '../services/UserProtector';
 import AllCourses from '../pages/UserPages/AllCourses';
 import CourseDetailsPage from '../pages/UserPages/CourseDetailsPage';
 import Checkout from '../pages/UserPages/Checkout';
+import CoursePlayer from '../pages/UserPages/CoursePlayer';
 
 const UserRoutes = () => {
     return (
@@ -23,6 +24,7 @@ const UserRoutes = () => {
                 <Route path = '/coursesPage' element = {<AllCourses />} />
                 <Route path = '/courseDetails/:id' element = {<CourseDetailsPage />} />
                 <Route path = '/checkout/:id' element = {<Checkout />} />
+                <Route path = '/coursePlayer' element = {<UserProtector> <CoursePlayer /></UserProtector>} />
         </Routes>
        </>
     );
