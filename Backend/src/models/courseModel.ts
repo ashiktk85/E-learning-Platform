@@ -102,8 +102,11 @@ const courseSchema = new Schema<ICourse>({
  users : {
   type : [String],
   default:[]
-}
-});
+},
+
+},
+
+);
 
 const Course = mongoose.model<ICourse>('Course', courseSchema);
 const Section = mongoose.model<ISection>('Section', sectionSchema);

@@ -1,6 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegClock, FaRegUser, FaRegFileAlt, FaStar } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { Base_URL } from "../../credentials";
+import axios from "axios";
 
 interface IcourseData {
   name: string;
@@ -23,10 +27,26 @@ const CourseCard: React.FC<IcourseData> = ({
   duration = "10 Hour",
   lessons = 30,
 }) => {
+  const {userInfo} = useSelector((state : RootState) => state.user)
+  const email = userInfo?.email
   const navigate = useNavigate();
 
-  const gotoCourseDetails = () => {
-    navigate(`/courseDetails/${id}`);
+  const gotoCourseDetails = async() => {
+    try {
+      const response = await axios.get(`${Base_URL}/check-enrollment/${email}/${id}`)
+      console.log(response.data);
+      
+      if (response.data) {
+        
+        navigate(`/coursePlayer/${id}`);
+      } else {
+        navigate(`/courseDetails/${id}`);
+      }
+    } catch (error : any) {
+      console.error('Error checking enrollment:', error);
+    }
+
+   
   };
 
   return (

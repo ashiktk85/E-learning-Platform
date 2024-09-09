@@ -7,6 +7,7 @@ import { TutorRepositary } from "../repository/tutorRepositary";
 import { UserRepositary } from "../repository/userRepository";
 import { adminRepository } from "../repository/adminRepository";
 import bcrypt from "bcrypt";
+import { createToken } from "../config/jwtConfig";
 
 require('dotenv').config();
 
@@ -29,6 +30,8 @@ export class AdminService {
             const adminInfo = {
                 email
             }
+
+            const accessToken = createToken(email as string, "Admin");
             console.log(adminInfo , "admin info");
             return adminInfo;
         } catch (error : any) {
@@ -170,6 +173,7 @@ export class AdminService {
             
 
             const updateUser = await UserRepositary.addTutorToUserModel(data.email as string , uniqueId as string, uniquePass as any)
+            // const tutorProfile = await 
             console.log(updateUser , "services");
             
             return updateUser;
@@ -217,6 +221,17 @@ export class AdminService {
             const response = await adminRepository.getCategoriesRepo()
             return response;
 
+        } catch (error : any) {
+            console.error("Error during admin getting categories in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async reportCourseService(courseId: any , videoId: any , reason: any , additionalInfo: any) {
+        try {
+
+            await adminRepository.saveReport(courseId , videoId , reason , additionalInfo)
+            
         } catch (error : any) {
             console.error("Error during admin getting categories in service:", error.message);
             throw new Error(error.message);

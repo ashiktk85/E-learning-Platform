@@ -1,4 +1,5 @@
 import Category from "../models/categoryModel";
+import Report from '../models/reportModel'
 
 export class adminRepository {
 
@@ -26,6 +27,21 @@ export class adminRepository {
         try {
             const categories = await Category.find({})
             return categories;    
+        } catch (error : any) {
+            throw new Error(error.message);
+        }
+    }
+
+    static async saveReport(courseId: any , videoId: any , reason: any , additionalInfo: any) {
+        try {
+            const newReport = await new Report({
+                courseId,
+                videoId,
+                reason,
+                additionalInfo,
+              });
+        
+              const savedReport = await newReport.save();
         } catch (error : any) {
             throw new Error(error.message);
         }

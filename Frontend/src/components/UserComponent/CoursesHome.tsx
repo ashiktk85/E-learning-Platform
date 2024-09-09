@@ -27,8 +27,8 @@ const CoursesHome = () => {
 
     useEffect(() => {
         fetchCourses();
-        // Uncomment if you need polling
-        // const intervalId = setInterval(fetchCourses, pollingInterval);
+        
+        // const intervalId = setInterval(fetchCourses, 1000);
         // return () => clearInterval(intervalId);
     }, [fetchCourses]);
 

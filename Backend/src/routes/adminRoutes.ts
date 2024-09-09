@@ -17,6 +17,7 @@ route.post('/acceptapplication/:id', adminController.acceptApplication.bind(admi
 route.get('/checktutorstatus/:email', adminController.checkTutorStatus.bind(adminController))
 route.post('/createcategory', adminController.createCategory.bind(adminController))
 route.get('/categories' , adminController.getCategories.bind(adminController))
+route.post('/report' , adminController.userReport.bind(adminController))
 
 
 export default route;

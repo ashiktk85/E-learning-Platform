@@ -63,6 +63,9 @@ export class TutorContoller {
         email as string
       );
 
+      console.log(response);
+      
+
       res.status(200).json(response);
     } catch (error: any) {
       console.error(error.message);
@@ -76,6 +79,8 @@ export class TutorContoller {
       console.log(data);
 
       const response = await this.tutorServices.editProfileService(data as any);
+      console.log(response, "usssss");
+      
 
       res.status(200).json(response);
     } catch (error: any) {
@@ -123,6 +128,25 @@ export class TutorContoller {
         console.error(error.message, "dsfsdf");
         res.status(500).json({ message: error.message });
     } 
+  }
+
+  async uploadProfile(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      const file  = req.file ; 
+      console.log(email, file);
+      
+      if (!email || !file) {
+        return res.status(400).json({ message: "Email and file are required." });
+      }
+
+      const response = await this.tutorServices.uploadProfile(email, file as any);
+
+      res.status(201).json(response);
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
   }
 
   

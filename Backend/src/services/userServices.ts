@@ -11,6 +11,8 @@ import razorpay from "../config/razorpay";
 import orderModel from "../models/orderModel";
 import { createUniquePass } from "../helper/tutorCredentials";
 import mongoose from "mongoose";
+import { CouresRepository } from "../repository/courseRepository";
+import { ParamsDictionary } from "express-serve-static-core";
 
 export class UserService {
   async signUp(userData: any) {
@@ -103,7 +105,7 @@ export class UserService {
         throw new Error("Invalid login credentials");
       }
 
-      const accessToken = createToken(user.userId as string);
+      const accessToken = createToken(user.userId as string, "User");
 
       const refreshToken = jwt.sign(
         { id: user.userId, email: user.email },
@@ -178,9 +180,9 @@ export class UserService {
     }
   }
 
-  async getCoursesService() {
+  async getCoursesService(category : string) {
     try {
-      const response = await UserRepositary.getCourses();
+      const response = await UserRepositary.getCourses(category as string);
 
       const awsConfig = new AwsConfig();
 
@@ -203,40 +205,42 @@ export class UserService {
 
   async getCourseDetail(id: string) {
     try {
-      const response = await UserRepositary.getCourse(id);
+        const response = await UserRepositary.getCourse(id);
+        const awsConfig = new AwsConfig();
 
-      const awsConfig = new AwsConfig();
+       
+        const thumbnailUrl = await awsConfig.getfile(
+            response?.thumbnail as string,
+            `tutors/${response.email}/courses/${response.courseId}/thumbnail`
+        );
 
-      const thumbnailUrl = await awsConfig.getfile(
-        response?.thumbnail as string,
-        `tutors/${response.email}/courses/${response.courseId}/thumbnail`
-      );
-
-      const sectionsWithUrls = await Promise.all(
-        response.sections.map(async (section: any) => {
-          const videosWithUrls = await Promise.all(
-            section.videos.map(async (video: any) => {
-              const videoUrl = await awsConfig.getfile(
-                video.videoUrl,
-                `tutors/${response.email}/courses/${response.courseId}/sections/${section._id}/videos`
-              );
-              return { ...video.toObject(), url: videoUrl };
+      
+        const sectionsWithUrls = await Promise.all(
+            response.sections.map(async (section: any, index: number) => {
+              
+                const videosWithUrls = await Promise.all(
+                    section.videos.map(async (video: any) => {
+                        const videoUrl = await awsConfig.getfile(
+                            video.videoUrl,
+                            `tutors/${response.email}/courses/${response.courseId}/sections/${index}/videos`
+                        );
+                        return { ...video.toObject(), url: videoUrl };
+                    })
+                );
+                return { ...section.toObject(), videos: videosWithUrls };
             })
-          );
-          return { ...section.toObject(), videos: videosWithUrls };
-        })
-      );
+        );
 
-      return {
-        ...response,
-        thumbnailUrl,
-        sections: sectionsWithUrls,
-      };
+        return {
+            ...response,
+            thumbnailUrl,
+            sections: sectionsWithUrls,
+        };
     } catch (error: any) {
-      console.error("Error fetching course details:", error.message);
-      throw new Error(`Failed to fetch course details: ${error.message}`);
+        console.error("Error fetching course details:", error.message);
+        throw new Error(`Failed to fetch course details: ${error.message}`);
     }
-  }
+}
 
   async CoursePaymentService(
     amount: number,
@@ -254,7 +258,7 @@ export class UserService {
 
       const user = await UserRepositary.existUser(email);
 
-      // const course = await UserRepositary.getCourse(courseId);
+   
 
       const paymentId = createUniquePass(10);
       const orderId = createUniquePass(10);
@@ -272,6 +276,8 @@ export class UserService {
       const saveOrder = await UserRepositary.saveOder(orderDetails);
 
       const addCourseUser = await UserRepositary.saveCourse(courseId , email)
+
+      
 
       const order = await razorpay.orders.create(options);
 
@@ -297,6 +303,58 @@ export class UserService {
     } catch (error : any) {
       console.error("Error in saving course in serice :", error.message);
       throw new Error(` ${error.message}`);
+    }
+  }
+
+  async checkEnrollementSevice(courseId : string, email : string) {
+    try {
+
+      const user = await UserRepositary.existUser(email as string)
+
+      if(!user) {
+        throw new Error("User dosen't exist.")
+      }
+
+      if(user?.courses) {
+        const isEnrolled =  (user.courses as string[]).includes(courseId);
+        
+        console.log("enrolll" , isEnrolled , courseId);
+        
+        return isEnrolled;
+
+      }
+
+      return false
+ 
+
+      
+    } catch (error : any) {
+      console.error("Error in checkin enrollment in user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  async MyCoursesService(userId: string , type : string) {
+    try {
+      const awsConfig = new AwsConfig();
+
+      const getCouses = await CouresRepository.getUserCourses(userId as string , type as string)
+
+      const coursesWithUrls = await Promise.all(
+        getCouses.map(async (course: ICourse) => {
+          const thumbnails = course.thumbnail
+            ? await awsConfig.getfile(
+                course.thumbnail,
+                `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+              )
+            : null;
+          return { ...course, thumbnail: thumbnails };
+        })
+      );
+      return coursesWithUrls;
+
+    } catch (error) {
+      
     }
   }
 }

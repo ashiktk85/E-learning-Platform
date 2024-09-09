@@ -83,6 +83,10 @@ const TutorDashboard: React.FC = () => {
     if (currentStep === "More Details") {
       return <MoreDetails onNext={handleNext} />;
     }
+
+    if(currentStep === "Courses") {
+      return <CourseList onNext={handleNext} />
+    }
   
 
     const selected = menuItems.find((item) => item.name === selectedItem);

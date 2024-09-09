@@ -129,4 +129,15 @@ export class AdminController {
         }
     }
 
+    async userReport(req : Request , res :Response) {
+        try {
+          const  {courseId ,videoId ,reason ,additionalInfo} = req.body;
+          console.log("e",courseId ,"e",videoId , "e", reason , "add" ,additionalInfo);
+          
+            const reporting = await this.adminService.reportCourseService(courseId , videoId , reason , additionalInfo)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
 }

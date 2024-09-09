@@ -5,8 +5,8 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const createToken = (user_id: string): string => {
-    const newToken = jwt.sign({ user_id }, process.env.SECRET_KEY as string, { expiresIn: '10s' });
+const createToken = (user_id: string, role : string): string => {
+    const newToken = jwt.sign({ user_id , role }, process.env.SECRET_KEY as string, { expiresIn: '10s' });
     return newToken;
  };
 
@@ -16,7 +16,7 @@ console.log("seceeet",secret_key);
 
 const verifyToken  = (req : Request , res : Response, next : NextFunction) => {
         const authHeader = req.headers['authorization']
-        console.log("!authheader");
+        console.log("!authheader",authHeader);
         
         if(!authHeader) {
             return res.status(401).send("Authorization failed.")
@@ -32,10 +32,15 @@ const verifyToken  = (req : Request , res : Response, next : NextFunction) => {
             return res.status(401).send("Authorization failed.")
         }
 
-        jwt.verify(token , secret_key ,(err : any) => {
+      const decoded : any =   jwt.verify(token , secret_key ,(err : any) => {
             console.log("error in verifying  jtoken");
             return res.status(401).send("Authorization failed.")
         })
+
+        if(decoded?.role !== "user") {
+            res.status(401).json({message: "Not authorized"})
+            return
+        }
 
         
         

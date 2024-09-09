@@ -27,7 +27,8 @@ const categorySchema = new Schema<ICategory>({
   },
 }, { 
   timestamps: true,
-});
+},
+);
 
 const Category = model<ICategory>('Category', categorySchema);
 

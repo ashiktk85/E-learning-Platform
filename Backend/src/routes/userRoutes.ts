@@ -23,6 +23,12 @@ route.get('/get-courses',userController.getCourses.bind(userController))
 route.get("/getCourse/:id", userController.getCourseDetail.bind(userController))
 route.post('/createorder', userController.coursePayment.bind(userController))
 route.post('/saveCourse', userController.saveCourse.bind(userController))
+route.get('/check-enrollment/:email/:courseId',userController.checkEnrollement.bind(userController))
+route.get('/mycourses/:userId', userController.MyCourses.bind(userController))
+
+
+// chat 
+
 
 export default route;
 

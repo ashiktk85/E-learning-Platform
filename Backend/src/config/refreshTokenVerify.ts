@@ -29,7 +29,7 @@ const refreshTokenHandler = (req: Request, res: Response) => {
 
     
     
-    const  newAccessToken = createToken(userId)
+    const  newAccessToken = createToken(userId, "User")
 
     res.json({ accessToken: newAccessToken });
   });

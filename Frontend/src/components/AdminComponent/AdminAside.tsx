@@ -103,7 +103,7 @@ const AdminAside = () => {
     <div className="grid col-span-3 h-full">
       <div className="flex h-screen">
         <aside
-          className={`bg-black text-white transition-all duration-300 rounded-md h-full ${
+          className={`bg-gradient-to-r from-emerald-500 to-emerald-900 text-white transition-all duration-300 rounded-md h-full ${
             isCollapsed ? "w-16" : "w-64"
           } flex flex-col p-4`}
         >
@@ -115,7 +115,7 @@ const AdminAside = () => {
               key={key}
               onClick={() => handleNavigation(item.path, key)}
               className={`flex items-center p-3 my-2 rounded-md cursor-pointer ${
-                activeItemKey === key ? "bg-gray-700" : "hover:bg-gray-600"
+                activeItemKey === key ? "bg-gradient-to-r from-slate-300 to-slate-500" : "hover:bg-gray-00"
               }`}
             >
               <span className="mr-3">{item.icon}</span>

@@ -12,6 +12,7 @@ import { createToken } from "../config/jwtConfig";
 import { Course } from "../models/courseModel";
 import Category from "../models/categoryModel";
 import orderModel from "../models/orderModel";
+import { application } from "express";
 
 export class UserRepositary {
   
@@ -219,13 +220,29 @@ export class UserRepositary {
         
       };
 
-      await TutorApplication.findOneAndUpdate({email : email} ,
+      const tutor = await TutorApplication.findOneAndUpdate({email : email} ,
         {
           $set : {
             status : 'accepted'
           }
         }
       )
+
+
+
+      const updateData = {
+        email : user.email,
+        role : tutor?.tutorRole,
+        bio : tutor?.teachingExperience,
+        education : tutor?.degree,
+        experience : tutor?.subjectsOfExpertise
+      }
+
+      const updatedProfile = await TutorProfile.findOneAndUpdate(
+        { userId: user._id }, 
+        { $set: updateData }, 
+        { new: true, upsert: true } 
+      );
   
       return userInfo;
     } catch (err: any) {
@@ -294,7 +311,7 @@ export class UserRepositary {
   }
   
 
-  static  async getApplicantDataRepo (email : string) {
+  static  async  getApplicantDataRepo (email : string) {
     try { 
       const tutorData = await TutorProfile.findOne({email : email},
         {
@@ -306,19 +323,48 @@ export class UserRepositary {
           bio : 1,
           role : 1,
           language : 1,
-          country : 1
+          country : 1,
+          profilePhotoUrl : 1,
+          email : 1,
+          userId : 1
         }
       )
-      return tutorData;
+
+      const tutor = {
+        userId: tutorData?.userId,
+        bio : tutorData?.bio,
+        tutorRole : tutorData?.role,
+        email : email,
+        education : tutorData?.education,
+        country : tutorData?.country,
+        experience : tutorData?.experience,
+        language : tutorData?.language,
+        profilePhotoUrl : tutorData?.profilePhotoUrl
+      }
+
+     
+      return tutor;
     } catch (error : any) {
       console.log("Error in getting applicant data user repo", error.message); 
       throw new Error(error.message);
     }
   }
   
-  static async getCourses() {
+  static async getCourses(category : string) {
     try {
-      const Courses = await Course.find({})
+      let filter : {category?: string} = {}
+      if (category && category !== "All") {
+        filter.category = category;
+      } else if(category && category === 'All') {
+        filter = {}
+      }
+
+      
+      console.log("Filter:", filter);
+
+
+      const Courses = await Course.find(filter)
+      // console.log(Courses);
       return Courses;
     } catch (error : any) {
       console.log("Error in getting courses user repo", error.message); 
@@ -368,7 +414,8 @@ export class UserRepositary {
             email : tutor.email,
             courseId : course.courseId,
             price : course.price,
-            uploadedDate : course?.createdAt
+            uploadedDate : course?.createdAt,
+            users : course?.users?.length
         }
 
         return CourseData;
@@ -397,12 +444,26 @@ export class UserRepositary {
       $push : { courses : courseId}
     })
 
+    const user = await UserModel.findOne({ email : email})
+    const userId = user?.userId
+
+    const add  = await Course.updateOne(
+      {courseId : courseId},
+      {
+        $push : {
+          users : userId
+        }
+      }
+    )
+
     return true;
     } catch (error : any) {
       console.log("Error in saving course data on user in user repo", error.message); 
       throw new Error(error.message);
     }
   }
+
+  
 }
 
 

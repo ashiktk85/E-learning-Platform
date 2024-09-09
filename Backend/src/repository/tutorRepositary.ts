@@ -141,7 +141,7 @@ export class TutorRepositary {
         { new: true, upsert: true } 
       );
       console.log('Profile updated or created:', updatedProfile);
-      return true;
+      return updatedProfile;
       
       
     } catch (error : any) {
@@ -214,6 +214,23 @@ export class TutorRepositary {
       return courses;
     } catch (error) {
       console.error('Error fetching courses:', error);
+      throw error;
+    }
+  }
+
+  static async uploadProfileRepo(email : string , profileName :string) {
+    try {
+      const profile = await TutorProfile.findOneAndUpdate({email : email}, 
+        {
+          $set : {
+            profilePhotoUrl : profileName
+          }
+        }
+      )
+
+      return true
+    } catch (error) {
+      console.error('Error uploading profile pic tutor repo:', error);
       throw error;
     }
   }

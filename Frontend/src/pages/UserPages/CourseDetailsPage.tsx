@@ -38,12 +38,14 @@ interface IcourseData {
   email: string;
   courseId: string;
   price: string | number;
+  users?: number
 }
 
 const CourseDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const navigate = useNavigate(); 
+console.log("courese id", id);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -78,9 +80,14 @@ const CourseDetailsPage = () => {
               <h1 className="text-xl font-bold">{courseData?.name}</h1>
               <div className="w-full flex gap-20">
                 <p>Ratings: {courseData?.ratings.length}</p>
+                <div className="flex gap-5">
+
                 <HiMiniUsers size={20} /> 
+                {courseData?.users}
+                </div>
+               
                 <div className="flex gap-5 ">
-                <FaBook />
+                <FaBook size={20}/>
                 {totalVideos}
                 </div>
                
@@ -98,7 +105,7 @@ const CourseDetailsPage = () => {
                       {section.videos.length > 0 ? (
                         section.videos.map((video, videoIndex) => (
                           <div
-                            className="flex items-center gap-2 p-2"
+                            className="flex items-center gap-2 p-2 "
                             key={videoIndex}
                           >
                             <MdOndemandVideo className="text-xl" />
@@ -121,9 +128,9 @@ const CourseDetailsPage = () => {
                 className="w-full h-60 rounded-md"
                 alt={`${courseData?.name} Thumbnail`}
               />
-              <h1 className="text-xl font-semibold">
+              <h1 className="text-lg font-medium">
                 {courseData?.price ? (
-                  <p className="px-5 py-3"> ${courseData.price}</p>
+                  <p className="px-5 py-3"> {"price : "+courseData.price}</p>
                 ) : (
                   <p className="text-green-500 px-5 py-3">Free</p>
                 )}

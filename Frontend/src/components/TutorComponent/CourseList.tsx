@@ -44,7 +44,7 @@ const CourseList: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
             shadow="sm"
             className="rounded-lg"
             isPressable
-            onPress={() => onNext(course.name)}
+            // onPress={() => onNext(course.name)}
           >
             <CardBody className="overflow-visible p-0">
               <Image

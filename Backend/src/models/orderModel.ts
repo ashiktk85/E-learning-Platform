@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
 
-// Define the Order schema
 const OrderSchema = new Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   courseId: { type: String, required: true },
@@ -11,9 +10,11 @@ const OrderSchema = new Schema({
   paymentStatus: { type: String, enum: ['Pending', 'Completed', 'Failed'], default: 'Pending' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-});
+ 
+},
+{ versionKey: false }
+);
 
-// Define the Order interface
 interface IOrder extends Document {
   userId: mongoose.Schema.Types.ObjectId;
   courseId: string;
@@ -24,6 +25,7 @@ interface IOrder extends Document {
   paymentStatus: 'Pending' | 'Completed' | 'Failed';
   createdAt: Date;
   updatedAt: Date;
+
 }
 
 export default model<IOrder>('Order', OrderSchema);

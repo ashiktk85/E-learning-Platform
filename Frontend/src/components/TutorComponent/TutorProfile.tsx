@@ -5,8 +5,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { MdAddAPhoto } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { ErrorMessage, Field, Form, Formik, useFormik } from "formik";
-
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast, Toaster } from "sonner";
 
@@ -16,24 +15,29 @@ interface ProfileData {
   bio: string;
   education: string;
   experience: string;
-  role: string;
+  tutorRole: string;
   country?: string;
   language?: string;
+  profileUrl?: string;
 }
 
 const TutorProfile = () => {
   const user = useSelector((state: RootState) => state.user);
   const userInfo = user.userInfo;
-  console.log("user" , userInfo);
-  
+
   const getTutorDataRef = useRef<() => Promise<void>>();
 
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(
     "https://via.placeholder.com/150"
   );
+  const [newImage, setNewImage] = useState<File | null>(null);
+  const [isSaveButtonVisible, setIsSaveButtonVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isProfileModal, setProfilModalOpen] = useState<boolean>(false);
+
+  console.log(imagePreview, "im prev");
+  
 
   useEffect(() => {
     const getTutorData = async () => {
@@ -41,8 +45,11 @@ const TutorProfile = () => {
         const response = await axios.get(
           `${url}/tutor/applicationdata/${userInfo?.email}`
         );
-        console.log(response.data);
         setProfileData(response.data);
+
+        if (response.data.profileUrl) {
+          setImagePreview(response.data.profileUrl);
+        }
       } catch (error) {
         console.error("Error fetching tutor data:", error);
       }
@@ -55,14 +62,17 @@ const TutorProfile = () => {
     }
   }, [userInfo?.email]);
 
-  const formikInitialValues = useMemo(() => ({
-    bio: profileData?.bio || "",
-    role: profileData?.role || "",
-    degree: profileData?.education || "",
-    country: profileData?.country || "",
-    language: profileData?.language || "",
-    experience: profileData?.experience || "",
-  }), [profileData]);
+  const formikInitialValues = useMemo(
+    () => ({
+      bio: profileData?.bio || "",
+      role: profileData?.tutorRole || "",
+      degree: profileData?.education || "",
+      country: profileData?.country || "",
+      language: profileData?.language || "",
+      experience: profileData?.experience || "",
+    }),
+    [profileData]
+  );
 
   const formik = useFormik({
     initialValues: formikInitialValues,
@@ -72,7 +82,6 @@ const TutorProfile = () => {
         .trim()
         .required("Bio required")
         .min(20, "Should at least have 30 words."),
-      // .max(20, "Should contain max 50 words."),
       role: Yup.string().trim().required("Role required"),
       degree: Yup.string().trim().required("Degree required"),
       country: Yup.string().trim().required("Country required"),
@@ -81,17 +90,15 @@ const TutorProfile = () => {
     }),
     onSubmit: async (values) => {
       try {
-        console.log(values);
         const email = userInfo?.email;
-        console.log(email);
 
         const response = await axios.post(`${url}/tutor/editprofile`, {
           values,
           email,
         });
-        if (response.data === true) {
-          const updatedProfileData: ProfileData = response.data.updatedProfile;
-          setProfileData(updatedProfileData);
+
+        if (response.data) {
+          setProfileData(response.data);
           toast.success("Profile updated.");
           getTutorDataRef.current?.();
           closeProfileModal();
@@ -102,20 +109,47 @@ const TutorProfile = () => {
     },
   });
 
- 
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setNewImage(file);
+      setImagePreview(URL.createObjectURL(file));
+      setIsSaveButtonVisible(true); 
     }
   };
 
- 
+  const handleImageSave = async () => {
+    if (newImage) {
+      try {
+        const formData = new FormData();
+        formData.append("profilePic", newImage);
+        formData.append("email", userInfo?.email || "");
+
+        console.log(formData);
+        
+
+        const response = await axios.post(
+          `${url}/tutor/uploadProfilePic`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.data) {
+          setProfileData(response.data);
+          setImagePreview(response.data.profilePhotoUrl);
+          toast.success("Profile picture updated.");
+          setIsSaveButtonVisible(false); // Hide save button after successful save
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+      }
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -137,7 +171,7 @@ const TutorProfile = () => {
         <div className="relative">
           <div className="w-40 h-40 rounded-full overflow-hidden bg-gray-200">
             <img
-              src={imagePreview}
+              src={profileData?.profileUrl || imagePreview}
               alt="Profile Photo"
               className="w-full h-full object-cover"
             />
@@ -185,6 +219,17 @@ const TutorProfile = () => {
           </div>
         </div>
       </div>
+
+      {isSaveButtonVisible && (
+        <div className="mt-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={handleImageSave}
+          >
+            Save
+          </button>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -350,7 +395,7 @@ const TutorProfile = () => {
             <div className="w-full h-12 border border-gray-300 rounded-lg bg-[#ffffff]">
               <p className="pl-2 pt-3 pr-2">
                 {" "}
-                {profileData?.role || "No role provided"}
+                {profileData?.tutorRole || "No role provided"}
               </p>
             </div>
           </div>

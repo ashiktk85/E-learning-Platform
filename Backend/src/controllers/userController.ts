@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { query, Request, Response } from "express";
 import {createToken, secret_key} from "../config/jwtConfig";
 import { UserService } from "../services/userServices";
 import jwt from "jsonwebtoken";
@@ -102,7 +102,8 @@ export class UserController {
 
   async getCourses(req : Request , res : Response ) {
     try {
-      const courses = await this.userService.getCoursesService()
+      const { category } = req.query as { category?: string };
+      const courses = await this.userService.getCoursesService(category as string)
       res.status(200).json(courses)
     } catch ( error : any) {
       console.error(error.message);
@@ -110,10 +111,14 @@ export class UserController {
     }
   }
 
-  async getCourseDetail(req : Request, res : Response) {
+  async   getCourseDetail(req : Request, res : Response) {
     try {
       const {id} = req.params
+      console.log(id , "id");
+      
       const courseData =  await this.userService.getCourseDetail(id as string)
+      console.log(courseData.sections[0].videos);
+      
       res.status(200).json(courseData)
     } catch (error : any) {
       console.error(error.message);
@@ -144,6 +149,39 @@ export class UserController {
       const response = await this.userService.saveCourseService(courseId as string ,email as string)
 
       res.status(201).json(true)
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async checkEnrollement(req : Request, res : Response) {
+    try {
+      const  {courseId , email} = req.params
+      console.log(courseId , "cuu");
+      
+
+      const response = await this.userService.checkEnrollementSevice(courseId as string, email as string)
+
+        console.log(response);
+        
+      res.status(200).json(response)
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async MyCourses(req : Request, res : Response) {
+    try {
+      
+      const userId = req.params.userId;
+      const { type } = req.query;
+
+      const courses = await this.userService.MyCoursesService(userId as string , type as string)
+
+      res.status(200).json(courses)
+
     } catch (error : any) {
       console.error(error.message);
       res.status(500).json({ message: error.message });

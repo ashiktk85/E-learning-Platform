@@ -32,5 +32,6 @@ route.get('/applicationdata/:email' , tutorController.getTutorDetails.bind(tutor
 route.post('/editprofile' , tutorController.editProfile.bind(tutorController))
 route.post('/create-course/:email', upload.any() ,tutorController.createCourse.bind(tutorController))
 route.get('/get-courses/:email', tutorController.getCourses.bind(tutorController))
+route.post('/uploadProfilePic',  upload.single("profilePic") ,tutorController.uploadProfile.bind(tutorController))
 
 export default route;

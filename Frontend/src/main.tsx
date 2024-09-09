@@ -8,7 +8,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { CourseProvider } from "./context/courseContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <CourseProvider>
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </CourseProvider>
       </PersistGate>
     </Provider>
-  </React.StrictMode>
+  
 );

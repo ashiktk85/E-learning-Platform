@@ -1,226 +1,189 @@
-import React from 'react';
+import axios from "axios";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { Base_URL } from "../../credentials";
+import Navbar from "../../components/UserComponent/Navbar";
+import { MdOutlineSettings } from "react-icons/md";
+import { toast, Toaster } from "sonner";
+
+interface IcourseData {
+  name: string;
+  description: string;
+  Category: string;
+  sections: Isection[];
+  tags: string[];
+  language: string;
+  ratings: number[];
+  comments: string[];
+  thumbnailUrl: string;
+  tutorName: string;
+  tutorBio: string;
+  education: string;
+  certifications: string[];
+  email: string;
+  courseId: string;
+  price: string | number;
+}
+
+interface Ivideo {
+  _id: string;
+  title: string;
+  url: string;
+  description: string;
+}
+
+interface Isection {
+  _id: string;
+  title: string;
+  sectionTitle: string;
+  videos: Ivideo[];
+}
 
 const CoursePlayer: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+  const [courseData, setCourseData] = useState<IcourseData | null>(null);
+  const [currentVideo, setCurrentVideo] = useState<Ivideo | null>(null);
+  const videoPlayerRef = useRef<HTMLVideoElement | null>(null);
+  const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({});
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const response = await axios.get(`${Base_URL}/getCourse/${courseId}`);
+        setCourseData(response.data);
+
+        const savedVideoId = localStorage.getItem(`activeVideo_${courseId}`);
+        const initialVideo = savedVideoId
+          ? response.data.sections
+              .flatMap((section: { videos: any }) => section.videos)
+              .find((video: { _id: string }) => video._id === savedVideoId)
+          : response.data.sections.length > 0 &&
+            response.data.sections[0].videos.length > 0
+          ? response.data.sections[0].videos[0]
+          : null;
+
+        setCurrentVideo(initialVideo);
+        setActiveVideoId(initialVideo?._id || null);
+      } catch (error) {
+        console.error("Error fetching course data:", error);
+      }
+    };
+    fetchCourseData();
+  }, [courseId]);
+
+  const handleVideoClick = (video: Ivideo) => {
+    setCurrentVideo(video);
+    setActiveVideoId(video._id);
+    localStorage.setItem(`activeVideo_${courseId}`, video._id);
+  };
+
+  const getThumbnailUrl = (videoUrl: string) => {
+    return new Promise<string>((resolve, reject) => {
+      const video = document.createElement("video");
+      video.src = videoUrl;
+      video.crossOrigin = "anonymous";
+
+      video.addEventListener("loadedmetadata", () => {
+        video.currentTime = 1;
+      });
+
+      video.addEventListener("seeked", () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const thumbnailUrl = canvas.toDataURL("image/png");
+        resolve(thumbnailUrl);
+      });
+
+      video.addEventListener("error", (error) => {
+        reject("Failed to load video");
+      });
+    });
+  };
+
+  useEffect(() => {
+    if (courseData) {
+      courseData.sections.forEach((section) => {
+        section.videos.forEach((video) => {
+          if (!thumbnails[video._id]) {
+            getThumbnailUrl(video.url)
+              .then((url) => {
+                setThumbnails((prev) => ({ ...prev, [video._id]: url }));
+              })
+              .catch((err) =>
+                console.error("Error generating thumbnail:", err)
+              );
+          }
+        });
+      });
+    }
+  }, [courseData, thumbnails]);
+
+  const handleReportClick = () => {
+    setShowReportModal(true);
+    setShowDropdown(false); // Close dropdown when report is clicked
+  };
+
+  const handleReportSubmit = async () => {
+    try {
+      await axios.post(`${Base_URL}/admin/report`, {
+        courseId,
+        videoId: activeVideoId,
+        reason: reportReason,
+        additionalInfo,
+      });
+      toast.success("Report submitted successfully");
+      setShowReportModal(false);
+      setReportReason("");
+      setAdditionalInfo("");
+    } catch (error) {
+      toast.error("Failed to submit report");
+    }
+  };
+
   return (
     <div
       className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden"
       style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
     >
+      <Toaster richColors position="top-center"/>
       <div className="layout-container flex h-full grow flex-col">
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f5f4] px-10 py-3">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-4 text-[#111817]">
-              <div className="size-4">
-                <svg
-                  viewBox="0 0 48 48"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </div>
-              <h2 className="text-[#111817] text-lg font-bold leading-tight tracking-[-0.015em]">
-                Learnly
-              </h2>
-            </div>
-            <label className="flex flex-col min-w-40 !h-10 max-w-64">
-              <div className="flex w-full flex-1 items-stretch rounded-xl h-full">
-                <div
-                  className="text-[#5f8c85] flex border-none bg-[#f0f5f4] items-center justify-center pl-4 rounded-l-xl border-r-0"
-                  data-icon="MagnifyingGlass"
-                  data-size="24px"
-                  data-weight="regular"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-                  </svg>
-                </div>
-                <input
-                  placeholder="Search"
-                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111817] focus:outline-0 focus:ring-0 border-none bg-[#f0f5f4] focus:border-none h-full placeholder:text-[#5f8c85] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
-                />
-              </div>
-            </label>
-          </div>
-          <div className="flex flex-1 justify-end gap-8">
-            <div
-              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-              style={{
-                backgroundImage:
-                  'url("https://cdn.usegalileo.ai/stability/db0d02e0-65cb-4773-97df-b3ddb8a44b83.png")',
-              }}
-            ></div>
-          </div>
-        </header>
-        <div className="gap-1 px-6 flex flex-1 justify-center py-5">
+        <Navbar />
+        <div className="gap-1 px-6 flex flex-1 justify-center py-5 mt-16">
           <div className="layout-content-container flex flex-col max-w-[920px] flex-1">
-            <div
-              className="relative flex items-center justify-center bg-[#111817] bg-cover bg-center aspect-video"
-              style={{
-                backgroundImage:
-                  'url("https://cdn.usegalileo.ai/stability/8e095af3-51a1-4be7-87d8-3e462e123651.png")',
-              }}
-            >
-              <button className="flex shrink-0 items-center justify-center rounded-full size-16 bg-black/40 text-white">
-                <div
-                  className="text-inherit"
-                  data-icon="Play"
-                  data-size="24px"
-                  data-weight="fill"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path>
-                  </svg>
-                </div>
-              </button>
+            <div className="relative flex items-center justify-center bg-[#111817] bg-cover bg-center aspect-video rounded-2xl">
+              {currentVideo ? (
+                <video
+                  ref={videoPlayerRef}
+                  controls
+                  src={currentVideo.url}
+                  className="w-full h-full object-cover rounded shadow"
+                />
+              ) : (
+                <p className="text-gray-500">
+                  Select a video from the playlist to start watching.
+                </p>
+              )}
             </div>
-            <h3 className="text-[#111817] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
-              Chapter 1: Introduction to the course
-            </h3>
-            <div className="flex gap-4 bg-white px-4 py-3">
-              <div
-                className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12"
-                data-icon="Play"
-                data-size="24px"
-                data-weight="regular"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24px"
-                  height="24px"
-                  fill="currentColor"
-                  viewBox="0 0 256 256"
-                >
-                  <path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"></path>
-                </svg>
-              </div>
-              <div className="flex flex-1 flex-col justify-center">
-                <p className="text-[#111817] text-base font-medium leading-normal">
-                  Introduction
-                </p>
-                <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                  Welcome to the course! In this video, you'll learn about the
-                  course structure and what you can expect from each lesson.
-                  You'll also get an overview of the topics that will be covered
-                  in the course.
-                </p>
-                <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                  Video - 2 mins
-                </p>
-              </div>
-            </div>
+
+            {currentVideo && (
+              <h3 className="text-[#111817] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+                {currentVideo.title}
+              </h3>
+            )}
+
             <div className="flex gap-4 bg-white px-4 py-3 justify-between">
               <div className="flex items-start gap-4">
-                <div
-                  className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12"
-                  data-icon="BookOpen"
-                  data-size="24px"
-                  data-weight="regular"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M224,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h64a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM96,192H32V64H96a24,24,0,0,1,22.45,16.07A56,56,0,0,0,112,136v12.12A39.91,39.91,0,0,0,96,192Zm128,0H160a39.91,39.91,0,0,0-16-43.88V136a56,56,0,0,0-6.45-26A24,24,0,0,1,160,64h64Z"></path>
-                  </svg>
-                </div>
-                <div className="flex flex-1 flex-col justify-center">
-                  <p className="text-[#111817] text-base font-medium leading-normal">
-                    Introduction
-                  </p>
-                  <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                    Welcome to the course! In this video, you'll learn about the
-                    course structure and what you can expect from each lesson.
-                    You'll also get an overview of the topics that will be
-                    covered in the course.
-                  </p>
-                  <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                    Video - 2 mins
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 border border-[#e1e6e4] flex items-center justify-center"
-                style={{
-                  backgroundImage:
-                    'url("https://cdn.usegalileo.ai/stability/4945d62d-8e1d-4c01-b0f8-97a9429e6a5a.png")',
-                }}
-              >
-                <span className="text-[#5f8c85]">✓</span>
-              </button>
-            </div>
-            <div
-              className="relative flex items-center justify-center bg-[#111817] bg-cover bg-center aspect-video"
-              style={{
-                backgroundImage:
-                  'url("https://cdn.usegalileo.ai/stability/4fdd97cd-bbdb-4cc6-96b4-9a15390c64c0.png")',
-              }}
-            >
-              <button className="flex shrink-0 items-center justify-center rounded-full size-16 bg-black/40 text-white">
-                <div
-                  className="text-inherit"
-                  data-icon="Play"
-                  data-size="24px"
-                  data-weight="fill"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"></path>
-                  </svg>
-                </div>
-              </button>
-            </div>
-            <h3 className="text-[#111817] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
-              Chapter 2: Understanding Cryptocurrency
-            </h3>
-            <div className="flex items-start gap-2 px-4 py-3">
-              <div className="flex flex-1 flex-col justify-center">
-                <p className="text-[#111817] text-base font-medium leading-normal">
-                  Introduction
-                </p>
-                <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                  Welcome to the course! In this video, you'll learn about the
-                  course structure and what you can expect from each lesson.
-                  You'll also get an overview of the topics that will be covered
-                  in the course.
-                </p>
-                <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                  Video - 2 mins
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 bg-white px-4 py-3 justify-between">
-              <div className="flex items-start gap-4">
-                <div
-                  className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12"
-                  data-icon="Star"
-                  data-size="24px"
-                  data-weight="fill"
-                >
+                <div className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24px"
@@ -233,73 +196,117 @@ const CoursePlayer: React.FC = () => {
                 </div>
                 <div className="flex flex-1 flex-col justify-center">
                   <p className="text-[#111817] text-base font-medium leading-normal">
-                    Introduction
+                    {currentVideo?.title}
                   </p>
                   <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                    Welcome to the course! In this video, you'll learn about the
-                    course structure and what you can expect from each lesson.
-                    You'll also get an overview of the topics that will be
-                    covered in the course.
-                  </p>
-                  <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                    Video - 2 mins
+                    {currentVideo?.description}
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 border border-[#e1e6e4] flex items-center justify-center"
-                style={{
-                  backgroundImage:
-                    'url("https://cdn.usegalileo.ai/stability/4945d62d-8e1d-4c01-b0f8-97a9429e6a5a.png")',
-                }}
-              >
-                <span className="text-[#5f8c85]">✓</span>
-              </button>
             </div>
-            <div className="flex items-start gap-4 px-4 py-3 justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
+          </div>
+
+          <div className="h-full w-1/4 pl-5">
+            <div className="flex justify-end pr-2 pb-2 relative">
+              <MdOutlineSettings
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="cursor-pointer"
+              />
+              {showDropdown && (
+                <div className="absolute right-0 top-8 bg-white shadow-lg rounded-md w-48">
+                  <button
+                    onClick={handleReportClick}
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
                   >
-                    <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
-                  </svg>
-                </span>
-                <p className="text-[#111817] text-base font-medium leading-normal">
-                  4.8 (38 ratings)
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                {[...Array(4)].map((_, index) => (
-                  <svg
-                    key={index}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"></path>
-                  </svg>
-                ))}
-              </div>
+                    Report Video
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="flex flex-1 items-center justify-end px-4 py-4">
-              <button
-                type="button"
-                className="rounded-lg bg-[#1f7a8c] px-6 py-2 text-white text-sm font-medium leading-normal"
-              >
-                Start Course
-              </button>
+            <div className="rounded-lg h-auto w-full overflow-y-auto max-h-[70vh] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+              {courseData?.sections.map((section) => (
+                <div key={section._id} className="mb-6">
+                  <h2 className="text-gray-600 text-sm font-semibold mb-2">
+                    {section.sectionTitle}
+                  </h2>
+                  {section.videos.map((video) => (
+                    <div
+                      key={video._id}
+                      className={`flex items-center p-2 mb-2 cursor-pointer rounded-lg ${
+                        activeVideoId === video._id
+                          ? "bg-gray-200"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleVideoClick(video)}
+                    >
+                      <img
+                        src={thumbnails[video._id] || ""}
+                        alt="thumbnail"
+                        className="w-16 h-10 rounded mr-3 object-cover"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-gray-800">
+                          {video.title}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+
+      {showReportModal && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 className="text-xl font-bold mb-4">Report Video</h2>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Reason:
+              </label>
+              <select
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="block w-full p-2 border rounded"
+              >
+                <option value="">Select a reason</option>
+                <option value="Promotes hate">Promotes hate</option>
+                <option value="Sexual content">Sexual content</option>
+                <option value="Inappropriate">Inappropriate</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            {reportReason === "Other" && (
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Additional Information:
+                </label>
+                <textarea
+                  value={additionalInfo}
+                  onChange={(e) => setAdditionalInfo(e.target.value)}
+                  className="block w-full p-2 border rounded"
+                />
+              </div>
+            )}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowReportModal(false)}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReportSubmit}
+                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

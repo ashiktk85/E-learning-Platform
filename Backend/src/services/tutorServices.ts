@@ -27,6 +27,7 @@ interface CourseData {
     additionalDetail1: string;
     price: string;
     files: { type: string; url: string }[];
+    profilePhotoUrl?: string;
   }
   
 
@@ -170,70 +171,7 @@ export class TutorServices {
             throw new Error(`Failed to upload file to S3: ${error.message}`);
         }
     }
-    
 
-    private async uploadFileToS3Multipart(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
-        const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname;
-        const partSize = 5 * 1024 * 1024; 
-        const totalParts = Math.ceil(file.buffer.length / partSize);
-        const uploadId = await s3Client.send(new CreateMultipartUploadCommand({
-            Bucket: bucketName,
-            Key: `${folderPath}${uniqueName}`,
-            ContentType: file.mimetype,
-        }));
-    
-        const uploadParts = [];
-        
-        try {
-            // Upload parts
-            for (let part = 0; part < totalParts; part++) {
-                const start = part * partSize;
-                const end = Math.min(file.buffer.length, start + partSize);
-                const partBuffer = file.buffer.slice(start, end);
-    
-                const uploadPartCommand = new UploadPartCommand({
-                    Bucket: bucketName,
-                    Key: `${folderPath}${uniqueName}`,
-                    PartNumber: part + 1,
-                    UploadId: uploadId.UploadId,
-                    Body: partBuffer,
-                    ContentLength: partBuffer.length,
-                });
-    
-                const uploadedPart = await s3Client.send(uploadPartCommand);
-                uploadParts.push({
-                    ETag: uploadedPart.ETag,
-                    PartNumber: part + 1,
-                });
-            }
-    
-         
-            const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
-                Bucket: bucketName,
-                Key: `${folderPath}${uniqueName}`,
-                UploadId: uploadId.UploadId,
-                MultipartUpload: { Parts: uploadParts },
-            });
-    
-            await s3Client.send(completeMultipartUploadCommand);
-            console.log('Multipart upload completed successfully');
-    
-            return uniqueName;
-        } catch (error: any) {
-           
-            await s3Client.send(new AbortMultipartUploadCommand({
-                Bucket: bucketName,
-                Key: `${folderPath}${uniqueName}`,
-                UploadId: uploadId.UploadId,
-            }));
-    
-            console.error('Error with multipart upload:', error);
-            throw new Error(`Multipart upload failed: ${error.message}`);
-        }
-    }
-    
-    
-    
 
     async verifyLoginService(applicationId : string , passcode : string) : Promise<any | void> {
         try {
@@ -250,8 +188,22 @@ export class TutorServices {
 
     async getApplicationDataService(email : string) : Promise<any> {
         try {
+            const awsConfig = new AwsConfig();
 
             const response = await UserRepositary.getApplicantDataRepo(email as string)
+
+            if(response?.profilePhotoUrl) {
+                console.log(typeof(response?.profilePhotoUrl));
+                
+                const profileUrl = await awsConfig.getfile(response?.profilePhotoUrl ,`tutorProfile/profileImgs/` )
+                return {...response , profileUrl};
+                
+                
+            }
+
+            
+
+           
 
             return response;
             
@@ -263,6 +215,7 @@ export class TutorServices {
 
     async editProfileService(data : any) {
         try {
+         
             const res = await TutorRepositary.editProfileRepo(data as any)
             return res;
         } catch (error :any) {
@@ -306,7 +259,23 @@ export class TutorServices {
         }
       }
       
+      async uploadProfile(email : string , file :  any) {
+        try {
+
+            const bucketName = "learn-sphere";
+            const profileKey = `tutorProfile/profileImgs/${file.originalname}`;
+            
+            
+            const uploadResult = await this.uploadFileToS3(bucketName, profileKey, file);
       
+            const res = await TutorRepositary.uploadProfileRepo(email as string, uploadResult)
+
+            return res;
+        } catch (error) {
+            console.error('Error in uploding profile in tutor service:', error);
+            throw error;
+        }
+      }
 
     
 }

@@ -11,6 +11,8 @@ import AllCourses from '../pages/UserPages/AllCourses';
 import CourseDetailsPage from '../pages/UserPages/CourseDetailsPage';
 import Checkout from '../pages/UserPages/Checkout';
 import CoursePlayer from '../pages/UserPages/CoursePlayer';
+import MyCourses from '../pages/UserPages/MyCourses';
+import Community from '../pages/UserPages/Community';
 
 const UserRoutes = () => {
     return (
@@ -24,7 +26,9 @@ const UserRoutes = () => {
                 <Route path = '/coursesPage' element = {<AllCourses />} />
                 <Route path = '/courseDetails/:id' element = {<CourseDetailsPage />} />
                 <Route path = '/checkout/:id' element = {<Checkout />} />
-                <Route path = '/coursePlayer' element = {<UserProtector> <CoursePlayer /></UserProtector>} />
+                <Route path = '/coursePlayer/:courseId' element = {<UserProtector> <CoursePlayer /></UserProtector>} />
+                <Route path = '/mycourses' element = {<UserProtector> <MyCourses /> </UserProtector>} />
+                <Route path = '/community' element = {<UserProtector ><Community /></UserProtector>} />
         </Routes>
        </>
     );

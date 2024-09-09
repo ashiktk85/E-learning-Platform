@@ -107,7 +107,8 @@ const tutorApplicationSchema = new Schema<ITutorApplication>(
   },
   {
     timestamps: true, 
-  }
+  },
+ 
 );
 
 const TutorApplication = model<ITutorApplication>('TutorApplication', tutorApplicationSchema);

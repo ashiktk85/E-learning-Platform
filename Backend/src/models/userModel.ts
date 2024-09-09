@@ -9,21 +9,20 @@ export interface IUser extends Document {
    passwordHash: string;
    createdAt: Date;
    lastLogin: Date;
-   tutor?: Boolean;
+   tutor?: boolean;
    subscriptionId?: string;
    following: string[];
    followers: string[];
    referral?: string;
    isBlocked: boolean;
    tutorCredentials?: {
-     tutorId: string;
-     passwordHash: string;
+     tutorId?: string;
+     passwordHash?: string;
    };
-   courses ?: [];
- }
- 
+   courses?: [];
+}
 
- const userSchema = new Schema<IUser>({
+const userSchema = new Schema<IUser>({
    userId: { 
      type: String, 
      required: true,
@@ -56,9 +55,9 @@ export interface IUser extends Document {
    lastLogin: {
       type: Date 
    },
-   tutor : {
-      type : Boolean,
-      default : false
+   tutor: {
+      type: Boolean,
+      default: false
    },
    subscriptionId: {
       type: String, 
@@ -80,16 +79,23 @@ export interface IUser extends Document {
       default: false 
    },
    tutorCredentials: {
-     tutorId: { type: String, unique: true },
-     passwordHash: { type: String },
+      tutorId: { 
+        type: String,
+      },
+      passwordHash: { type: String },
    },
-   courses : {
-      type : [String],
-      default:[]
+   courses: {
+      type: [String],
+      default: []
    }
- });
- 
- const userModel = model<IUser>("User", userSchema);
- 
- export default userModel;
- 
+});
+
+
+userSchema.index(
+  { 'tutorCredentials.tutorId': 1 },
+  { unique: true, partialFilterExpression: { 'tutorCredentials.tutorId': { $exists: true, $ne: null } } }
+);
+
+const userModel = model<IUser>("User", userSchema);
+
+export default userModel;

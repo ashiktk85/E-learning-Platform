@@ -26,6 +26,7 @@ interface IcourseData {
   email: string;
   courseId: string;
   price: any;
+  users?: string[]
 }
 
 interface Ivideo {
@@ -59,25 +60,32 @@ const Checkout = () => {
   }, [id]);
 
   const handlePayment = async () => {
-    if (!courseData?.price) {
-      const res = await axios.post(`${Base_URL}/saveCourse`, {
-        email: email,
-        courseId: courseData?.courseId,
-      });
-
-      if (res) {
-        toast("Course purchased", {
-          action: {
-            label: "ok",
-            onClick: () => navigate("/coursesPage"),
-          },
+    if (courseData?.price === "Free") {
+      // If the course is free, proceed with saving the course directly
+      try {
+        const res = await axios.post(`${Base_URL}/saveCourse`, {
+          email: email,
+          courseId: courseData?.courseId,
         });
+  
+        if (res) {
+          toast("Course purchased", {
+            action: {
+              label: "ok",
+              onClick: () => navigate("/coursesPage"),
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error saving free course:", error);
+        toast.error("Failed to purchase the free course.");
       }
     } else {
+     
       try {
         const options = {
           key: RAZOR_KEY,
-          amount: courseData?.price * 100,
+          amount: courseData?.price * 100, 
           currency: "INR",
           name: "Learnsphere",
           description: "Course Payment",
@@ -94,7 +102,7 @@ const Checkout = () => {
                 paymentId: response.razorpay_payment_id,
                 orderId: response.razorpay_order_id,
               });
-
+  
               toast.success("Payment successful and order created.");
               setTimeout(() => {
                 navigate("/coursesPage");
@@ -110,7 +118,7 @@ const Checkout = () => {
             contact: "9876543210",
           },
         };
-
+  
         const paymentObject = new (window as any).Razorpay(options);
         paymentObject.open();
       } catch (error) {
@@ -119,6 +127,7 @@ const Checkout = () => {
       }
     }
   };
+  
 
   return (
     <main className="max-h-max w-full">
@@ -161,7 +170,7 @@ const Checkout = () => {
             <span className="text-gray-500">SUBTOTAL :</span>
             <span className="font-bold">
               {" "}
-              {courseData?.price ? "$ " + courseData?.price : "Free"}
+              {courseData?.price}
             </span>
           </div>
           <div className="flex justify-between">
@@ -171,7 +180,7 @@ const Checkout = () => {
           <div className="flex justify-between">
             <span className="text-gray-800 font-semibold">TOTAL :</span>
             <span className="font-bold">
-              {courseData?.price ? "$ " + courseData?.price : "Free"}
+              {courseData?.price}
             </span>
           </div>
         </div>
