@@ -220,9 +220,11 @@ export class UserService {
               
                 const videosWithUrls = await Promise.all(
                     section.videos.map(async (video: any) => {
+                      console.log(video.videoUrl , "vurl");
+                      
                         const videoUrl = await awsConfig.getfile(
                             video.videoUrl,
-                            `tutors/${response.email}/courses/${response.courseId}/sections/${index}/videos`
+                            `tutors/${response.email}/courses/${response.courseId}/videos`
                         );
                         return { ...video.toObject(), url: videoUrl };
                     })

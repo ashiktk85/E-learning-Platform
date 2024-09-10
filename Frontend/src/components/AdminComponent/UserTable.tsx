@@ -91,7 +91,7 @@ const UsersPage: React.FC = () => {
         <div className="px-0 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">Users</p>
+              
              
             </div>
             <div className="px-4 py-3">
@@ -147,7 +147,7 @@ const UsersPage: React.FC = () => {
                                                     ? handleUnblockClick(user)
                                                     : handleBlockClick(user)
                                                 }
-                          >Edit</button>
+                          >Block</button>
                         </td>
                       </tr>
                     ))}

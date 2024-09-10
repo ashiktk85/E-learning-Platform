@@ -17,6 +17,7 @@ interface CourseData {
     name: string;
     description: string;
     videos: {
+      name: string;
       description: string; title: string; videoUrl: string 
 }[];
   }[];
@@ -156,7 +157,7 @@ export class TutorRepositary {
       const videoFiles = data.files.filter((file) => file.type === 'video');
       const thumbnail = data.files.find((file) => file.type === 'thumbnail')?.url || '';
 
-      console.log(data.sections , "sections");
+      // console.log(data.sections , "sections");
       
       const sections = await Promise.all(
         data.sections.map(async (sectionData, sectionIndex) => {
@@ -164,7 +165,7 @@ export class TutorRepositary {
             sectionData.videos.map(async (video, videoIndex) => {
               
               const videoDoc = new Video({
-                title: video.title || `Video ${videoIndex + 1}`, 
+                title: video.name || `Video ${videoIndex + 1}`, 
                 description: sectionData.description,
                 videoUrl: videoFiles[videoIndex]?.url || '', 
               });
@@ -232,6 +233,19 @@ export class TutorRepositary {
     } catch (error) {
       console.error('Error uploading profile pic tutor repo:', error);
       throw error;
+    }
+  }
+
+  static async findVideo(videoId : string) {
+    try {
+      const video = await Video.findById({_id : videoId})
+      console.log(video, "video");
+
+      return video;
+      
+    } catch (error : any) {
+      console.log("Error in getting video  in tutor repo", error.message); 
+      throw new Error(error.message);
     }
   }
 }

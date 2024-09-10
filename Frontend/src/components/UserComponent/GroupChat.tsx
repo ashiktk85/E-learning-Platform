@@ -26,7 +26,6 @@ const GroupChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const socketRef = useRef<any>(null);
 
-  // Fetch courses on mount
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
@@ -40,40 +39,40 @@ const GroupChat: React.FC = () => {
     fetchCourseData();
   }, [userInfo?.userId]);
 
-  // Fetch messages whenever a course is selected
+
   useEffect(() => {
     const fetchMessages = async () => {
       if (selectedCourse) {
-        setIsLoading(true); // Show loading while fetching data
+        setIsLoading(true); 
         try {
           const response = await userAxiosInstance.get(
             `${Base_URL}/community/messages/${selectedCourse}`
           );
-          setMessages(response.data); // Set fetched messages
+          setMessages(response.data); 
         } catch (error) {
           console.error("Error fetching messages:", error);
         } finally {
-          setIsLoading(false); // Hide loading after fetching data
+          setIsLoading(false);
         }
       }
     };
 
-    fetchMessages(); // Call the function to fetch messages
+    fetchMessages(); 
 
     if (selectedCourse) {
-      // Connect to socket when a course is selected
+  
       socketRef.current = io(Base_URL);
       const socket = socketRef.current;
 
-      // Join the room for the selected course
+    
       socket.emit("joinRoom", selectedCourse);
 
-      // Listen for incoming messages
+    
       socket.on("receiveMessage", (payload: Message) => {
         setMessages((prevMsgs) => [...prevMsgs, payload]);
       });
 
-      // Cleanup on component unmount or when selected course changes
+      
       return () => {
         socket.off("receiveMessage");
         socket.disconnect();
@@ -95,8 +94,8 @@ const GroupChat: React.FC = () => {
   };
 
   const handleCourseClick = (courseId: string) => {
-    setSelectedCourse(courseId); // Update the selected course
-    setMessages([]); // Clear messages when switching courses
+    setSelectedCourse(courseId); 
+    setMessages([]); 
   };
 
   return (
@@ -126,12 +125,21 @@ const GroupChat: React.FC = () => {
           ))}
         </div>
       </section>
-      <section className="bg-white w-full h-full rounded-lg px-3 py-2 flex flex-col">
+      <section
+  className="bg-white w-full h-full rounded-lg px-3 py-2 flex flex-col"
+ 
+>
         {selectedCourse ? (
           <>
             <div className="w-full h-12 bg-orange-50 rounded-md mb-2"></div>
 
-            <div className="flex-grow bg-gray-100 overflow-y-auto rounded-md mb-2 p-3">
+            <div className="flex-grow bg-gray-100 overflow-y-auto rounded-md mb-2 p-3"
+             style={{
+              backgroundImage: 'url(https://i.pinimg.com/564x/f9/b2/0c/f9b20cfb86e7775f86124bee62d13458.jpg)',
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center', 
+            }}
+            >
               {isLoading ? (
                 <p className="text-center text-gray-500">Loading messages...</p>
               ) : messages.length > 0 ? (

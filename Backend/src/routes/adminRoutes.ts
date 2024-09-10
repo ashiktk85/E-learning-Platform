@@ -18,6 +18,11 @@ route.get('/checktutorstatus/:email', adminController.checkTutorStatus.bind(admi
 route.post('/createcategory', adminController.createCategory.bind(adminController))
 route.get('/categories' , adminController.getCategories.bind(adminController))
 route.post('/report' , adminController.userReport.bind(adminController))
+route.get('/getReports' , adminController.getReports.bind(adminController))
+route.get('/getcourses', adminController.getCourses.bind(adminController))
+
+//
+route.get('/reportDetail/:reportId',adminController.reportDetail.bind(adminController))
 
 
 export default route;

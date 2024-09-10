@@ -2,12 +2,15 @@ import React from 'react';
 import {Navigate ,Route , Routes ,Router } from 'react-router-dom'
 import AdminLogin from '../pages/AdminPages/AdminloginPage';
 import AdminDashboard from '../pages/AdminPages/AdminDashboard';
-import UserList from '../components/AdminComponent/UserList';
+import UserList from '../pages/AdminPages/UserListPage';
 import AdminNewTutorApplications from '../components/AdminComponent/AdminNewTutorApplications';
-import ApplicantDetails from '../components/AdminComponent/ApplicantDetails';
+import ApplicantDetails from '../pages/AdminPages/ApplicantDetailsPage';
 import AdminProtector from '../services/AdminProtector';
-import TutorList from '../components/AdminComponent/TutorList';
+import TutorList from '../pages/AdminPages/TutorListPage';
 import CategoryList from '../components/AdminComponent/CategoryList';
+import AdminReportList from '../components/AdminComponent/AdminReportList';
+import ReportDetailComponent from '../components/AdminComponent/ReportDetailComponent';
+import AdminCoursesPage from '../pages/AdminPages/AdminCoursesPage';
 
 const AdminRoutes = () => {
     return (
@@ -20,6 +23,9 @@ const AdminRoutes = () => {
                     <Route path=  '/applicationdetails' element={<AdminProtector><ApplicantDetails /></AdminProtector>} />
                     <Route path = '/tutors' element = {<AdminProtector> <TutorList /> </AdminProtector>} />
                     <Route path = '/category' element = {<AdminProtector> <CategoryList /></AdminProtector>} />
+                    <Route path = '/reports' element = {<AdminProtector> <AdminReportList /> </AdminProtector>} />
+                    <Route path = '/reportDetail/:id' element = {<AdminProtector><ReportDetailComponent /></AdminProtector>} /> 
+                    <Route path = '/courses' element = {<AdminProtector> <AdminCoursesPage /></AdminProtector>} />
             </Routes>
         </div>
     );

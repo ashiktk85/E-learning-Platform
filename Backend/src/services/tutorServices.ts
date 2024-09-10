@@ -98,10 +98,9 @@ export class TutorServices {
                 console.log('Processing File:', file);
     
                 if (file.fieldname.startsWith('sections')) {
-                    let sectionIndex = file.fieldname.match(/sections\[(\d+)\]/)?.[1];
-                    const videoIndex = file.fieldname.match(/videos\[(\d+)\]/)?.[1];
+             
     
-                    const folderPath = `${tutorFolderPath}sections/${sectionIndex}/videos/`;
+                    const folderPath = `${tutorFolderPath}videos/`;
                     
                     console.log(`Uploading video to ${folderPath}`);
                     const url = await this.uploadFileToS3(bucketName, folderPath, file);
@@ -123,6 +122,9 @@ export class TutorServices {
                 ...courseData,
                 files: fileUrls,
             };
+
+            // console.log("vidd",combinedData.sections[0].video,"com");
+            
     
            
             const res = await TutorRepositary.saveCourse(combinedData as any, email as string);
@@ -148,7 +150,7 @@ export class TutorServices {
             //     fileBuffer = await compressVideo(file);
             // }
     
-            const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname;
+            const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname.trim();
     
             const params = {
                 Bucket: bucketName,

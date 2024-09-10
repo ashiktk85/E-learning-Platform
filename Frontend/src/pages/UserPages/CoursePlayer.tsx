@@ -130,21 +130,23 @@ const CoursePlayer: React.FC = () => {
 
   const handleReportClick = () => {
     setShowReportModal(true);
-    setShowDropdown(false); // Close dropdown when report is clicked
+    setShowDropdown(false); 
   };
 
   const handleReportSubmit = async () => {
     try {
-      await axios.post(`${Base_URL}/admin/report`, {
+      const res = await axios.post(`${Base_URL}/admin/report`, {
         courseId,
         videoId: activeVideoId,
         reason: reportReason,
         additionalInfo,
       });
-      toast.success("Report submitted successfully");
-      setShowReportModal(false);
-      setReportReason("");
-      setAdditionalInfo("");
+      if(res.data === true) {
+        toast.success("Report submitted successfully");
+        setShowReportModal(false);
+        setReportReason("");
+        setAdditionalInfo("");
+      }
     } catch (error) {
       toast.error("Failed to submit report");
     }
@@ -240,7 +242,7 @@ const CoursePlayer: React.FC = () => {
                       onClick={() => handleVideoClick(video)}
                     >
                       <img
-                        src={thumbnails[video._id] || ""}
+                        src={courseData?.thumbnailUrl}
                         alt="thumbnail"
                         className="w-16 h-10 rounded mr-3 object-cover"
                       />

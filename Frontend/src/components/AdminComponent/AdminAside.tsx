@@ -76,7 +76,7 @@ const AdminAside = () => {
   };
 
   const handleNavigation = (path: string, key: number) => {
-    setActiveItemKey(key); // Set the active item
+    setActiveItemKey(key); 
     if (path === "/admin/logout") {
       setIsModalOpen(true);
     } else {
@@ -88,7 +88,7 @@ const AdminAside = () => {
     dispatch(logout())
       .unwrap()
       .then(() => {
-        setActiveItemKey(0); // Reset active item on logout
+        setActiveItemKey(0); 
         navigate("/admin");
       })
       .catch((error: any) => {
@@ -103,7 +103,7 @@ const AdminAside = () => {
     <div className="grid col-span-3 h-full">
       <div className="flex h-screen">
         <aside
-          className={`bg-gradient-to-r from-emerald-500 to-emerald-900 text-white transition-all duration-300 rounded-md h-full ${
+          className={`bg-white text-black transition-all duration-300 rounded-md h-full border-r-2 ${
             isCollapsed ? "w-16" : "w-64"
           } flex flex-col p-4`}
         >
@@ -115,7 +115,7 @@ const AdminAside = () => {
               key={key}
               onClick={() => handleNavigation(item.path, key)}
               className={`flex items-center p-3 my-2 rounded-md cursor-pointer ${
-                activeItemKey === key ? "bg-gradient-to-r from-slate-300 to-slate-500" : "hover:bg-gray-00"
+                activeItemKey === key ? "bg-gradient-to-r from-stone-500 to-stone-700 text-white" : "hover:bg-gray-100"
               }`}
             >
               <span className="mr-3">{item.icon}</span>
@@ -124,7 +124,7 @@ const AdminAside = () => {
           ))}
           <div
             onClick={() => handleNavigation("/admin/logout", menuItems.length)}
-            className={`flex items-center p-3 my-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700`}
+            className={`flex items-center p-3 my-2 rounded-md cursor-pointer  hover:bg-gradient-to-r from-rose-400 to-red-500 hover:text-white`}
           >
             <span className="mr-3">
               <IoMdLogOut />

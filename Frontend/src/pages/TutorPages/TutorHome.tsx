@@ -13,6 +13,8 @@ import { RootState } from "../../redux/store";
 const TutorHome = () => {
 
   const tutor = useSelector((state : RootState) => state.user)
+  console.log(tutor);
+  
     
   const navigate = useNavigate();
 

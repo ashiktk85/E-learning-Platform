@@ -8,7 +8,7 @@ import ProfilePage from './pages/UserPages/ProfilePage';
 import AdminLogin from './pages/AdminPages/AdminloginPage';
 
 import TVScreen from './components/common/UserCommon/404';
-import UserList from './components/AdminComponent/UserList';
+import UserList from './pages/AdminPages/UserListPage';
 import UserRoutes from './Routes/userRoutes';
 import AdminRoutes from './Routes/adminRoutes';
 import TutorRoutes from './Routes/tutorRoutes';

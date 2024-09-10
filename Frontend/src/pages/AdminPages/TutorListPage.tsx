@@ -1,7 +1,7 @@
 import React from 'react';
-import AdminAside from './AdminAside';
-import UserTable from './UserTable';
-import Search from '../common/AdminCommon/Search';
+import AdminAside from '../../components/AdminComponent/AdminAside';
+import UserTable from '../../components/AdminComponent/UserTable';
+import Search from '../../components/common/AdminCommon/Search';
 
 const TutorList = () => {
     return (
@@ -10,7 +10,7 @@ const TutorList = () => {
       <div className="col-span-8 bg-spotify-white w-full mt-10 h-80">
       <div className='flex justify-between'> 
       <h1 className="font-extrabold font-poppins text-2xl justify-start">Tutor list</h1>
-        <Search />
+    
         </div>
        
         <UserTable />

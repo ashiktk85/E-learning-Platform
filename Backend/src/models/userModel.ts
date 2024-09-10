@@ -16,7 +16,7 @@ export interface IUser extends Document {
    referral?: string;
    isBlocked: boolean;
    tutorCredentials?: {
-     tutorId?: string;
+     email?: string;
      passwordHash?: string;
    };
    courses?: [];
@@ -79,7 +79,7 @@ const userSchema = new Schema<IUser>({
       default: false 
    },
    tutorCredentials: {
-      tutorId: { 
+      email: { 
         type: String,
       },
       passwordHash: { type: String },

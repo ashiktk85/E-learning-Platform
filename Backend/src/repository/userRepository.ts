@@ -133,10 +133,8 @@ export class UserRepositary {
           isBlocked : 1
       }
     )
-      
-      console.log(data);
-      return data
-      
+      // console.log(data);
+      return data 
     } catch (error: any) {
       console.error('Error fetching users:', error);
     }
@@ -162,9 +160,7 @@ export class UserRepositary {
         { email: email },               
         { isBlocked: false }
       );
-      
       return true;
-      
     } catch (error : any) {
       console.error('Error in blocking user in  repo:', error);
     }
@@ -172,7 +168,6 @@ export class UserRepositary {
 
   static async addTutorToUserModel(
     email: string,
-    uniqueId: string,
     uniquePass: any
   ): Promise<any | void> {
     try {
@@ -182,7 +177,7 @@ export class UserRepositary {
           $set: {
             tutor: true,
             tutorCredentials: {
-              tutorId: uniqueId,
+              email: email,
               passwordHash: uniquePass,
             },
           },
@@ -199,15 +194,12 @@ export class UserRepositary {
           passwordHash: 1,
           isBlocked: 1,
           tutor : 1,
-          
           },
         }
       );
-  
       if (!user) {
         throw new Error('User not found');
       }
-  
       const userInfo = {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -227,9 +219,6 @@ export class UserRepositary {
           }
         }
       )
-
-
-
       const updateData = {
         email : user.email,
         role : tutor?.tutorRole,
@@ -251,10 +240,10 @@ export class UserRepositary {
     }
   }
 
-  static async verifyTutor(applicationId :string , passcode :any) {
+  static async verifyTutor(email :string , passcode :any) {
     try {
       
-      const user = await UserModel.findOne({ 'tutorCredentials.tutorId': applicationId },
+      const user = await UserModel.findOne({ email: email },
         {
           _id: 0,
           userId: 1,
@@ -462,6 +451,8 @@ export class UserRepositary {
       throw new Error(error.message);
     }
   }
+
+  
 
   
 }

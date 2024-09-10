@@ -11,8 +11,8 @@ const ConnectDB = async () => {
         await mongoose.connection.db.collection('users').dropIndex('tutorCredentials.tutorId_1');
     console.log('Index dropped successfully');
         
-    } catch (error) {
-        console.log("Database  betrayed broo");
+    } catch (error: any) {
+        console.log("Database  betrayed broo", error.message);
         
     }
 }

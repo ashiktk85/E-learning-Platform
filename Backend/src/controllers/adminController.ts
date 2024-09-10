@@ -135,9 +135,54 @@ export class AdminController {
           console.log("e",courseId ,"e",videoId , "e", reason , "add" ,additionalInfo);
           
             const reporting = await this.adminService.reportCourseService(courseId , videoId , reason , additionalInfo)
+
+            if(reporting === true) {
+              return  res.status(201).json(true)
+            } 
+
+            res.json(false)
+
         } catch (error : any) {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async getReports(req : Request , res :Response) {
+        try {
+            const reports = await this.adminService.getReportService()
+
+            res.status(200).json(reports)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async reportDetail(req : Request , res :Response) {
+        try {
+            const {reportId} = req.params
+            // console.log(reportId);
+            
+            const report = await this.adminService.reportDetail(reportId)
+
+            res.status(200).json(report)
+
+            
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+
+    async getCourses(req : Request , res :Response) {
+        try {
+            const courses = await this.adminService.getCourses()
+
+            res.status(200).json(courses)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+
 
 }

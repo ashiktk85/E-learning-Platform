@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import AdminAside from "./AdminAside";
+import AdminAside from "../../components/AdminComponent/AdminAside";
 import {
   Modal,
   ModalContent,
@@ -190,7 +190,7 @@ const ApplicantDetails = () => {
           </div>
         </section>
 
-        {!isTutor && (
+        {applicationData?.status === "pending" && (
           <div className="flex justify-end">
             <Button
               className="h-12 w-24 bg-green-500 mt-10 rounded-md hover:bg-green-700 mr-10 text-white font-semibold"

@@ -8,6 +8,8 @@ import { UserRepositary } from "../repository/userRepository";
 import { adminRepository } from "../repository/adminRepository";
 import bcrypt from "bcrypt";
 import { createToken } from "../config/jwtConfig";
+import { Course, ICourse } from "../models/courseModel";
+import { v4 as uuidv4 } from "uuid";
 
 require('dotenv').config();
 
@@ -169,10 +171,10 @@ export class AdminService {
             // const saltRounds: number = 10;
             // const hashedPassword =await bcrypt.hash(uniquePass as string, saltRounds)
 
-            console.log(uniquePass , data.email , uniqueId);
+            console.log(uniquePass , data.email );
             
 
-            const updateUser = await UserRepositary.addTutorToUserModel(data.email as string , uniqueId as string, uniquePass as any)
+            const updateUser = await UserRepositary.addTutorToUserModel(data.email as string ,  uniquePass as any)
             // const tutorProfile = await 
             console.log(updateUser , "services");
             
@@ -229,11 +231,104 @@ export class AdminService {
 
     async reportCourseService(courseId: any , videoId: any , reason: any , additionalInfo: any) {
         try {
+            const coures = await UserRepositary.getCourse(courseId)
+            if(!coures) {
+                throw new Error("Cannot find course.")
+              }
 
-            await adminRepository.saveReport(courseId , videoId , reason , additionalInfo)
+              const user = await UserRepositary.existUser(coures?.email)
+
+              if(!user) {
+                throw new Error("Cannot find user/tutor.")
+              }
+            const tutorName =  user?.firstName + " " +user?.lastName
+            const courseName = coures?.name
+
+            const reportId = uuidv4()
+
+            const res = await adminRepository.saveReport(courseId , videoId , reason , additionalInfo , tutorName , courseName , reportId)
+
+          return res;
             
         } catch (error : any) {
+            console.error("Error during admin saving report in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async getReportService() {
+        try {
+            const reports = await adminRepository.getReports()
+            return reports;
+        } catch ( error : any) {
             console.error("Error during admin getting categories in service:", error.message);
+            throw new Error(error.message);
+        }
+    
+    }
+
+    async reportDetail(reportId : string) {
+        try {
+            const awsConfig = new AwsConfig();
+            const report = await adminRepository.reportDetail(reportId)
+
+            const coures = await UserRepositary.getCourse(report.courseId)
+            if(!coures) {
+                throw new Error("Cannot find course.")
+              }
+
+              const thumbnailUrl = await awsConfig.getfile(
+                coures?.thumbnail as string,
+                `tutors/${coures.email}/courses/${coures.courseId}/thumbnail`
+            );
+
+              const user = await UserRepositary.existUser(coures?.email)
+
+              if(!user) {
+                throw new Error("Cannot find user/tutor.")
+              }
+
+            
+                const reportData = {
+                    thumbnailUrl : thumbnailUrl,
+                    tutorName : user.firstName+ " "+user.lastName,
+                    coureName : coures.name,
+                    courseDescripiton : coures.description,
+                    tutorEmail : coures.email,
+                    users : coures?.users,
+                    report
+                }
+
+                return reportData;
+              
+
+        } catch (error : any) {
+            console.error("Error during admin getting report detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    } 
+
+
+    async getCourses() {
+        try {
+            const response = await adminRepository.getCourses();
+
+            const awsConfig = new AwsConfig();
+      
+            const coursesWithUrls = await Promise.all(
+              response.map(async (course: ICourse) => {
+                const thumbnails = course.thumbnail
+                  ? await awsConfig.getfile(
+                      course.thumbnail,
+                      `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+                    )
+                  : null;
+                return { ...course, thumbnail: thumbnails };
+              })
+            );
+            return coursesWithUrls;
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
             throw new Error(error.message);
         }
     }
