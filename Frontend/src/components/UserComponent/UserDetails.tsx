@@ -37,6 +37,8 @@ const UserDetails = () => {
         toast.success("Details updated")
         closeEditModal();
       } else if (response.meta.requestStatus === "rejected") {
+        
+  
         toast.info("No changes made")
       }
     } catch (error) {

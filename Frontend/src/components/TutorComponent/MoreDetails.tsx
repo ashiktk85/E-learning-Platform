@@ -166,22 +166,26 @@ const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext 
         </button>
       </div>
 
-     
+      {/* Progress Modal */}
       <Modal
         isOpen={isUploading}
         onRequestClose={() => {}}
         contentLabel="Uploading"
         className="fixed inset-0 flex justify-center items-center p-4"
-        overlayClassName="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+        overlayClassName="fixed inset-0 flex justify-center items-center"
       >
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto text-center">
           <h2 className="text-lg font-semibold">Uploading Course</h2>
           <p className="mt-2">Please do not close or refresh the page.</p>
-          <div className="w-full mt-4 bg-gray-200 rounded h-4">
+          <div className="w-full mt-4 bg-gray-200 rounded h-4 relative">
             <div
-              className="bg-green-600 h-full rounded"
+              className="bg-green-600 h-full rounded transition-all duration-500 ease-in-out"
               style={{ width: `${uploadProgress}%` }}
-            />
+            >
+              <span className="absolute text-center pr-2 text-white text-sm">
+                {uploadProgress}%
+              </span>
+            </div>
           </div>
         </div>
       </Modal>

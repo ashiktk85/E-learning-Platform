@@ -2,8 +2,9 @@ import React from 'react';
 import AdminAside from '../../components/AdminComponent/AdminAside';
 import UserTable from '../../components/AdminComponent/UserTable';
 import Search from '../../components/common/AdminCommon/Search';
+import TutorList from '../../components/AdminComponent/TutorList';
 
-const TutorList = () => {
+const TutorListPage = () => {
     return (
         <div className="grid grid-cols-12">
       <AdminAside />
@@ -13,11 +14,11 @@ const TutorList = () => {
     
         </div>
        
-        <UserTable />
+        <TutorList />
         
       </div>
     </div>
     );
 }
 
-export default TutorList;
+export default TutorListPage;

@@ -7,9 +7,10 @@ import { Base_URL } from "../../credentials";
 import axios from "axios";
 
 interface IcourseData {
-  name: string;
+  courseName: string;
   thumbnail: string;
-  id: string;
+  courseId
+: string;
   price: string | number;
   rating?: number;
   students?: number;
@@ -18,9 +19,10 @@ interface IcourseData {
 }
 
 const CourseCard: React.FC<IcourseData> = ({
-  name,
+  courseName,
   thumbnail,
-  id,
+  courseId
+,
   price,
   rating = 5,
   students = 300,
@@ -33,14 +35,16 @@ const CourseCard: React.FC<IcourseData> = ({
 
   const gotoCourseDetails = async() => {
     try {
-      const response = await axios.get(`${Base_URL}/check-enrollment/${email}/${id}`)
+      const response = await axios.get(`${Base_URL}/check-enrollment/${email}/${courseId}`)
       console.log(response.data);
       
       if (response.data) {
         
-        navigate(`/coursePlayer/${id}`);
+        navigate(`/coursePlayer/${courseId
+        }`);
       } else {
-        navigate(`/courseDetails/${id}`);
+        navigate(`/courseDetails/${courseId
+        }`);
       }
     } catch (error : any) {
       console.error('Error checking enrollment:', error);
@@ -61,7 +65,7 @@ const CourseCard: React.FC<IcourseData> = ({
 
       <div className="w-3/4">
         <p className="text-[#111418] text-base font-normal leading-normal">
-          {name}
+          {courseName}
         </p>
        
         <div className="flex justify-between px-2">

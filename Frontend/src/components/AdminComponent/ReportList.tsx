@@ -3,13 +3,14 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
-import { updateUserBlockStatus } from "../../redux/actions/adminActions";
 import { useNavigate } from "react-router-dom";
+import { MdArrowForwardIos } from "react-icons/md";
+import { MdArrowBackIos } from "react-icons/md";
 
 const url = "http://localhost:7000";
 
 interface IReport {
-    reportId :string
+  reportId: string;
   tutorName: string;
   courseName: string;
   courseId: string;
@@ -21,40 +22,53 @@ interface IReport {
 }
 
 const ReportList: React.FC = () => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [reports, setReports] = useState<IReport[]>([]);
+  const [filteredReports, setFilteredReports] = useState<IReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [selectedUser, setSelectedUser] = useState<IReport | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [modalAction, setModalAction] = useState<"block" | "unblock">("block");
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const items = 8; 
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get<IReport[]>(`${url}/admin/getReports`);
-        setReports(response.data);
+        const response = await axios.get(`${url}/admin/getReports`, {
+          params: {
+            page: currentPage,
+            limit: items,
+          },
+        });
+        const fetchedReports = response.data.reports || [];
+        setReports(fetchedReports);
+        setFilteredReports(fetchedReports);
+        setTotalPages(response.data.totalPages || 1);
       } catch (err) {
         setError(err as Error);
+        toast.error("Failed to fetch reports");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [currentPage]);
 
-  const handleConfirmAction = async () => {
-    if (selectedUser) {
-      try {
-      } catch (error) {
-        toast.error("Error updating user status");
-      } finally {
-        setShowModal(false);
-        setSelectedUser(null);
-      }
-    }
+  useEffect(() => {
+    const filtered = reports.filter(
+      (report) =>
+        report.tutorName.toLowerCase().includes(search.toLowerCase()) ||
+        report.courseName.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredReports(filtered);
+  }, [search, reports]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -81,7 +95,9 @@ const ReportList: React.FC = () => {
                     </svg>
                   </div>
                   <input
-                    placeholder="Search by username, email, role"
+                    placeholder="Search by tutor or course name"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f4] focus:border-none h-full placeholder:text-[#637588] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
                   />
                 </div>
@@ -107,27 +123,35 @@ const ReportList: React.FC = () => {
                       <th className="px-4 py-3 text-left text-[#111418] w-[400px] text-sm font-bold leading-normal">
                         Status
                       </th>
-
                       <th className="px-4 py-3 text-left text-[#111418] w-[400px] text-sm font-bold leading-normal">
                         View
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {reports.length === 0 ? (
+                    {loading ? (
                       <tr>
                         <td
                           colSpan={6}
                           className="text-center py-4 text-gray-500"
                         >
-                          No reports...
+                          Loading reports...
+                        </td>
+                      </tr>
+                    ) : filteredReports.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="text-center py-4 text-gray-500"
+                        >
+                          No reports found.
                         </td>
                       </tr>
                     ) : (
-                      reports.map((report, index) => (
+                      filteredReports.map((report, index) => (
                         <tr key={index} className="border-t border-[#dce0e5]">
                           <td className="pl-4 py-3 text-[#111418] text-sm">
-                            {index + 1}
+                            {index + 1 + (currentPage - 1) * items}
                           </td>
                           <td className="px-4 py-3 text-[#111418] text-sm">
                             {report.courseName}
@@ -149,9 +173,12 @@ const ReportList: React.FC = () => {
                               </p>
                             )}
                           </td>
-                          <td className="pr-12 text-[#111418] text-sm text-right">
-                            <button className="bg-black text-white w-12 rounded-sm"
-                            onClick={() => navigate(`/admin/reportDetail/${report.reportId}`)}
+                          <td className="px-4 text-[#111418] text-sm ">
+                            <button
+                              className="bg-black text-white w-12 rounded-sm"
+                              onClick={() =>
+                                navigate(`/admin/reportDetail/${report.reportId}`)
+                              }
                             >
                               View
                             </button>
@@ -162,10 +189,37 @@ const ReportList: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+
+            
+              <div className="flex justify-center items-center my-4 mt-10">
+                <button
+                  className="px-4 py-2 mx-1 rounded bg-gradient-to-r from-stone-500 to-stone-700 "
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <MdArrowBackIos fill={"#ffffff"}/>
+                  
+                </button>
+
+               
+                <span className="mx-2 text-sm text-black">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  className="px-4 py-2 mx-1 rounded bg-gradient-to-r from-stone-500 to-stone-700 "
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  
+                <MdArrowForwardIos fill={"#ffffff"} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

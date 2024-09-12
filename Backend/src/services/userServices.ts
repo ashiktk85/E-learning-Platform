@@ -4,7 +4,7 @@ import { UserRepositary } from "../repository/userRepository";
 import sendEmailOtp from "../helper/mailService";
 import redisClient from "../helper/redisCache";
 import jwt, { Secret } from "jsonwebtoken";
-import { createToken } from "../config/jwtConfig";
+import { createRefreshToken, createToken } from "../config/jwtConfig";
 import { AwsConfig } from "../config/awsFileConfigs";
 import { Course, ICourse } from "../models/courseModel";
 import razorpay from "../config/razorpay";
@@ -105,13 +105,9 @@ export class UserService {
         throw new Error("Invalid login credentials");
       }
 
-      const accessToken = createToken(user.userId as string, "User");
+      const accessToken = createToken(user.userId as string, "user");
 
-      const refreshToken = jwt.sign(
-        { id: user.userId, email: user.email },
-        process.env.SECRET_KEY!,
-        { expiresIn: "7d" }
-      );
+      const refreshToken = createRefreshToken(user.userId as string , "user")
 
       const userInfo = {
         firstName: user.firstName,
@@ -122,7 +118,8 @@ export class UserService {
         isBlocked: user.isBlocked,
         tutor: user.tutor,
       };
-
+    
+      
       return { userInfo, accessToken, refreshToken };
     } catch (error: any) {
       console.error("Error during login verification:", error.message);
@@ -180,28 +177,33 @@ export class UserService {
     }
   }
 
-  async getCoursesService(category : string) {
+  async getCoursesService(category: string, page: number, limit: number) {
     try {
-      const response = await UserRepositary.getCourses(category as string);
+        const response = await UserRepositary.getCourses(category, page, limit);
 
-      const awsConfig = new AwsConfig();
+        const awsConfig = new AwsConfig();
 
-      const coursesWithUrls = await Promise.all(
-        response.map(async (course: ICourse) => {
-          const thumbnails = course.thumbnail
-            ? await awsConfig.getfile(
-                course.thumbnail,
-                `tutors/${course.email}/courses/${course.courseId}/thumbnail`
-              )
-            : null;
-          return { ...course, thumbnail: thumbnails };
-        })
-      );
-      return coursesWithUrls;
+        const coursesWithUrls = await Promise.all(
+            response.courses.map(async (course: ICourse) => {
+                const thumbnails = course.thumbnail
+                    ? await awsConfig.getfile(
+                        course.thumbnail,
+                        `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+                    )
+                    : null;
+                return { ...course, thumbnail: thumbnails };
+            })
+        );
+        return {
+            courses: coursesWithUrls,
+            totalPages: response.totalPages
+        };
     } catch (error) {
-      throw error;
+        throw error;
     }
-  }
+}
+
+
 
   async getCourseDetail(id: string) {
     try {

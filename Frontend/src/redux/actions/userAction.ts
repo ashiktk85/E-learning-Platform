@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { User } from '../../Types/user';
 import userAxiosInstance from '../../config/axiosInstance/userInstance';
+import { user } from '@nextui-org/react';
 
 const url = 'http://localhost:7000';
 
@@ -68,7 +69,7 @@ export const login = createAsyncThunk<{ accessToken: string; userInfo: User }, {
   'user/authLogin',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${url}/verifyLogin`, { email, password });
+      const response = await axios.post(`${url}/verifyLogin`, { email, password } , {withCredentials : true});
       return response.data.cred;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Login failed');
@@ -95,7 +96,8 @@ export const updateUserInfo = createAsyncThunk<User | 'no change', UpdateUserInf
   'user/updateUserInfo',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await userAxiosInstance.put(`${url}/edituser`, userData);
+      const response = await userAxiosInstance.put(`${url}/edituser`, userData 
+       );
       if (response.data.message === 'No changes found') {
         return 'no change';
       }

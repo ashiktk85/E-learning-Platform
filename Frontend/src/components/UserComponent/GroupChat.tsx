@@ -135,7 +135,7 @@ const GroupChat: React.FC = () => {
 
             <div className="flex-grow bg-gray-100 overflow-y-auto rounded-md mb-2 p-3"
              style={{
-              backgroundImage: 'url(https://i.pinimg.com/564x/f9/b2/0c/f9b20cfb86e7775f86124bee62d13458.jpg)',
+              // backgroundImage: 'url(https://i.pinimg.com/564x/f9/b2/0c/f9b20cfb86e7775f86124bee62d13458.jpg)',
               backgroundSize: 'cover', 
               backgroundPosition: 'center', 
             }}

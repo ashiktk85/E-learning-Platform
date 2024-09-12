@@ -1,52 +1,75 @@
-import { Request, Response , NextFunction } from "express";
-import jwt from "jsonwebtoken"
-import dotenv from 'dotenv'
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+import HTTP_statusCode from "../Enums/httpStatusCode";
 
+dotenv.config();
 
-dotenv.config()
+const secret_key = process.env.SECRET_KEY as string;
 
-const createToken = (user_id: string, role : string): string => {
-    const newToken = jwt.sign({ user_id , role }, process.env.SECRET_KEY as string, { expiresIn: '10s' });
-    return newToken;
- };
+const createToken = (user_id: string, role: string): string => {
+    return jwt.sign({ user_id, role }, secret_key, { expiresIn: '10s' });
+};
 
-let secret_key = process.env.SECRET_KEY as string;
+const createRefreshToken = (user_id: string, role: string): string => {
+    return jwt.sign({ user_id, role }, secret_key, { expiresIn: '7d' });
+};
 
-console.log("seceeet",secret_key);
-
-const verifyToken  = (req : Request , res : Response, next : NextFunction) => {
-        const authHeader = req.headers['authorization']
-        console.log("!authheader",authHeader);
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+       console.log(req.cookies, "cookies");
+       
         
-        if(!authHeader) {
-            return res.status(401).send("Authorization failed.")
-        }
-
-        const token = authHeader.split(" ")[1]
-        console.log(token);
-
-        console.log("!token");
+       const accessToken: string = req.cookies.AccessToken;
+        console.log(accessToken , "accerss");
         
+        if (accessToken) {
+            jwt.verify(accessToken, secret_key, async (err, decoded) => {
+                if (err) {
+                    await handleRefreshToken(req, res, next);
+                } else {
+                   
+                    const { role } = decoded as jwt.JwtPayload;
+                    if (role !== "user") { 
+                        return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Insufficient role.' });
+                    }
+                    next();
+                };
+            });
+        } else {
+            await handleRefreshToken(req, res, next);
+        };
+    } catch (error) {
+        res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Access token not valid.' });
+    };
+};
 
-        if(!token) {
-            return res.status(401).send("Authorization failed.")
-        }
+const handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken: string = req.cookies.RefreshToken;
+    if (refreshToken) {
+        jwt.verify(refreshToken, secret_key, (err, decoded) => {
+            if (err) {
+                return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Refresh token not valid.' });
+            } else {
+                const { user_id, role } = decoded as jwt.JwtPayload;
+                
+                if (!user_id || !role) {
+                    return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Token payload invalid.' });
+                } else {
+                   
+                    const newAccessToken = createToken(user_id, role);
+                    res.cookie("AccessToken", newAccessToken, {
+                        httpOnly: true,
+                        sameSite: 'strict',
+                        maxAge: 15 * 60 * 1000,
+                    });
+                    next();
+                };
+            };
+        });
+    } else {
+        return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Refresh token not provided.' });
+    };
+};
 
-      const decoded : any =   jwt.verify(token , secret_key ,(err : any) => {
-            console.log("error in verifying  jtoken");
-            return res.status(401).send("Authorization failed.")
-        })
-
-        if(decoded?.role !== "user") {
-            res.status(401).json({message: "Not authorized"})
-            return
-        }
-
-        
-        
-}
-
-
-
-export  {secret_key ,createToken , verifyToken};
- 
+export { createToken, verifyToken, createRefreshToken };

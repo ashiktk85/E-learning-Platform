@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { createServer } from 'http'
 import { configSocketIO } from './config/socketConfig';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ const corsOptions = {
     // optionsSuccessStatus: 200
 };
 
-
+app.use(cookieParser());
 app.use(express.json({ limit: '5gb' })); 
 app.use(express.urlencoded({ limit: '5gb', extended: true })); 
 app.use(cors(corsOptions));

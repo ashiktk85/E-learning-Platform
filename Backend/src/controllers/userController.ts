@@ -1,7 +1,7 @@
 import { query, Request, Response } from "express";
-import {createToken, secret_key} from "../config/jwtConfig";
+
 import { UserService } from "../services/userServices";
-import jwt from "jsonwebtoken";
+
 
 export class UserController {
   private userService: UserService;
@@ -55,15 +55,20 @@ export class UserController {
       if (!result) {
         return res.status(401).json({ message: "Invalid login credentials" });
       }
-      res.cookie('refreshToken', result.refreshToken, {
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'strict', 
-        maxAge: 30 * 24 * 60 * 60 * 1000, 
-      });
+
+      res.cookie("RefreshToken", result.refreshToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+     });
+     res.cookie("AccessToken", result.accessToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000,
+     });
   
-      const { accessToken, userInfo } = result;
-      const cred = {accessToken , userInfo}
+      const { userInfo } = result;
+      const cred = { userInfo}
       res.status(200).json({ message: "Login successful", cred });
     } catch (error: any) {
       console.error(error.message);
@@ -100,16 +105,22 @@ export class UserController {
     }
   }
 
-  async getCourses(req : Request , res : Response ) {
+  async getCourses(req: Request, res: Response) {
     try {
-      const { category } = req.query as { category?: string };
-      const courses = await this.userService.getCoursesService(category as string)
-      res.status(200).json(courses)
-    } catch ( error : any) {
-      console.error(error.message);
-      res.status(500).json({ message: error.message });
+        const { category, page = "1", limit = "10" } = req.query as { category?: string; page?: string; limit?: string };
+      
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+
+        const courses = await this.userService.getCoursesService(category as string, pageNumber, limitNumber);
+        res.status(200).json(courses);
+    } catch (error: any) {
+        console.error(error.message);
+        res.status(500).json({ message: error.message });
     }
-  }
+}
+
+
 
   async   getCourseDetail(req : Request, res : Response) {
     try {

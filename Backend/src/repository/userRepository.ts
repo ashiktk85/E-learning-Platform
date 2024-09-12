@@ -119,26 +119,71 @@ export class UserRepositary {
     }
   }
 
-  static async getUsersRepo(): Promise< any> {
-    try {
-      const data = await UserModel.find({}, 
-        {
-          _id : 0, 
-          firstName : 1, 
-          lastName : 1,
-          email :1,
-          phone: 1,
-          createdAt : 1,
-          roles : 1,
-          isBlocked : 1
-      }
-    )
-      // console.log(data);
-      return data 
-    } catch (error: any) {
+ 
+static async getUsersRepo(page: number, limit: number): Promise<{ users: any[]; total: number }> {
+  try {
+   
+      const skip = (page - 1) * limit;
+
+     
+      const users = await UserModel.find(
+          {},
+          {
+              _id: 0,
+              firstName: 1,
+              lastName: 1,
+              email: 1,
+              phone: 1,
+              createdAt: 1,
+              roles: 1,
+              isBlocked: 1,
+          }
+      )
+          .skip(skip)
+          .limit(limit);
+
+      
+      const total = await UserModel.countDocuments();
+
+      return { users, total };
+  } catch (error: any) {
       console.error('Error fetching users:', error);
-    }
+      throw new Error('Error fetching users from database');
   }
+}
+
+static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[]; total: number }> {
+  try {
+   
+      const skip = (page - 1) * limit;
+
+     
+      const users = await UserModel.find(
+          {tutor : true},
+          {
+              _id: 0,
+              firstName: 1,
+              lastName: 1,
+              email: 1,
+              phone: 1,
+              createdAt: 1,
+              roles: 1,
+              isBlocked: 1,
+          }
+      )
+          .skip(skip)
+          .limit(limit);
+
+      
+      const total = await UserModel.countDocuments();
+
+      return { users, total };
+  } catch (error: any) {
+      console.error('Error fetching users:', error);
+      throw new Error('Error fetching users from database');
+  }
+}
+
 
   static async blockUser(email : string) : Promise<boolean | void> {
     try {
@@ -339,31 +384,40 @@ export class UserRepositary {
     }
   }
   
-  static async getCourses(category : string) {
+  static async getCourses(category: string, page: number, limit: number) {
     try {
-      let filter : {category?: string} = {}
-      if (category && category !== "All") {
-        filter.category = category;
-      } else if(category && category === 'All') {
-        filter = {}
-      }
+        let filter: {  isBlocked: boolean; category?: string } = { isBlocked: false };;
+       
+        if (category && category !== "All") {
+            filter.category = category;
+        } else if (category && category === 'All') {
+            filter = {isBlocked: false};
+        }
 
-      
-      console.log("Filter:", filter);
+        const skip = (page - 1) * limit;
+        const totalCourses = await Course.countDocuments(filter).exec();
+        const totalPages = Math.ceil(totalCourses / limit);
 
+        const courses = await Course.find(filter , {isBlocked : false}).lean()
+            .skip(skip)
+            .limit(limit)
+            .exec();
 
-      const Courses = await Course.find(filter)
-      // console.log(Courses);
-      return Courses;
-    } catch (error : any) {
-      console.log("Error in getting courses user repo", error.message); 
-      throw new Error(error.message);
+        return {
+            courses,
+            totalPages
+        };
+    } catch (error: any) {
+        console.log("Error in getting courses user repo", error.message);
+        throw new Error(error.message);
     }
-  }
+}
+
+
 
   static async getCourse(id : string) {
     try {
-        const course = await Course.findOne({courseId : id}).populate({
+        const course = await Course.findOne({courseId : id}, {isBlocked : false}).populate({
           path: 'sections',
           populate: { path: 'videos' }  
         });
@@ -428,7 +482,7 @@ export class UserRepositary {
   static async saveCourse(courseId : string , email : string) {
     try {
       const res = await UserModel.updateOne(
-        { email : email}, 
+        { email : email} ,{isBlocked : false}, 
     {
       $push : { courses : courseId}
     })

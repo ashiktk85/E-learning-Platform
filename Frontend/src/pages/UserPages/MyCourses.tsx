@@ -1,4 +1,4 @@
-// src/pages/MyCourses.tsx
+
 import React, { useEffect, useState } from "react";
 import Footer from "../../components/common/UserCommon/Footer";
 import Navbar from "../../components/UserComponent/Navbar";
@@ -7,12 +7,13 @@ import { RootState } from "../../redux/store";
 import userAxiosInstance from "../../config/axiosInstance/userInstance";
 import { Base_URL } from "../../credentials";
 import CourseCard from "../../components/UserComponent/CourseCard";
+import BlockChecker from "../../services/BlockChecker";
 
 const MyCourses: React.FC = () => {
+  BlockChecker()
   const { userInfo } = useSelector((state: RootState) => state.user);
   const [courseData, setCourseData] = useState<any[]>([]);
-  const [filterType, setFilterType] = useState<string>("all"); // State for filter type
-
+  const [filterType, setFilterType] = useState<string>("all");
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
@@ -135,9 +136,9 @@ const MyCourses: React.FC = () => {
                 {courseData.map((course) => (
                   <CourseCard
                     key={course._id}
-                    name={course._doc.name as string}
+                    courseName={course._doc.name as string}
                     thumbnail={course.thumbnail as string}
-                    id={course._doc.courseId}
+                    courseId={course._doc.courseId}
                     price={course._doc.price}
                   />
                 ))}

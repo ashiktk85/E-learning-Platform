@@ -9,6 +9,7 @@ import { Base_URL } from "../../credentials";
 import { useNavigate } from "react-router-dom"; 
 import AccordionItem from "../../components/UserComponent/Accordian";
 import { MdOndemandVideo } from "react-icons/md";
+import BlockChecker from "../../services/BlockChecker";
 
 interface Ivideo {
   title: string;
@@ -42,6 +43,7 @@ interface IcourseData {
 }
 
 const CourseDetailsPage = () => {
+  BlockChecker()
   const { id } = useParams<{ id: string }>();
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const navigate = useNavigate(); 

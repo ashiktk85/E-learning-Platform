@@ -21,24 +21,57 @@ export class AdminController {
         }
     }
 
-    async getUsers(req : Request , res : Response) : Promise<any | void> {
-        try {
-            const userList = await this.adminService.getUserListService()
-            console.log("user list contriller", userList);
-            res.status(200).json(userList)
-        } catch (error : any) {
-            res.status(500).json({ message: error.message });
-        }
+
+async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+       
+        const page = parseInt(req.query.page as string, 10) || 1; 
+        const limit = parseInt(req.query.limit as string, 10) || 10; 
+
+        const { users, total } = await this.adminService.getUserListService(page, limit);
+        console.log("User list in controller", users);
+
+        res.status(200).json({
+            users,
+            total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+        });
+    } catch (error: any) {
+        console.error("Error fetching users in controller:", error.message);
+        res.status(500).json({ message: error.message });
     }
+}
+
+async getTutors(req: Request, res: Response): Promise<void> {
+    try {
+        const page = parseInt(req.query.page as string, 10) || 1; 
+        const limit = parseInt(req.query.limit as string, 10) || 10; 
+
+        const { users, total } = await this.adminService.getTutorsService(page, limit);
+        console.log("User list in controller", users);
+
+        res.status(200).json({
+            users,
+            total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+        });
+    } catch (error: any) {
+        console.error("Error fetching users in controller:", error.message);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 
     async blockUser(req : Request , res : Response) : Promise<any | void> {
         try {
            const { email } = req.params
+           console.log(email, "em");
+           
             const response = await this.adminService.blockUserService(email)
-            console.log(response);
-
+            // console.log(response)
             res.status(200).json(response)
-            
         } catch (error : any) {
             res.status(500).json({ message: error.message });
         }
@@ -48,10 +81,8 @@ export class AdminController {
         try {
            const { email } = req.params
             const response = await this.adminService.unblockeUserService(email)
-            console.log(response);
-
-            res.status(200).json(response)
-            
+            // console.log(response);
+            res.status(200).json(response)  
         } catch (error : any) {
             res.status(500).json({ message: error.message });
         }
@@ -147,15 +178,21 @@ export class AdminController {
         }
     }
 
-    async getReports(req : Request , res :Response) {
+    async getReports(req: Request, res: Response) {
         try {
-            const reports = await this.adminService.getReportService()
-
-            res.status(200).json(reports)
-        } catch (error : any) {
+            // Extract pagination parameters from the query
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+    
+            // Call the service method with pagination parameters
+            const { reports, totalPages } = await this.adminService.getReportService(page, limit);
+    
+            res.status(200).json({ reports, totalPages });
+        } catch (error: any) {
             res.status(500).json({ message: error.message });
         }
     }
+    
 
     async reportDetail(req : Request , res :Response) {
         try {
@@ -178,6 +215,32 @@ export class AdminController {
             const courses = await this.adminService.getCourses()
 
             res.status(200).json(courses)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async blockCourse(req : Request , res :Response) {
+        try {
+            const { courseId } = req.params;
+
+            console.log("loof,",courseId);
+            
+
+            const response = await this.adminService.blockCourseService(courseId)
+
+            res.status(200).json(response)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    async unBlockCourse(req : Request , res :Response) {
+        try {
+            const { courseId } = req.params;
+
+            const response = await this.adminService.unBlockCourseService(courseId)
+            res.status(200).json(response)
         } catch (error : any) {
             res.status(500).json({ message: error.message });
         }

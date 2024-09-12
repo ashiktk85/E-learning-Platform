@@ -8,6 +8,7 @@ import { toast, Toaster } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import userAxiosInstance from "../../config/axiosInstance/userInstance";
+import BlockChecker from "../../services/BlockChecker";
 
 interface IcourseData {
   name: string;
@@ -41,6 +42,7 @@ interface Isection {
 }
 
 const Checkout = () => {
+  BlockChecker()
   const { userInfo } = useSelector((state: RootState) => state.user);
   const email = userInfo?.email;
   const { id } = useParams<{ id: string }>();

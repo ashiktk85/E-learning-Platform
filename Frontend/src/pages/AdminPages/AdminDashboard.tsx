@@ -15,8 +15,8 @@ const Dashboard = () => {
       
       <div className="col-span-8 bg-spotify-white w-full mt-10 h-80">
         <div className='flex justify-between'> 
-        <h1 className="font-extrabold font-poppins text-2xl justify-start">Welcome to Dashboard</h1>
-        <Search />
+        <h1 className="font-extrabold font-poppins text-3xl justify-start">Welcome to Dashboard</h1>
+     
         </div>
         
         <p className="text-spotify-black font-poppins font-medium mt-2">

@@ -5,6 +5,7 @@ import { Base_URL } from "../../credentials";
 import Navbar from "../../components/UserComponent/Navbar";
 import { MdOutlineSettings } from "react-icons/md";
 import { toast, Toaster } from "sonner";
+import BlockChecker from "../../services/BlockChecker";
 
 interface IcourseData {
   name: string;
@@ -40,6 +41,7 @@ interface Isection {
 }
 
 const CoursePlayer: React.FC = () => {
+  BlockChecker()
   const { courseId } = useParams<{ courseId: string }>();
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const [currentVideo, setCurrentVideo] = useState<Ivideo | null>(null);
@@ -52,6 +54,7 @@ const CoursePlayer: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
+   
     const fetchCourseData = async () => {
       try {
         const response = await axios.get(`${Base_URL}/getCourse/${courseId}`);

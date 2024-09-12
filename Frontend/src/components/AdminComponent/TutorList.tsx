@@ -19,7 +19,7 @@ interface User {
   phone: string;
 }
 
-const UsersPage: React.FC = () => {
+const TutorList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -37,7 +37,7 @@ const UsersPage: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${url}/admin/getusers`, {
+        const response = await axios.get(`${url}/admin/getTutors`, {
           params: {
             page: currentPage,
             limit: itemsPerPage,
@@ -292,4 +292,4 @@ const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage;
+export default TutorList;

@@ -1,18 +1,23 @@
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const url = "http://localhost:7000";
 const userAxiosInstance = axios.create({
   baseURL: url,
-  withCredentials: true, 
+  withCredentials: true,
 });
 
 userAxiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
-    
+
+
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
+
+
     return config;
   },
   (error) => {
@@ -31,24 +36,18 @@ userAxiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        
         const response = await axios.post(`${url}/refresh-token`, {}, {
-          withCredentials: true, 
+          withCredentials: true,
         });
 
         const { accessToken } = response.data;
 
-     
         localStorage.setItem("accessToken", accessToken);
-
-      
         originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
 
         return userAxiosInstance(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-
-        
         return Promise.reject(refreshError);
       }
     }

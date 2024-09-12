@@ -190,7 +190,7 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0  flex items-center justify-center">
           <div className="bg-white p-4 rounded-lg shadow-lg w-1/3">
             <h2 className="pb-2 font-bold">Add a Tag</h2>
             <input

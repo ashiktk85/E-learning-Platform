@@ -3,7 +3,7 @@ import {Navigate ,Route , Routes ,Router } from 'react-router-dom'
 import AdminLogin from '../pages/AdminPages/AdminloginPage';
 import AdminDashboard from '../pages/AdminPages/AdminDashboard';
 import UserList from '../pages/AdminPages/UserListPage';
-import AdminNewTutorApplications from '../components/AdminComponent/AdminNewTutorApplications';
+import AdminNewTutorApplications from '../pages/AdminPages/ApplicationListPage';
 import ApplicantDetails from '../pages/AdminPages/ApplicantDetailsPage';
 import AdminProtector from '../services/AdminProtector';
 import TutorList from '../pages/AdminPages/TutorListPage';

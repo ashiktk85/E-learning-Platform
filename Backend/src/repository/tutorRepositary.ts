@@ -208,7 +208,7 @@ export class TutorRepositary {
 
   static async getCoursesByTutor(email: string) {
     try {
-      const courses = await Course.find({ email }).populate({
+      const courses = await Course.find({ email },{isBlocked : false}).populate({
         path: 'sections',
         populate: { path: 'videos' }  
       });

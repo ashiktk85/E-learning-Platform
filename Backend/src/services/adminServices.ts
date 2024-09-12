@@ -42,34 +42,61 @@ export class AdminService {
         }
     }
 
-    async getUserListService(): Promise<void | any> {
-        try {
-            const getUsers = await UserRepositary.getUsersRepo();
-            console.log("User data in service", getUsers);
-    
-           
-            const cleanedUsers = getUsers.map((user: any) => {
-                const { firstName, lastName, email, phone, createdAt, roles, isBlocked } = user._doc;
-                return {
-                    firstName,
-                    lastName,
-                    email,
-                    phone,
-                    roles,
-                    isBlocked,
-                    createdAt: createdAt.toISOString().slice(0, 10),
-                };
-            });
-    
-            console.log("Cleaned user data", cleanedUsers);
-    
-            return cleanedUsers;
-            
-        } catch (error: any) {
-            console.error("Error during admin getting users services:", error.message);
-            throw new Error(error.message);
-        }
+
+async getUserListService(page: number, limit: number): Promise<{ users: any[]; total: number }> {
+    try {
+        const { users, total } = await UserRepositary.getUsersRepo(page, limit);
+        console.log("User data in service", users);
+
+        const cleanedUsers = users.map((user: any) => {
+            const { firstName, lastName, email, phone, createdAt, roles, isBlocked } = user._doc;
+            return {
+                firstName,
+                lastName,
+                email,
+                phone,
+                roles,
+                isBlocked,
+                createdAt: createdAt.toISOString().slice(0, 10),
+            };
+        });
+
+        console.log("Cleaned user data", cleanedUsers);
+
+        return { users: cleanedUsers, total };
+    } catch (error: any) {
+        console.error("Error during admin getting users services:", error.message);
+        throw new Error(error.message);
     }
+}
+
+async getTutorsService(page: number, limit: number): Promise<{ users: any[]; total: number }> {
+    try {
+        const { users, total } = await UserRepositary.getTutorsRepo(page, limit);
+        console.log("User data in service", users);
+
+        const cleanedUsers = users.map((user: any) => {
+            const { firstName, lastName, email, phone, createdAt, roles, isBlocked } = user._doc;
+            return {
+                firstName,
+                lastName,
+                email,
+                phone,
+                roles,
+                isBlocked,
+                createdAt: createdAt.toISOString().slice(0, 10),
+            };
+        });
+
+        console.log("Cleaned user data", cleanedUsers);
+
+        return { users: cleanedUsers, total };
+    } catch (error: any) {
+        console.error("Error during admin getting users services:", error.message);
+        throw new Error(error.message);
+    }
+}
+
     
     async blockUserService(email : string) : Promise<boolean | void> {
         try {
@@ -256,16 +283,19 @@ export class AdminService {
         }
     }
 
-    async getReportService() {
+    async getReportService(page: number, limit: number) {
         try {
-            const reports = await adminRepository.getReports()
-            return reports;
-        } catch ( error : any) {
-            console.error("Error during admin getting categories in service:", error.message);
+            const skip = (page - 1) * limit;
+            const reports = await adminRepository.getReports(skip, limit);
+            const totalReports = await adminRepository.countReports();
+            const totalPages = Math.ceil(totalReports / limit);
+            return { reports, totalPages };
+        } catch (error: any) {
+            console.error("Error during admin getting reports in service:", error.message);
             throw new Error(error.message);
         }
-    
     }
+    
 
     async reportDetail(reportId : string) {
         try {
@@ -327,6 +357,26 @@ export class AdminService {
               })
             );
             return coursesWithUrls;
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async blockCourseService(courseId : string) {
+        try {
+            const res = await adminRepository.blockCourseRepo(courseId)
+            return res;
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async unBlockCourseService(courseId : string) {
+        try {
+            const res = await adminRepository.unBlockCourseRepo(courseId)
+            return res;
         } catch (error : any) {
             console.error("Error during admin getting course detail in service:", error.message);
             throw new Error(error.message);

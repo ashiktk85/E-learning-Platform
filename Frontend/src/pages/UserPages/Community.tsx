@@ -5,8 +5,10 @@ import { IoMdChatboxes } from "react-icons/io";
 import Svg from "../../assets/svgs/Svg";
 import Blogs from "../../components/UserComponent/Blogs";
 import GroupChat from "../../components/UserComponent/GroupChat";
+import BlockChecker from "../../services/BlockChecker";
 
 const Community = () => {
+  BlockChecker()
   const [active, setActive] = useState('blogs'); 
 
   

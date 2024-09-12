@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 const BlockChecker = () => {
   const navigate = useNavigate()
   const isBlocked = useSelector((state: RootState) => state.user.userInfo?.isBlocked);
+  console.log("isblocked", isBlocked);
+  
 
   useEffect(() => {
     if (isBlocked) {
