@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Footer from "../../components/common/UserCommon/Footer";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -9,11 +9,13 @@ import { toast, Toaster } from "sonner";
 
 import { useNavigate } from "react-router-dom";
 import userAxiosInstance from "../../config/axiosInstance/userInstance";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 const url = "http://localhost:7000";
 
 const TutorLogin: React.FC = () => {
     const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>();
+  const [showPassword, setShowPassword] = useState(false);
   const validationSchema = Yup.object({
     applicationId: Yup.string()
       .required("Tutor ID is required")
@@ -114,9 +116,9 @@ const TutorLogin: React.FC = () => {
                 ) : null}
               </div>
 
-              <div className="pl-10 pr-20">
+              <div className="relative pl-10 pr-20 flex">
                 <input
-                  type="text"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Passcode"
                   name="passcode"
                   className={`w-full text-black py-2 my-4 border-b bg-transparent border-black outline-none focus:outline-none ${
@@ -128,6 +130,14 @@ const TutorLogin: React.FC = () => {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
+                <button
+                type="button"
+                className="absolute right-20 top-1/2 transform -translate-y-1/2 text-black"
+                onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <AiOutlineEye size={24} /> : <AiOutlineEyeInvisible size={24} />}
+                  
+                </button>
                 {formik.touched.passcode && formik.errors.passcode ? (
                   <div className="text-red-500 text-sm">
                     {formik.errors.passcode}

@@ -1,6 +1,16 @@
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+    S3Client,
+    PutObjectCommand,
+    GetObjectCommand,
+    DeleteObjectCommand,
+    CreateMultipartUploadCommand,
+    UploadPartCommand,
+    CompleteMultipartUploadCommand,
+    AbortMultipartUploadCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 require('dotenv').config();
+import * as crypto from 'crypto';
 
 export class AwsConfig {
     bucketName: string;
@@ -17,7 +27,7 @@ export class AwsConfig {
             },
             region: this.region,
         });
-    } 
+    }
 
     async getfile(fileName: string, folder: string): Promise<string> {
         try {
@@ -31,6 +41,34 @@ export class AwsConfig {
         } catch (error) {
             console.error("Error generating signed URL:", error);
             throw error;
+        }
+    }
+
+    async uploadFileToS3(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
+        try {
+            const fileBuffer = file.buffer; 
+
+            const uniqueName = crypto.randomBytes(16).toString('hex');
+
+            const params = {
+                Bucket: this.bucketName,
+                Key: `${folderPath}${uniqueName}`,
+                Body: fileBuffer,
+                ContentType: file.mimetype,
+            };
+
+            const command = new PutObjectCommand(params);
+            const sent = await this.s3client.send(command); 
+
+            if (sent && sent.$metadata.httpStatusCode === 200) {
+                const fileUrl = `${uniqueName}`; 
+                return fileUrl;
+            } else {
+                throw new Error('File upload failed');
+            }
+        } catch (error: any) {
+            console.error('Error uploading file to S3:', error.message);
+            throw new Error(`Failed to upload file to S3: ${error.message}`);
         }
     }
 }

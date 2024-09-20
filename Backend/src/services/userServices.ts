@@ -13,6 +13,16 @@ import { createUniquePass } from "../helper/tutorCredentials";
 import mongoose from "mongoose";
 import { CouresRepository } from "../repository/courseRepository";
 import { ParamsDictionary } from "express-serve-static-core";
+import { S3Client } from "@aws-sdk/client-s3";
+
+
+const s3Client = new S3Client({
+  region: 'eu-north-1',
+  credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
 
 export class UserService {
   async signUp(userData: any) {
@@ -359,6 +369,60 @@ export class UserService {
 
     } catch (error) {
       
+    }
+  }
+
+  async addRatingService(userId : String , rating : number ,courseId  : any) {
+    try {
+      console.log("rate serv");
+      
+      const addRating = await UserRepositary.addRatingRepo(userId as String , rating as number ,courseId as any)
+      return addRating;
+    } catch (error) {
+      
+    }
+  }
+
+  async getRatingService(userId : string) {
+    try {
+      const getRating =  await UserRepositary.getRatingRepo(userId as string)
+      return getRating
+    } catch (error) {
+      
+    }
+  }
+
+  async saveProfile(profile : Express.Multer.File , userId :string) {
+    try {
+      const awsConfig = new AwsConfig();
+      const bucketName = "learn-sphere";
+      const profileUrl = await awsConfig.uploadFileToS3(bucketName , `users/profile/${userId}/`, profile)
+      const save = await UserRepositary.saveProfile(userId as string , profileUrl as string)
+      return save;
+    } catch (error : any) {
+      console.error("Error in saving profile pic user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  async getProfileService(email:string) {
+    try {
+      const awsConfig = new AwsConfig();
+      const user = await UserRepositary.existUser(email)
+
+      if(!user) {
+        console.log("no user");
+        
+      }
+      console.log(user ,user?.profile,user?.userId);
+      
+      const profileUrl = await awsConfig.getfile(user?.profile as string, `users/profile/${user?.userId}`)
+
+      return profileUrl
+      
+    } catch (error : any) {
+      console.error("Error in getting profile pic user serice :", error.message);
+      throw new Error(` ${error.message}`);
     }
   }
 }

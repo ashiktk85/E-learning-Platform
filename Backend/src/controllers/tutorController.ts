@@ -130,24 +130,24 @@ export class TutorContoller {
     } 
   }
 
-  async uploadProfile(req: Request, res: Response) {
-    try {
-      const { email } = req.body;
-      const file  = req.file ; 
-      console.log(email, file);
+  // async uploadProfile(req: Request, res: Response) {
+  //   try {
+  //     const { email } = req.body;
+  //     const file  = req.file ; 
+  //     console.log(email, file);
       
-      if (!email || !file) {
-        return res.status(400).json({ message: "Email and file are required." });
-      }
+  //     if (!email || !file) {
+  //       return res.status(400).json({ message: "Email and file are required." });
+  //     }
 
-      const response = await this.tutorServices.uploadProfile(email, file as any);
+  //     const response = await this.tutorServices.uploadProfile(email, file as any);
 
-      res.status(201).json(response);
-    } catch (error : any) {
-      console.error(error.message);
-      res.status(500).json({ message: error.message });
-    }
-  }
+  //     res.status(201).json(response);
+  //   } catch (error : any) {
+  //     console.error(error.message);
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // }
 
   
 }

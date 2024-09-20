@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import CourseCard from './CourseCard';
 import axios from 'axios';
 import { Base_URL } from '../../credentials';
@@ -9,13 +9,19 @@ const CoursesHome = () => {
     const user = useSelector((state: RootState) => state.user);
     const userInfo = user.userInfo;
     const [courses, setCourses] = useState<any[]>([]);
+    const previousCoursesRef = useRef<any[]>([]);
 
+    
     const fetchCourses = useCallback(async () => {
         try {
             const response = await axios.get(`${Base_URL}/get-courses`);
-
             if (Array.isArray(response.data.courses)) {
-                setCourses(response.data.courses);
+                const newCourses = response.data.courses;
+
+                if (JSON.stringify(newCourses) !== JSON.stringify(previousCoursesRef.current)) {
+                    setCourses(newCourses);
+                    previousCoursesRef.current = newCourses; 
+                }
             } else {
                 console.error("Unexpected data format:", response.data);
             }
@@ -24,11 +30,17 @@ const CoursesHome = () => {
         }
     }, []);
 
+   
     useEffect(() => {
         fetchCourses();
+        const intervalId = setInterval(() => {
+            fetchCourses(); 
+        }, 10000);
+
+        return () => clearInterval(intervalId); 
     }, [fetchCourses]);
 
-    // Check if courses is an array before slicing
+  
     const displayedCourses = Array.isArray(courses) ? courses.slice(0, 8) : [];
 
     return (

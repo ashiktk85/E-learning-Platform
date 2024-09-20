@@ -5,7 +5,7 @@ import { S3Client, PutObjectCommand , GetObjectCommand, DeleteObjectCommand, Cre
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { AwsConfig } from "../config/awsFileConfigs";
 
-import * as crypto from 'crypto';
+
 import { UserRepositary } from "../repository/userRepository";
 import { ICourse, ISection, IVideo } from "../models/courseModel";
 import compressVideo from "../helper/videoCompression";
@@ -32,17 +32,12 @@ interface CourseData {
   
 
 
-const s3Client = new S3Client({
-    region: 'eu-north-1',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-});
+
 
 const aws = new AwsConfig()
 
 export class TutorServices {
+    private awsConfig = new AwsConfig();
     
     async tutorApplicationService(files: any, data: any): Promise<void> {
         const bucketName = "learn-sphere";
@@ -50,18 +45,18 @@ export class TutorServices {
         const fileUrls: { type: string, url: string }[] = [];
 
         if (files.idProof) {
-            const url = await this.uploadFileToS3(bucketName, 'tutorApplication/idProofs/', files.idProof[0]);
+            const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/idProofs/', files.idProof[0]);
             fileUrls.push({ type: 'idProof', url });
         }
 
         if (files.resume) {
-            const url = await this.uploadFileToS3(bucketName, 'tutorApplication/resume/', files.resume[0]);
+            const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/resume/', files.resume[0]);
             fileUrls.push({ type: 'resume', url });
         }
 
         if (files.certifications) {
             for (const certificate of files.certifications) {
-                const url = await this.uploadFileToS3(bucketName, 'tutorApplication/certifications/', certificate);
+                const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/certifications/', certificate);
                 fileUrls.push({ type: 'certification', url });
             }
         }
@@ -103,13 +98,13 @@ export class TutorServices {
                     const folderPath = `${tutorFolderPath}videos/`;
                     
                     console.log(`Uploading video to ${folderPath}`);
-                    const url = await this.uploadFileToS3(bucketName, folderPath, file);
+                    const url = await this.awsConfig.uploadFileToS3(bucketName, folderPath, file);
                     fileUrls.push({ type: 'video', url });
                 } else if (file.fieldname === 'thumbnail') {
                     const folderPath = `${tutorFolderPath}thumbnail/`;
     
                     console.log(`Uploading thumbnail to ${folderPath}`);
-                    const url = await this.uploadFileToS3(bucketName, folderPath, file);
+                    const url = await this.awsConfig.uploadFileToS3(bucketName, folderPath, file);
                     fileUrls.push({ type: 'thumbnail', url });
                 }
             }
@@ -141,38 +136,7 @@ export class TutorServices {
     
     
 
-    private async uploadFileToS3(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
-        try {
-            let fileBuffer = file.buffer;
-    
-            // if (file.mimetype.startsWith('video/')) {
-            //     console.log('Compressing video...');
-            //     fileBuffer = await compressVideo(file);
-            // }
-    
-            const uniqueName = crypto.randomBytes(16).toString('hex') + '-' + file.originalname.trim();
-    
-            const params = {
-                Bucket: bucketName,
-                Key: `${folderPath}${uniqueName}`,
-                Body: fileBuffer,
-                ContentType: file.mimetype,
-            };
-    
-            const command = new PutObjectCommand(params);
-            const sent = await s3Client.send(command);
-    
-            if (sent && sent.$metadata.httpStatusCode === 200) {
-                const fileUrl = uniqueName;
-                return fileUrl;
-            } else {
-                throw new Error('File upload failed');
-            }
-        } catch (error: any) {
-            console.error('Error uploading file to S3:', error.message);
-            throw new Error(`Failed to upload file to S3: ${error.message}`);
-        }
-    }
+   
 
 
     async verifyLoginService(applicationId : string , passcode : string) : Promise<any | void> {
@@ -190,14 +154,14 @@ export class TutorServices {
 
     async getApplicationDataService(email : string) : Promise<any> {
         try {
-            const awsConfig = new AwsConfig();
+            
 
             const response = await UserRepositary.getApplicantDataRepo(email as string)
 
             if(response?.profilePhotoUrl) {
                 console.log(typeof(response?.profilePhotoUrl));
                 
-                const profileUrl = await awsConfig.getfile(response?.profilePhotoUrl ,`tutorProfile/profileImgs/` )
+                const profileUrl = await this.awsConfig.getfile(response?.profilePhotoUrl ,`tutorProfile/profileImgs/` )
                 return {...response , profileUrl};
                 
                 
@@ -261,23 +225,23 @@ export class TutorServices {
         }
       }
       
-      async uploadProfile(email : string , file :  any) {
-        try {
+    //   async uploadProfile(email : string , file :  any) {
+    //     try {
 
-            const bucketName = "learn-sphere";
-            const profileKey = `tutorProfile/profileImgs/${file.originalname}`;
+    //         const bucketName = "learn-sphere";
+    //         const profileKey = `tutorProfile/profileImgs/${file.originalname}`;
             
             
-            const uploadResult = await this.uploadFileToS3(bucketName, profileKey, file);
+    //         const uploadResult = await this.awsConfig.uploadFileToS3(bucketName, profileKey, file);
       
-            const res = await TutorRepositary.uploadProfileRepo(email as string, uploadResult)
+    //         const res = await TutorRepositary.uploadProfileRepo(email as string, uploadResult)
 
-            return res;
-        } catch (error) {
-            console.error('Error in uploding profile in tutor service:', error);
-            throw error;
-        }
-      }
+    //         return res;
+    //     } catch (error) {
+    //         console.error('Error in uploding profile in tutor service:', error);
+    //         throw error;
+    //     }
+    //   }
 
     
 }

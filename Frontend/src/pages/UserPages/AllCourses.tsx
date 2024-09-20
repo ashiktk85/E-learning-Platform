@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import BlockChecker from "../../services/BlockChecker";
+import Footer from "../../components/common/UserCommon/Footer";
 
 interface Category {
   _id: string;
@@ -25,11 +26,11 @@ const AllCourses: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const coursesPerPage = 12;
+  const coursesPerPage = 8;
   const navigate = useNavigate();
 
   const fetchCourses = useCallback(async () => {
@@ -73,7 +74,7 @@ const AllCourses: React.FC = () => {
   const applyFilters = () => {
     let filtered = courses;
     
-    if (selectedCategory !== "all") {
+    if (selectedCategory !== "All") {
       filtered = filtered.filter(course => course.category === selectedCategory);
     }
     
@@ -195,6 +196,7 @@ const AllCourses: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

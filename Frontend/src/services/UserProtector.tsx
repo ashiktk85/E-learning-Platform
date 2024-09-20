@@ -7,18 +7,18 @@ interface UserProtectorProps {
 
 const UserProtector: React.FC<UserProtectorProps> = ({ children }) => {
   const navigate = useNavigate();
-  const userToken = localStorage.getItem('accessToken');
+  const user = localStorage.getItem('userInfo');
 
   useEffect(() => {
-    if (!userToken) {
+    if (!user) {
       navigate('/login', {
         state: { message: 'Authorization failed' },
         replace: true,
       });
     }
-  }, [navigate, userToken]);
+  }, [navigate, user]);
 
-  return userToken ? <>{children}</> : null;
+  return user ? <>{children}</> : null;
 };
 
 export default UserProtector;

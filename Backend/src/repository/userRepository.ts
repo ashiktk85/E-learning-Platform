@@ -13,9 +13,9 @@ import { Course } from "../models/courseModel";
 import Category from "../models/categoryModel";
 import orderModel from "../models/orderModel";
 import { application } from "express";
+import { Rating } from "../models/ratingModel";
 
 export class UserRepositary {
-  
   static async existUser(email: string): Promise<IUser | null> {
     try {
       const existUser = await UserModel.findOne({ email });
@@ -63,10 +63,13 @@ export class UserRepositary {
           phone: 1,
           passwordHash: 1,
           isBlocked: 1,
-          tutor : 1,
-          
+          tutor: 1,
         }
       );
+
+      if (user?.isBlocked === true) {
+        throw new Error("You are restricted.");
+      }
 
       if (!user) {
         throw new Error("User doesn't exist");
@@ -78,10 +81,6 @@ export class UserRepositary {
         throw new Error("Invalid password");
       }
 
-      if (user.isBlocked === true) {
-        throw new Error("User blocked.");
-      }
-
       // const accessToken = jwt.sign(
       //   { id: user.userId, email: user.email },
       //   process.env.SECRET_KEY!,
@@ -89,7 +88,6 @@ export class UserRepositary {
       // );
 
       return user;
-      
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -103,6 +101,12 @@ export class UserRepositary {
       console.log("getting here repo");
       console.log(userid);
 
+      const user = await UserModel.findOne({ userId: userid }).lean();
+
+      if (user?.isBlocked === true) {
+        throw new Error("You are currently restricted.");
+      }
+
       const updatedUser = await userModel
         .findOneAndUpdate(
           { userId: userid },
@@ -114,100 +118,97 @@ export class UserRepositary {
       console.log("updated user:", updatedUser);
 
       return updatedUser ? updatedUser.toObject() : null;
-    } catch (error : any) {
+    } catch (error: any) {
       throw error;
     }
   }
 
- 
-static async getUsersRepo(page: number, limit: number): Promise<{ users: any[]; total: number }> {
-  try {
-   
-      const skip = (page - 1) * limit;
-
-     
-      const users = await UserModel.find(
-          {},
-          {
-              _id: 0,
-              firstName: 1,
-              lastName: 1,
-              email: 1,
-              phone: 1,
-              createdAt: 1,
-              roles: 1,
-              isBlocked: 1,
-          }
-      )
-          .skip(skip)
-          .limit(limit);
-
-      
-      const total = await UserModel.countDocuments();
-
-      return { users, total };
-  } catch (error: any) {
-      console.error('Error fetching users:', error);
-      throw new Error('Error fetching users from database');
-  }
-}
-
-static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[]; total: number }> {
-  try {
-   
-      const skip = (page - 1) * limit;
-
-     
-      const users = await UserModel.find(
-          {tutor : true},
-          {
-              _id: 0,
-              firstName: 1,
-              lastName: 1,
-              email: 1,
-              phone: 1,
-              createdAt: 1,
-              roles: 1,
-              isBlocked: 1,
-          }
-      )
-          .skip(skip)
-          .limit(limit);
-
-      
-      const total = await UserModel.countDocuments();
-
-      return { users, total };
-  } catch (error: any) {
-      console.error('Error fetching users:', error);
-      throw new Error('Error fetching users from database');
-  }
-}
-
-
-  static async blockUser(email : string) : Promise<boolean | void> {
+  static async getUsersRepo(
+    page: number,
+    limit: number
+  ): Promise<{ users: any[]; total: number }> {
     try {
-      const response = await UserModel.findOneAndUpdate(
-        { email: email },               
-        { isBlocked: true }
-      );
-      
-      return true;
-      
-    } catch (error : any) {
-      console.error('Error in blocking user in  repo:', error);
+      const skip = (page - 1) * limit;
+
+      const users = await UserModel.find(
+        {},
+        {
+          _id: 0,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          phone: 1,
+          createdAt: 1,
+          roles: 1,
+          isBlocked: 1,
+        }
+      )
+        .skip(skip)
+        .limit(limit);
+
+      const total = await UserModel.countDocuments();
+
+      return { users, total };
+    } catch (error: any) {
+      console.error("Error fetching users:", error);
+      throw new Error("Error fetching users from database");
     }
   }
 
-  static async unblockUserRepo(email : string) : Promise<boolean | void> {
+  static async getTutorsRepo(
+    page: number,
+    limit: number
+  ): Promise<{ users: any[]; total: number }> {
+    try {
+      const skip = (page - 1) * limit;
+
+      const users = await UserModel.find(
+        { tutor: true },
+        {
+          _id: 0,
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          phone: 1,
+          createdAt: 1,
+          roles: 1,
+          isBlocked: 1,
+        }
+      )
+        .skip(skip)
+        .limit(limit);
+
+      const total = await UserModel.countDocuments();
+
+      return { users, total };
+    } catch (error: any) {
+      console.error("Error fetching users:", error);
+      throw new Error("Error fetching users from database");
+    }
+  }
+
+  static async blockUser(email: string): Promise<boolean | void> {
     try {
       const response = await UserModel.findOneAndUpdate(
-        { email: email },               
+        { email: email },
+        { isBlocked: true }
+      );
+
+      return true;
+    } catch (error: any) {
+      console.error("Error in blocking user in  repo:", error);
+    }
+  }
+
+  static async unblockUserRepo(email: string): Promise<boolean | void> {
+    try {
+      const response = await UserModel.findOneAndUpdate(
+        { email: email },
         { isBlocked: false }
       );
       return true;
-    } catch (error : any) {
-      console.error('Error in blocking user in  repo:', error);
+    } catch (error: any) {
+      console.error("Error in blocking user in  repo:", error);
     }
   }
 
@@ -228,22 +229,22 @@ static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[];
           },
         },
         {
-          new: true, 
+          new: true,
           projection: {
             _id: 0,
-          userId: 1,
-          firstName: 1,
-          lastName: 1,
-          email: 1,
-          phone: 1,
-          passwordHash: 1,
-          isBlocked: 1,
-          tutor : 1,
+            userId: 1,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+            phone: 1,
+            passwordHash: 1,
+            isBlocked: 1,
+            tutor: 1,
           },
         }
       );
       if (!user) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
       const userInfo = {
         firstName: user.firstName,
@@ -254,41 +255,41 @@ static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[];
         isBlocked: user.isBlocked,
         tutor: user.tutor,
         tutorCredential: user.tutorCredentials,
-        
       };
 
-      const tutor = await TutorApplication.findOneAndUpdate({email : email} ,
+      const tutor = await TutorApplication.findOneAndUpdate(
+        { email: email },
         {
-          $set : {
-            status : 'accepted'
-          }
+          $set: {
+            status: "accepted",
+          },
         }
-      )
+      );
       const updateData = {
-        email : user.email,
-        role : tutor?.tutorRole,
-        bio : tutor?.teachingExperience,
-        education : tutor?.degree,
-        experience : tutor?.subjectsOfExpertise
-      }
+        email: user.email,
+        role: tutor?.tutorRole,
+        bio: tutor?.teachingExperience,
+        education: tutor?.degree,
+        experience: tutor?.subjectsOfExpertise,
+      };
 
       const updatedProfile = await TutorProfile.findOneAndUpdate(
-        { userId: user._id }, 
-        { $set: updateData }, 
-        { new: true, upsert: true } 
+        { userId: user._id },
+        { $set: updateData },
+        { new: true, upsert: true }
       );
-  
+
       return userInfo;
     } catch (err: any) {
-      console.error('Error in addTutorToUserModel:', err.message);
-      throw err; 
+      console.error("Error in addTutorToUserModel:", err.message);
+      throw err;
     }
   }
 
-  static async verifyTutor(email :string , passcode :any) {
+  static async verifyTutor(email: string, passcode: any) {
     try {
-      
-      const user = await UserModel.findOne({ email: email },
+      const user = await UserModel.findOne(
+        { email: email },
         {
           _id: 0,
           userId: 1,
@@ -298,31 +299,17 @@ static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[];
           phone: 1,
           passwordHash: 1,
           isBlocked: 1,
-          tutor : 1,
-          tutorCredentials : 1
+          tutor: 1,
+          tutorCredentials: 1,
         }
       );
 
-      if(!user) {
-        throw new Error("Tutor dosen't exist.")
+      if (!user) {
+        throw new Error("Tutor dosen't exist.");
       }
 
-      // const mismatch = await bcrypt.compare(passcode, user.tutorCredentials?.passwordHash as any)
-      // console.log(passcode, user.tutorCredentials?.passwordHash);
-      
-
-      // console.log("type of passcode" , typeof(passcode) , "type of hash" , typeof(user.tutorCredentials?.passwordHash));
-      
-
-      // console.log(mismatch, "pass");
-      
-
-      // if(!mismatch) {
-      //   throw new Error("Wrong passcode")
-      // }
-
-      if(passcode !== user.tutorCredentials?.passwordHash) {
-        throw new Error("Wrong passcode")
+      if (passcode !== user.tutorCredentials?.passwordHash) {
+        throw new Error("Wrong passcode");
       }
 
       const userInfo = {
@@ -332,184 +319,263 @@ static async getTutorsRepo(page: number, limit: number): Promise<{ users: any[];
         userId: user.userId,
         phone: user.phone,
         isBlocked: user.isBlocked,
-        tutor : user.tutor,
+        tutor: user.tutor,
         tutorCredential: user.tutorCredentials,
       };
 
       return userInfo;
-
-    } catch (error : any) {
-      console.log("Error in verifying tutor login in tutor repo", error.message);
+    } catch (error: any) {
+      console.log(
+        "Error in verifying tutor login in tutor repo",
+        error.message
+      );
       throw new Error(error.message);
     }
   }
-  
 
-  static  async  getApplicantDataRepo (email : string) {
-    try { 
-      const tutorData = await TutorProfile.findOne({email : email},
+  static async getApplicantDataRepo(email: string) {
+    try {
+      const tutorData = await TutorProfile.findOne(
+        { email: email },
         {
-          _id : 0,
-          applicationId : 1,
-          tutorRole :1,
-          education : 1,
-          experience :1,
-          bio : 1,
-          role : 1,
-          language : 1,
-          country : 1,
-          profilePhotoUrl : 1,
-          email : 1,
-          userId : 1
+          _id: 0,
+          applicationId: 1,
+          tutorRole: 1,
+          education: 1,
+          experience: 1,
+          bio: 1,
+          role: 1,
+          language: 1,
+          country: 1,
+          profilePhotoUrl: 1,
+          email: 1,
+          userId: 1,
         }
-      )
+      );
 
       const tutor = {
         userId: tutorData?.userId,
-        bio : tutorData?.bio,
-        tutorRole : tutorData?.role,
-        email : email,
-        education : tutorData?.education,
-        country : tutorData?.country,
-        experience : tutorData?.experience,
-        language : tutorData?.language,
-        profilePhotoUrl : tutorData?.profilePhotoUrl
-      }
+        bio: tutorData?.bio,
+        tutorRole: tutorData?.role,
+        email: email,
+        education: tutorData?.education,
+        country: tutorData?.country,
+        experience: tutorData?.experience,
+        language: tutorData?.language,
+        profilePhotoUrl: tutorData?.profilePhotoUrl,
+      };
 
-     
       return tutor;
-    } catch (error : any) {
-      console.log("Error in getting applicant data user repo", error.message); 
+    } catch (error: any) {
+      console.log("Error in getting applicant data user repo", error.message);
       throw new Error(error.message);
     }
   }
-  
+
   static async getCourses(category: string, page: number, limit: number) {
     try {
-        let filter: {  isBlocked: boolean; category?: string } = { isBlocked: false };;
-       
-        if (category && category !== "All") {
-            filter.category = category;
-        } else if (category && category === 'All') {
-            filter = {isBlocked: false};
-        }
+      let filter: { isBlocked: boolean; category?: string } = {
+        isBlocked: false,
+      };
 
-        const skip = (page - 1) * limit;
-        const totalCourses = await Course.countDocuments(filter).exec();
-        const totalPages = Math.ceil(totalCourses / limit);
+      if (category && category !== "All") {
+        filter.category = category;
+      } else if (category && category === "All") {
+        filter = { isBlocked: false };
+      }
 
-        const courses = await Course.find(filter , {isBlocked : false}).lean()
-            .skip(skip)
-            .limit(limit)
-            .exec();
+      const skip = (page - 1) * limit;
+      const totalCourses = await Course.countDocuments(filter).exec();
+      const totalPages = Math.ceil(totalCourses / limit);
 
-        return {
-            courses,
-            totalPages
-        };
+      const courses = await Course.find(filter, { isBlocked: false })
+        .lean()
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+      return {
+        courses,
+        totalPages,
+      };
     } catch (error: any) {
-        console.log("Error in getting courses user repo", error.message);
-        throw new Error(error.message);
-    }
-}
-
-
-
-  static async getCourse(id : string) {
-    try {
-        const course = await Course.findOne({courseId : id}, {isBlocked : false}).populate({
-          path: 'sections',
-          populate: { path: 'videos' }  
-        });
-
-        // console.log(course , "sss");
-        
-        if(!course) {
-          throw new Error("Cannot find course.")
-        }
-
-        const tutor = await TutorProfile.findOne({ email : course?.email})
-        if(!tutor) {
-          throw new Error("Cannot find tutor.")
-        }
-
-        const userTutor = await UserModel.findOne({email : tutor?.email})
-        if(!userTutor) {
-          throw new Error("Cannot find userTutor.")
-        }
-
-
-        const CourseData = {
-          id  : course._id,
-            name : course.name,
-            description : course.description,
-            Category : course.category,
-            sections : course.sections,
-            tags : course.tags,
-            language : course.language,
-            ratings : course?.ratings,
-            comments : course?.comments,
-            thumbnail : course.thumbnail,
-            tutorName : userTutor.firstName + userTutor.lastName,
-            tutorBio : tutor.bio,
-            education : tutor.education,
-            certifications : tutor.certifications,
-            email : tutor.email,
-            courseId : course.courseId,
-            price : course.price,
-            uploadedDate : course?.createdAt,
-            users : course?.users?.length
-        }
-
-        return CourseData;
-    } catch (error : any) {
-      console.log("Error in getting course detail user repo", error.message); 
+      console.log("Error in getting courses user repo", error.message);
       throw new Error(error.message);
     }
   }
 
-  static async saveOder (orderData : any) {
+  static async getCourse(id: string) {
     try {
-      const order = await new orderModel(orderData)
-      await order.save()
+      const course = await Course.findOne(
+        { courseId: id },
+        { isBlocked: false }
+      ).populate({
+        path: "sections",
+        populate: { path: "videos" },
+      });
+
+      // console.log(course , "sss");
+
+      if (!course) {
+        throw new Error("Cannot find course.");
+      }
+
+      const tutor = await TutorProfile.findOne({ email: course?.email });
+      if (!tutor) {
+        throw new Error("Cannot find tutor.");
+      }
+
+      const userTutor = await UserModel.findOne({ email: tutor?.email });
+      if (!userTutor) {
+        throw new Error("Cannot find userTutor.");
+      }
+
+      
+
+      const CourseData = {
+        id: course._id,
+        name: course.name,
+        description: course.description,
+        Category: course.category,
+        sections: course.sections,
+        tags: course.tags,
+        language: course.language,
+        ratings: course?.ratings,
+        comments: course?.comments,
+        thumbnail: course.thumbnail,
+        tutorName: userTutor.firstName + userTutor.lastName,
+        tutorBio: tutor.bio,
+        education: tutor.education,
+        certifications: tutor.certifications,
+        email: tutor.email,
+        courseId: course.courseId,
+        price: course.price,
+        uploadedDate: course?.createdAt,
+        users: course?.users?.length,
+      };
+
+      return CourseData;
+    } catch (error: any) {
+      console.log("Error in getting course detail user repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  static async saveOder(orderData: any) {
+    try {
+      const order = await new orderModel(orderData);
+      await order.save();
       return true;
-    } catch (error : any) {
-      console.log("Error in saving order data in user repo", error.message); 
+    } catch (error: any) {
+      console.log("Error in saving order data in user repo", error.message);
       throw new Error(error.message);
     }
   }
-  
-  static async saveCourse(courseId : string , email : string) {
+
+  static async saveCourse(courseId: string, email: string) {
     try {
       const res = await UserModel.updateOne(
-        { email : email} ,{isBlocked : false}, 
-    {
-      $push : { courses : courseId}
-    })
-
-    const user = await UserModel.findOne({ email : email})
-    const userId = user?.userId
-
-    const add  = await Course.updateOne(
-      {courseId : courseId},
-      {
-        $push : {
-          users : userId
+        { email: email },
+        {
+          $push: { courses: courseId },
         }
-      }
-    )
+      );
 
-    return true;
-    } catch (error : any) {
-      console.log("Error in saving course data on user in user repo", error.message); 
+      console.log(res, "res");
+
+      const user = await UserModel.findOne({ email: email });
+      const userId = user?.userId;
+
+      const add = await Course.updateOne(
+        { courseId: courseId },
+        {
+          $push: {
+            users: userId,
+          },
+        }
+      );
+
+      return true;
+    } catch (error: any) {
+      console.log(
+        "Error in saving course data on user in user repo",
+        error.message
+      );
       throw new Error(error.message);
     }
   }
 
-  
+  static async addRatingRepo(userId: String, rating: number, courseId : String) {
+    try {
+      console.log("rate repo");
+      
+      const user = await UserModel.findOne({ userId: userId });
 
-  
+      const newRating = new Rating({ userId : user?._id, value : rating });
+      console.log(courseId);
+      
+
+      const course = await Course.findOneAndUpdate(
+        { courseId : courseId }, 
+        { $push: { ratings: newRating._id } }, 
+        { new: true } 
+      );
+
+      if (!course) {
+        throw new Error("Course not found.");
+      }
+      const status = await newRating.save();
+      console.log(status);
+      
+      return true;
+    } catch (error: any) {
+      console.log(
+        "Error in saving rating data on user in user repo",
+        error.message
+      );
+      throw new Error(error.message);
+    }
+  }
+
+  static async getRatingRepo(userId : string) {
+    try {
+      const user = await userModel.findOne({userId : userId})
+      const rating = await Rating.findOne({userId : user?._id})
+
+      if(!rating) {
+        return 0;
+      }
+      
+
+      return rating?.value
+    } catch (error : any) {
+      console.log(
+        "Error in getting rating data on user in user repo",
+        error.message
+      );
+      throw new Error(error.message);
+    }
+  }
+
+  static async saveProfile(userId :string , profileUrl :string) {
+    try {
+
+      const update = await userModel.findOneAndUpdate({userId : userId},
+        {
+          $set : {
+            profile : profileUrl
+          }
+        }
+      )
+
+      return true;
+      
+    } catch (error: any) {
+      console.log(
+        "Error in saving profile  in user repo",
+        error.message
+      );
+      throw new Error(error.message);
+    }
+  }
 }
-
-
-

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { toast } from "sonner";
+import ApiBlock from "../../services/ApiBlock";
 
 
 
@@ -30,8 +31,18 @@ const UserDetails = () => {
   }) => {
     try {
       values.userId = data.userInfo.userId;
+      // ApiBlock()
+      const isBlocked = localStorage.getItem("isBlocked")
+      console.log("atleast here",isBlocked);
+      if(isBlocked === "true") {
+        console.log("atleast here");
+        
+        toast.warning("Currently you are restricted.")
+        return;
+      } else {
 
-      const response = await dispatch(updateUserInfo(values));
+        const response = await dispatch(updateUserInfo(values));
+     
       if (response.meta.requestStatus === "fulfilled") {
         console.log("User information updated successfully:", response.payload);
         toast.success("Details updated")
@@ -41,6 +52,7 @@ const UserDetails = () => {
   
         toast.info("No changes made")
       }
+    }
     } catch (error) {
       console.error("Failed to update user", error);
     }

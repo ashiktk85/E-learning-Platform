@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { Base_URL } from "../../credentials";
 import axios from "axios";
+import { toast, Toaster } from "sonner";
 
 interface IcourseData {
   courseName: string;
@@ -36,7 +37,7 @@ const CourseCard: React.FC<IcourseData> = ({
   const gotoCourseDetails = async() => {
     try {
       const response = await axios.get(`${Base_URL}/check-enrollment/${email}/${courseId}`)
-      console.log(response.data);
+      console.log(response.data,"rs");
       
       if (response.data) {
         
@@ -47,7 +48,8 @@ const CourseCard: React.FC<IcourseData> = ({
         }`);
       }
     } catch (error : any) {
-      console.error('Error checking enrollment:', error);
+      console.error('Error checking enrollment:', error.response.data.message);
+      toast.warning(error?.response?.data?.message)
     }
 
    
@@ -55,6 +57,7 @@ const CourseCard: React.FC<IcourseData> = ({
 
   return (
     <div className="flex flex-col gap-3 pb-3">
+      <Toaster richColors position="top-center"/>
       <div
         className="w-[280px] bg-center bg-no-repeat aspect-video bg-cover rounded-xl cursor-pointer "
         style={{
@@ -88,37 +91,3 @@ const CourseCard: React.FC<IcourseData> = ({
 
 export default React.memo(CourseCard);
 
-//   <div
-//   onClick={gotoCourseDetails}
-//   className="cursor-pointer border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-transform duration-300 scale-100"
-// >
-//   <img
-//     src={thumbnail}
-//     className="h-40 w-full object-cover"
-//     alt={`Thumbnail of ${name}`}
-//   />
-//   <div className="p-4">
-//     <div className="flex justify-between items-center mb-2">
-//       <h1 className="text-lg font-semibold text-gray-800">{name}</h1>
-//       <div className="flex items-center ml-auto">
-//         <FaStar className="w-4 h-4 text-yellow-500" />
-//         <span className="text-sm font-medium text-gray-600 ml-1">{rating.toFixed(1)}</span>
-//       </div>
-//     </div>
-
-//     <div className="flex items-center justify-between text-gray-600 mb-2 text-sm">
-//       <div className="flex items-center gap-1">
-//         <FaRegUser className="w-4 h-4" />
-//         <span>{students}</span>
-//       </div>
-//       <div className="flex items-center gap-1">
-//         <FaRegClock className="w-4 h-4" />
-//         <span>{duration}</span>
-//       </div>
-//       <div className="flex items-center gap-1">
-//         <FaRegFileAlt className="w-4 h-4" />
-//         <span>{lessons} Lessons</span>
-//       </div>
-//     </div>
-//   </div>
-// </div>

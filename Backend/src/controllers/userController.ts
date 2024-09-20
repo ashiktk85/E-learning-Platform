@@ -1,6 +1,7 @@
 import { query, Request, Response } from "express";
 
 import { UserService } from "../services/userServices";
+import HTTP_statusCode from "../Enums/httpStatusCode";
 
 
 export class UserController {
@@ -128,7 +129,7 @@ export class UserController {
       console.log(id , "id");
       
       const courseData =  await this.userService.getCourseDetail(id as string)
-      console.log(courseData.sections[0].videos);
+      // console.log(courseData.sections[0].videos);
       
       res.status(200).json(courseData)
     } catch (error : any) {
@@ -174,7 +175,7 @@ export class UserController {
 
       const response = await this.userService.checkEnrollementSevice(courseId as string, email as string)
 
-        console.log(response);
+        // console.log(response);
         
       res.status(200).json(response)
     } catch (error : any) {
@@ -199,6 +200,72 @@ export class UserController {
     }
   }
 
+  async addRating(req : Request, res : Response) {
+    try {
+      
+      const userId = req.params.userId;
+      const { rating ,courseId } = req.body;
+      
+      
+
+      const addRating = await this.userService.addRatingService(userId as string , rating as number,courseId.courseId as string)
+
+      res.status(201).json(addRating)
+
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getRating(req : Request, res : Response) {
+    try {
+      const userId = req.params.userId;
+      console.log("lklklklklklk",userId);
+      
+      const rating = await this.userService.getRatingService(userId as string)
+
+      console.log("con", rating);
+      res.status(200).json(rating)
+      
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async saveProfilePic(req : Request, res : Response) {
+    try {
+      const profile = req.file
+      const userId = req.body.userId
+      
+      if(!profile) {
+        throw new Error("No profile given")
+      }
+
+      const status = await this.userService.saveProfile(profile as Express.Multer.File , userId as string)
+
+      res.status(201).json(status)
+      
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+
+  async getProfile(req : Request, res : Response) {
+    try {
+     const {email} = req.params
+     const profileUrl = await this.userService.getProfileService(email as string)
+     console.log(profileUrl);
+     
+      res.status(HTTP_statusCode.OK).json(profileUrl)
+    } catch (error : any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
   
 }
 

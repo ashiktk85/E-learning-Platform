@@ -10,6 +10,7 @@ import UserDetails from "../../components/UserComponent/UserDetails";
 import ProfileCourses from "../../components/UserComponent/ProfileCourses";
 import ProfileTutors from "../../components/UserComponent/ProfileTutors";
 import BlockChecker from "../../services/BlockChecker";
+import ProfileImage from "../../components/UserComponent/profileImg";
 
 const ProfilePage = () => {
 
@@ -32,6 +33,7 @@ const ProfilePage = () => {
 
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userInfo')
+    localStorage.removeItem('profileImage')
 
     window.location.href = '/login';
   };
@@ -49,14 +51,15 @@ const ProfilePage = () => {
             <div className="relative bg-white rounded-2xl shadow-lg p-6 w-11/12 max-w-4xl overflow-hidden opacity-95">
               <div className="absolute inset-0 bg-white backdrop-blur-md"></div>
               <div className="relative flex items-center">
-                <img
+                {/* <img
                   className="rounded-full w-20 h-20 border-2 border-white shadow-md"
                   src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
                   alt="Profile"
-                />
-                <span className="material-symbols-outlined mt-12 mr-5">
+                /> */}
+                {/* <span className="material-symbols-outlined mt-12 mr-5">
                   edit
-                </span>
+                </span> */}
+                <ProfileImage />
                 <div className="ml-4">
                   <h1 className="text-xl font-bold">
                     {data.userInfo.firstName + " " + data.userInfo.lastName}

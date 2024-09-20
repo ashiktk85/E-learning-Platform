@@ -20,6 +20,7 @@ export interface IUser extends Document {
      passwordHash?: string;
    };
    courses?: [];
+   profile?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -87,6 +88,9 @@ const userSchema = new Schema<IUser>({
    courses: {
       type: [String],
       default: []
+   },
+   profile : {
+      type : String
    }
 });
 

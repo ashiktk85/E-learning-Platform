@@ -91,7 +91,12 @@ const userSlice = createSlice({
       })
       .addCase(updateUserBlockStatus.fulfilled, (state, action: PayloadAction<{ email: string; isBlocked: boolean }>) => {
         const { email, isBlocked } = action.payload;
+        console.log(isBlocked, "llll");
+        localStorage.setItem('isBlocked', JSON.stringify(isBlocked));
+        
         if (state.userInfo && state.userInfo.email === email) {
+          console.log("in stte");
+          
           state.userInfo.isBlocked = isBlocked;
         }
         state.loading = false;

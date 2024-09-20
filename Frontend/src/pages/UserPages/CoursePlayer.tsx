@@ -7,6 +7,15 @@ import { MdOutlineSettings } from "react-icons/md";
 import { toast, Toaster } from "sonner";
 import BlockChecker from "../../services/BlockChecker";
 
+import Box from "@mui/joy/Box";
+import Button from "@mui/joy/Button";
+import Add from "@mui/icons-material/Add";
+import RatingModal from "../../components/UserComponent/RatingModal";
+import ExistRating from "../../components/UserComponent/ExistRating";
+import userAxiosInstance from "../../config/axiosInstance/userInstance";
+import { user } from "@nextui-org/react";
+
+
 interface IcourseData {
   name: string;
   description: string;
@@ -34,6 +43,7 @@ interface Ivideo {
 }
 
 interface Isection {
+  description: string;
   _id: string;
   title: string;
   sectionTitle: string;
@@ -41,20 +51,20 @@ interface Isection {
 }
 
 const CoursePlayer: React.FC = () => {
-  BlockChecker()
+  BlockChecker();
   const { courseId } = useParams<{ courseId: string }>();
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const [currentVideo, setCurrentVideo] = useState<Ivideo | null>(null);
+  const [currentSection, setCurrentSection] = useState<Isection | null>(null);
   const videoPlayerRef = useRef<HTMLVideoElement | null>(null);
-  const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({});
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-
+  
+  
   useEffect(() => {
-   
     const fetchCourseData = async () => {
       try {
         const response = await axios.get(`${Base_URL}/getCourse/${courseId}`);
@@ -72,6 +82,11 @@ const CoursePlayer: React.FC = () => {
 
         setCurrentVideo(initialVideo);
         setActiveVideoId(initialVideo?._id || null);
+        const currentSection = response.data.sections.find(
+          (section: Isection) =>
+            section.videos.some((video) => video._id === initialVideo?._id)
+        );
+        setCurrentSection(currentSection || null);
       } catch (error) {
         console.error("Error fetching course data:", error);
       }
@@ -83,57 +98,16 @@ const CoursePlayer: React.FC = () => {
     setCurrentVideo(video);
     setActiveVideoId(video._id);
     localStorage.setItem(`activeVideo_${courseId}`, video._id);
+
+    const currentSection = courseData?.sections.find((section) =>
+      section.videos.some((v) => v._id === video._id)
+    );
+    setCurrentSection(currentSection || null);
   };
-
-  const getThumbnailUrl = (videoUrl: string) => {
-    return new Promise<string>((resolve, reject) => {
-      const video = document.createElement("video");
-      video.src = videoUrl;
-      video.crossOrigin = "anonymous";
-
-      video.addEventListener("loadedmetadata", () => {
-        video.currentTime = 1;
-      });
-
-      video.addEventListener("seeked", () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const thumbnailUrl = canvas.toDataURL("image/png");
-        resolve(thumbnailUrl);
-      });
-
-      video.addEventListener("error", (error) => {
-        reject("Failed to load video");
-      });
-    });
-  };
-
-  useEffect(() => {
-    if (courseData) {
-      courseData.sections.forEach((section) => {
-        section.videos.forEach((video) => {
-          if (!thumbnails[video._id]) {
-            getThumbnailUrl(video.url)
-              .then((url) => {
-                setThumbnails((prev) => ({ ...prev, [video._id]: url }));
-              })
-              .catch((err) =>
-                console.error("Error generating thumbnail:", err)
-              );
-          }
-        });
-      });
-    }
-  }, [courseData, thumbnails]);
 
   const handleReportClick = () => {
     setShowReportModal(true);
-    setShowDropdown(false); 
+    setShowDropdown(false);
   };
 
   const handleReportSubmit = async () => {
@@ -144,7 +118,7 @@ const CoursePlayer: React.FC = () => {
         reason: reportReason,
         additionalInfo,
       });
-      if(res.data === true) {
+      if (res.data === true) {
         toast.success("Report submitted successfully");
         setShowReportModal(false);
         setReportReason("");
@@ -160,11 +134,12 @@ const CoursePlayer: React.FC = () => {
       className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden"
       style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
     >
-      <Toaster richColors position="top-center"/>
+      <Toaster richColors position="top-center" />
       <div className="layout-container flex h-full grow flex-col">
         <Navbar />
         <div className="gap-1 px-6 flex flex-1 justify-center py-5 mt-16">
           <div className="layout-content-container flex flex-col max-w-[920px] flex-1">
+           
             <div className="relative flex items-center justify-center bg-[#111817] bg-cover bg-center aspect-video rounded-2xl">
               {currentVideo ? (
                 <video
@@ -181,36 +156,58 @@ const CoursePlayer: React.FC = () => {
             </div>
 
             {currentVideo && (
-              <h3 className="text-[#111817] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
-                {currentVideo.title}
-              </h3>
+              <div className="bg-white px-4 py-3">
+                <h4>Title</h4>
+                <h3 className="text-lg font-bold"> {currentVideo.title}</h3>
+                <p>Description</p>
+                <p className="text-sm text-gray-600">
+                  {currentVideo.description}
+                </p>
+              </div>
             )}
 
-            <div className="flex gap-4 bg-white px-4 py-3 justify-between">
-              <div className="flex items-start gap-4">
-                <div className="text-[#111817] flex items-center justify-center rounded-lg bg-[#f0f5f4] shrink-0 size-12">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z"></path>
-                  </svg>
-                </div>
-                <div className="flex flex-1 flex-col justify-center">
-                  <p className="text-[#111817] text-base font-medium leading-normal">
-                    {currentVideo?.title}
-                  </p>
-                  <p className="text-[#5f8c85] text-sm font-normal leading-normal">
-                    {currentVideo?.description}
-                  </p>
-                </div>
+            {currentSection && (
+              <div className="mt-4 bg-white px-4 py-3">
+                <p>Section</p>
+                <h2 className="text-lg font-bold">
+                  
+                  {currentSection.sectionTitle}
+                </h2>
+                <p>Description</p>
+                <p className="text-sm text-gray-600">
+                  {currentSection.description}
+                </p>
               </div>
+            )}
+
+          
+            {/* <div className=" py-10 cursor-pointer"
+            onClick={() => setRatingModal(!ratingModal)}
+            >
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+               
+                
+                <Button
+                  disabled
+                  color="success"
+                  variant="outlined"
+                  startDecorator={<Add />}
+                >
+                  Add Rating
+                </Button>
+              </Box>
+            </div> */}
+            <div className="flex-col h-20 py-10 ">
+            <RatingModal courseId = {courseData?.courseId}/>
+            <h1 className="py-5">Your Rating</h1>
+            {/* <ExistRating /> */}
             </div>
+           
+
+           
           </div>
 
+       
           <div className="h-full w-1/4 pl-5">
             <div className="flex justify-end pr-2 pb-2 relative">
               <MdOutlineSettings
@@ -253,6 +250,9 @@ const CoursePlayer: React.FC = () => {
                         <span className="text-sm font-medium text-gray-800">
                           {video.title}
                         </span>
+                        {/* <p className="text-xs text-gray-600">
+                          {video.description}
+                        </p> */}
                       </div>
                     </div>
                   ))}
@@ -263,55 +263,51 @@ const CoursePlayer: React.FC = () => {
         </div>
       </div>
 
+     
       {showReportModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 className="text-xl font-bold mb-4">Report Video</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-4">Report Video</h2>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Reason:
+              <label className="block text-gray-700 font-medium mb-2">
+                Reason for report
               </label>
-              <select
+              <input
+                type="text"
+                className="w-full border rounded p-2"
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                className="block w-full p-2 border rounded"
-              >
-                <option value="">Select a reason</option>
-                <option value="Promotes hate">Promotes hate</option>
-                <option value="Sexual content">Sexual content</option>
-                <option value="Inappropriate">Inappropriate</option>
-                <option value="Other">Other</option>
-              </select>
+              />
             </div>
-            {reportReason === "Other" && (
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Additional Information:
-                </label>
-                <textarea
-                  value={additionalInfo}
-                  onChange={(e) => setAdditionalInfo(e.target.value)}
-                  className="block w-full p-2 border rounded"
-                />
-              </div>
-            )}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-2">
+                Additional Information
+              </label>
+              <textarea
+                className="w-full border rounded p-2"
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+              />
+            </div>
             <div className="flex justify-end">
               <button
-                onClick={() => setShowReportModal(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2"
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                onClick={handleReportSubmit}
               >
-                Cancel
+                Submit Report
               </button>
               <button
-                onClick={handleReportSubmit}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                onClick={() => setShowReportModal(false)}
               >
-                Submit
+                Cancel
               </button>
             </div>
           </div>
         </div>
       )}
+
+      
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { RootState } from "../../redux/store";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast, Toaster } from "sonner";
+import ProfileImg from "../UserComponent/profileImg";
 
 const url = "http://localhost:7000";
 
@@ -118,38 +119,7 @@ const TutorProfile = () => {
     }
   };
 
-  const handleImageSave = async () => {
-    if (newImage) {
-      try {
-        const formData = new FormData();
-        formData.append("profilePic", newImage);
-        formData.append("email", userInfo?.email || "");
 
-        console.log(formData);
-        
-
-        const response = await axios.post(
-          `${url}/tutor/uploadProfilePic`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        if (response.data) {
-          setProfileData(response.data);
-          setImagePreview(response.data.profilePhotoUrl);
-          toast.success("Profile picture updated.");
-          setIsSaveButtonVisible(false); // Hide save button after successful save
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        toast.error("Failed to upload image.");
-      }
-    }
-  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -169,29 +139,15 @@ const TutorProfile = () => {
 
       <div className="flex items-center mt-5">
         <div className="relative">
-          <div className="w-40 h-40 rounded-full overflow-hidden bg-gray-200">
-            <img
-              src={profileData?.profileUrl || imagePreview}
-              alt="Profile Photo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            id="imageInput"
-            className="hidden"
-            onChange={handleImageChange}
-          />
-          <label
-            htmlFor="imageInput"
-            className="absolute bottom-0 right-0 bg-gray-800 text-white p-2 rounded-full cursor-pointer"
-          >
-            <MdAddAPhoto size={24} />
-          </label>
+         
+            <ProfileImg />
+          
+         
+         
+          
         </div>
 
-        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10 relative ">
+        <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10  ">
           <div className="flex">
             <h3 className="font-bold pb-2">Name:</h3>
             <p className="pl-5 font-medium">
@@ -220,16 +176,7 @@ const TutorProfile = () => {
         </div>
       </div>
 
-      {isSaveButtonVisible && (
-        <div className="mt-4">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={handleImageSave}
-          >
-            Save
-          </button>
-        </div>
-      )}
+     
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">

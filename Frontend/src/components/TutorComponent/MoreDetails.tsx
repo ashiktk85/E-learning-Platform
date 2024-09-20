@@ -166,7 +166,7 @@ const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext 
         </button>
       </div>
 
-      {/* Progress Modal */}
+     
       <Modal
         isOpen={isUploading}
         onRequestClose={() => {}}
@@ -179,7 +179,7 @@ const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext 
           <p className="mt-2">Please do not close or refresh the page.</p>
           <div className="w-full mt-4 bg-gray-200 rounded h-4 relative">
             <div
-              className="bg-green-600 h-full rounded transition-all duration-500 ease-in-out"
+              className="bg-green-600 h-full rounded transition-all duration-2000 ease-in-out pb-1"
               style={{ width: `${uploadProgress}%` }}
             >
               <span className="absolute text-center pr-2 text-white text-sm">
