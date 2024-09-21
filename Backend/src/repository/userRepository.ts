@@ -166,6 +166,7 @@ export class UserRepositary {
         { tutor: true },
         {
           _id: 0,
+          userId : 1,
           firstName: 1,
           lastName: 1,
           email: 1,
@@ -173,6 +174,7 @@ export class UserRepositary {
           createdAt: 1,
           roles: 1,
           isBlocked: 1,
+          profile : 1
         }
       )
         .skip(skip)

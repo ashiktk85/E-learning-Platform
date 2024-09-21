@@ -59,7 +59,7 @@ const ProfilePage = () => {
                 {/* <span className="material-symbols-outlined mt-12 mr-5">
                   edit
                 </span> */}
-                <ProfileImage />
+                <ProfileImage size={80} showEditOption={true}/>
                 <div className="ml-4">
                   <h1 className="text-xl font-bold">
                     {data.userInfo.firstName + " " + data.userInfo.lastName}

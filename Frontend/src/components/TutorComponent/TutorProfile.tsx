@@ -38,7 +38,6 @@ const TutorProfile = () => {
   const [isProfileModal, setProfilModalOpen] = useState<boolean>(false);
 
   console.log(imagePreview, "im prev");
-  
 
   useEffect(() => {
     const getTutorData = async () => {
@@ -115,11 +114,9 @@ const TutorProfile = () => {
       const file = event.target.files[0];
       setNewImage(file);
       setImagePreview(URL.createObjectURL(file));
-      setIsSaveButtonVisible(true); 
+      setIsSaveButtonVisible(true);
     }
   };
-
-
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -139,12 +136,7 @@ const TutorProfile = () => {
 
       <div className="flex items-center mt-5">
         <div className="relative">
-         
-            <ProfileImg />
-          
-         
-         
-          
+          <ProfileImg size={150} showEditOption = {true} />
         </div>
 
         <div className="ml-8 flex-grow bg-green-200 shadow-lg p-4 rounded-lg pl-10  ">
@@ -175,8 +167,6 @@ const TutorProfile = () => {
           </div>
         </div>
       </div>
-
-     
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">

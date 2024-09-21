@@ -7,22 +7,26 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { toast } from "sonner";
 
-const ProfileImg = () => {
+interface ProfileImgProps {
+  size: number;
+  showEditOption?: boolean; 
+}
+
+const ProfileImg: React.FC<ProfileImgProps> = ({ size, showEditOption }) => {
   const { userInfo } = useSelector((state: RootState) => state.user);
   const userId = userInfo?.userId || "sss";
 
   const [profileModal, setProfileModal] = useState<boolean>(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); 
-  const [tempImage, setTempImage] = useState<File | null>(null); 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [tempImage, setTempImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-   
     const fetchProfile = async () => {
       try {
         const response = await userAxiosInstance.get(`/getProfile/${userInfo?.email}`);
         if (response.data) {
-          setSelectedImage(response.data); 
+          setSelectedImage(response.data);
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -55,12 +59,11 @@ const ProfileImg = () => {
         },
       });
 
-    
       const newImageUrl = URL.createObjectURL(tempImage);
       setSelectedImage(newImageUrl);
 
       setProfileModal(false);
-      toast.success("Profile Pic uploaded.")
+      toast.success("Profile Pic uploaded.");
 
       console.log("Image uploaded successfully:", response.data);
     } catch (error: any) {
@@ -70,7 +73,7 @@ const ProfileImg = () => {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setTempImage(e.target.files[0]); 
+      setTempImage(e.target.files[0]);
     }
   };
 
@@ -81,22 +84,24 @@ const ProfileImg = () => {
     if (selectedImage) {
       return selectedImage;
     }
-    return defaultProfile; 
+    return defaultProfile;
   };
 
   return (
     <>
-      <div className="relative w-20 h-20">
+      <div className="relative" style={{ width: size, height: size }}>
         <img
           className="w-full h-full rounded-full object-cover"
-          src={selectedImage || defaultProfile}
+          src={getImageSrc()}
           alt="profile img"
         />
-        <BiSolidMessageSquareEdit
-          fill="black"
-          className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full cursor-pointer"
-          onClick={() => setProfileModal(!profileModal)}
-        />
+        {showEditOption && (
+          <BiSolidMessageSquareEdit
+            fill="black"
+            className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full cursor-pointer"
+            onClick={() => setProfileModal(!profileModal)}
+          />
+        )}
       </div>
 
       {profileModal && (
@@ -104,9 +109,8 @@ const ProfileImg = () => {
           <div className="w-1/4 h-1/2 bg-white p-4 rounded shadow-lg flex flex-col items-center">
             <h2 className="text-lg font-semibold mb-4">Update profile</h2>
 
-         
             <img
-              src={getImageSrc()} 
+              src={getImageSrc()}
               alt="profile preview"
               className="w-40 h-40 rounded-full object-cover mb-4"
             />
@@ -120,7 +124,7 @@ const ProfileImg = () => {
             />
 
             <div
-              className="w-10 h-10 bg-gray-300 rounded-full flex justify-center items-center cursor-pointer mb-4 ml-24 inset-0  " 
+              className="w-10 h-10 bg-gray-300 rounded-full flex justify-center items-center cursor-pointer mb-4 ml-24 inset-0"
               onClick={handleCameraClick}
             >
               <FaCamera size={20} />

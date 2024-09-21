@@ -5,6 +5,7 @@ import Search from '../../components/common/AdminCommon/Search';
 import TutorList from '../../components/AdminComponent/TutorList';
 
 const TutorListPage = () => {
+  
     return (
         <div className="grid grid-cols-12">
       <AdminAside />

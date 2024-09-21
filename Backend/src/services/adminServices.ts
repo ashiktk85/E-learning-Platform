@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import { createToken } from "../config/jwtConfig";
 import { Course, ICourse } from "../models/courseModel";
 import { v4 as uuidv4 } from "uuid";
+import { profile } from "console";
 
 require('dotenv').config();
 
@@ -75,18 +76,29 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
         const { users, total } = await UserRepositary.getTutorsRepo(page, limit);
         console.log("User data in service", users);
 
-        const cleanedUsers = users.map((user: any) => {
-            const { firstName, lastName, email, phone, createdAt, roles, isBlocked } = user._doc;
-            return {
-                firstName,
-                lastName,
-                email,
-                phone,
-                roles,
-                isBlocked,
-                createdAt: createdAt.toISOString().slice(0, 10),
-            };
-        });
+       
+        const cleanedUsers = await Promise.all(
+            users.map(async (user: any) => {
+                const { firstName, lastName, email, phone, createdAt, roles, isBlocked, profile, userId } = user._doc;
+                
+                let profileUrl = "";
+                if (profile) {
+                    profileUrl = await this.aws.getfile(profile as string, `users/profile/${userId}`);
+                }
+
+                return {
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    roles,
+                    isBlocked,
+                    profileUrl,
+                    createdAt: createdAt.toISOString().slice(0, 10),
+                    userId
+                };
+            })
+        );
 
         console.log("Cleaned user data", cleanedUsers);
 

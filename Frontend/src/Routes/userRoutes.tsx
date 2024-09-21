@@ -13,6 +13,8 @@ import Checkout from '../pages/UserPages/Checkout';
 import CoursePlayer from '../pages/UserPages/CoursePlayer';
 import MyCourses from '../pages/UserPages/MyCourses';
 import Community from '../pages/UserPages/Community';
+import TutorsPage from '../pages/UserPages/TutorsPage';
+import TutorDetails from '../pages/UserPages/TutorDetails';
 
 const UserRoutes = () => {
     return (
@@ -29,6 +31,8 @@ const UserRoutes = () => {
                 <Route path = '/coursePlayer/:courseId' element = {<UserProtector> <CoursePlayer /></UserProtector>} />
                 <Route path = '/mycourses' element = {<UserProtector> <MyCourses /> </UserProtector>} />
                 <Route path = '/community' element = {<UserProtector ><Community /></UserProtector>} />
+                <Route path = '/tutors' element = {<TutorsPage />} />
+                <Route path = '/tutorDetails/:id' element = {<TutorDetails />} />
         </Routes>
        </>
     );
