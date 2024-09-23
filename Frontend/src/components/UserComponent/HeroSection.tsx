@@ -70,8 +70,8 @@ const HeroSection = () => {
               alt="Overlay Image 2"
               className="w-full h-full object-cover rounded-xl shadow-xl" 
             />
-            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md">
-              <p className="text-sm font-semibold text-[#17171a]"
+            <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-sm px-3 py-2 rounded-md shadow-md cursor-pointer">
+              <p className="text-sm font-semibold text-[#17171a] "
               onClick={goToCommunity}
               >Join Our Community</p>
             </div>

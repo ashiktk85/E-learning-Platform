@@ -248,5 +248,18 @@ export class TutorRepositary {
       throw new Error(error.message);
     }
   }
+
+  static async getTutorDetail(email : string) {
+    try {
+      const tutor =  await TutorProfile.findOne({email : email}).lean()
+
+      if(!tutor) throw new Error("Cannot find Tutor")
+       
+      return tutor;
+    } catch (error : any) {
+      console.log("Error in getting tutro detail in tutor repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
 }
 

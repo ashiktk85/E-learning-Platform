@@ -16,7 +16,7 @@ import { application } from "express";
 import { Rating } from "../models/ratingModel";
 
 export class UserRepositary {
-  static async existUser(email: string): Promise<IUser | null> {
+  static async existUser(email: string ): Promise<IUser | null> {
     try {
       const existUser = await UserModel.findOne({ email });
       // console.log("Existing user found ", existUser);
@@ -34,6 +34,27 @@ export class UserRepositary {
       }
     }
   }
+
+  static async getUser(id: string ): Promise<IUser | null> {
+    try {
+      const existUser = await UserModel.findOne({ userId : id });
+      // console.log("Existing user found ", existUser);
+
+      return existUser;
+    } catch (error: any) {
+      console.log(
+        "Error in checking existing user in userrepo -> exitUser",
+        error
+      );
+      if (error instanceof MongoServerError && error.code === 11000) {
+        throw new Error("Email already exists");
+      } else {
+        throw error;
+      }
+    }
+  }
+  
+  
 
   static async createUser(userData: any): Promise<IUser> {
     try {

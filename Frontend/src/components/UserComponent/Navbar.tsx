@@ -14,7 +14,7 @@ const Navbar = () => {
     { text: "Plans", path: "/plans" },
     { text: "Courses", path: "/coursesPage" },
     { text: "Be a Tutor", path: "/tutor" },
-    { text: "About", path: "/about" },
+    { text: "Orders", path: "/orders" },
     { text: "Contact", path: "/contact" },
     { text: "Profile", path: "/profile" },
   ];

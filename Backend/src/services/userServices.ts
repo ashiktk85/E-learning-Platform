@@ -14,13 +14,13 @@ import mongoose from "mongoose";
 import { CouresRepository } from "../repository/courseRepository";
 import { ParamsDictionary } from "express-serve-static-core";
 import { S3Client } from "@aws-sdk/client-s3";
-
+import { TutorRepositary } from "../repository/tutorRepositary";
 
 const s3Client = new S3Client({
-  region: 'eu-north-1',
+  region: "eu-north-1",
   credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -117,7 +117,7 @@ export class UserService {
 
       const accessToken = createToken(user.userId as string, "user");
 
-      const refreshToken = createRefreshToken(user.userId as string , "user")
+      const refreshToken = createRefreshToken(user.userId as string, "user");
 
       const userInfo = {
         firstName: user.firstName,
@@ -128,8 +128,7 @@ export class UserService {
         isBlocked: user.isBlocked,
         tutor: user.tutor,
       };
-    
-      
+
       return { userInfo, accessToken, refreshToken };
     } catch (error: any) {
       console.error("Error during login verification:", error.message);
@@ -189,72 +188,67 @@ export class UserService {
 
   async getCoursesService(category: string, page: number, limit: number) {
     try {
-        const response = await UserRepositary.getCourses(category, page, limit);
+      const response = await UserRepositary.getCourses(category, page, limit);
 
-        const awsConfig = new AwsConfig();
+      const awsConfig = new AwsConfig();
 
-        const coursesWithUrls = await Promise.all(
-            response.courses.map(async (course: ICourse) => {
-                const thumbnails = course.thumbnail
-                    ? await awsConfig.getfile(
-                        course.thumbnail,
-                        `tutors/${course.email}/courses/${course.courseId}/thumbnail`
-                    )
-                    : null;
-                return { ...course, thumbnail: thumbnails };
-            })
-        );
-        return {
-            courses: coursesWithUrls,
-            totalPages: response.totalPages
-        };
+      const coursesWithUrls = await Promise.all(
+        response.courses.map(async (course: ICourse) => {
+          const thumbnails = course.thumbnail
+            ? await awsConfig.getfile(
+                course.thumbnail,
+                `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+              )
+            : null;
+          return { ...course, thumbnail: thumbnails };
+        })
+      );
+      return {
+        courses: coursesWithUrls,
+        totalPages: response.totalPages,
+      };
     } catch (error) {
-        throw error;
+      throw error;
     }
-}
-
-
+  }
 
   async getCourseDetail(id: string) {
     try {
-        const response = await UserRepositary.getCourse(id);
-        const awsConfig = new AwsConfig();
+      const response = await UserRepositary.getCourse(id);
+      const awsConfig = new AwsConfig();
 
-       
-        const thumbnailUrl = await awsConfig.getfile(
-            response?.thumbnail as string,
-            `tutors/${response.email}/courses/${response.courseId}/thumbnail`
-        );
+      const thumbnailUrl = await awsConfig.getfile(
+        response?.thumbnail as string,
+        `tutors/${response.email}/courses/${response.courseId}/thumbnail`
+      );
 
-      
-        const sectionsWithUrls = await Promise.all(
-            response.sections.map(async (section: any, index: number) => {
-              
-                const videosWithUrls = await Promise.all(
-                    section.videos.map(async (video: any) => {
-                      console.log(video.videoUrl , "vurl");
-                      
-                        const videoUrl = await awsConfig.getfile(
-                            video.videoUrl,
-                            `tutors/${response.email}/courses/${response.courseId}/videos`
-                        );
-                        return { ...video.toObject(), url: videoUrl };
-                    })
-                );
-                return { ...section.toObject(), videos: videosWithUrls };
+      const sectionsWithUrls = await Promise.all(
+        response.sections.map(async (section: any, index: number) => {
+          const videosWithUrls = await Promise.all(
+            section.videos.map(async (video: any) => {
+              console.log(video.videoUrl, "vurl");
+
+              const videoUrl = await awsConfig.getfile(
+                video.videoUrl,
+                `tutors/${response.email}/courses/${response.courseId}/videos`
+              );
+              return { ...video.toObject(), url: videoUrl };
             })
-        );
+          );
+          return { ...section.toObject(), videos: videosWithUrls };
+        })
+      );
 
-        return {
-            ...response,
-            thumbnailUrl,
-            sections: sectionsWithUrls,
-        };
+      return {
+        ...response,
+        thumbnailUrl,
+        sections: sectionsWithUrls,
+      };
     } catch (error: any) {
-        console.error("Error fetching course details:", error.message);
-        throw new Error(`Failed to fetch course details: ${error.message}`);
+      console.error("Error fetching course details:", error.message);
+      throw new Error(`Failed to fetch course details: ${error.message}`);
     }
-}
+  }
 
   async CoursePaymentService(
     amount: number,
@@ -272,8 +266,6 @@ export class UserService {
 
       const user = await UserRepositary.existUser(email);
 
-   
-
       const paymentId = createUniquePass(10);
       const orderId = createUniquePass(10);
 
@@ -289,9 +281,7 @@ export class UserService {
 
       const saveOrder = await UserRepositary.saveOder(orderDetails);
 
-      const addCourseUser = await UserRepositary.saveCourse(courseId , email)
-
-      
+      const addCourseUser = await UserRepositary.saveCourse(courseId, email);
 
       const order = await razorpay.orders.create(options);
 
@@ -302,57 +292,55 @@ export class UserService {
     }
   }
 
-  async saveCourseService(courseId : string, email : string)  {
+  async saveCourseService(courseId: string, email: string) {
     try {
+      const addCourseUser = await UserRepositary.saveCourse(courseId, email);
 
-      const addCourseUser = await UserRepositary.saveCourse(courseId , email)
-
-      if(addCourseUser === true) {
-        return true
+      if (addCourseUser === true) {
+        return true;
       }
 
       console.log("user course array didnt add");
-      
-        
-    } catch (error : any) {
+    } catch (error: any) {
       console.error("Error in saving course in serice :", error.message);
       throw new Error(` ${error.message}`);
     }
   }
 
-  async checkEnrollementSevice(courseId : string, email : string) {
+  async checkEnrollementSevice(courseId: string, email: string) {
     try {
+      const user = await UserRepositary.existUser(email as string);
 
-      const user = await UserRepositary.existUser(email as string)
-
-      if(!user) {
-        throw new Error("User dosen't exist.")
+      if (!user) {
+        throw new Error("User dosen't exist.");
       }
 
-      if(user?.courses) {
-        const isEnrolled =  (user.courses as string[]).includes(courseId);
-        
-        console.log("enrolll" , isEnrolled , courseId);
-        
+      if (user?.courses) {
+        const isEnrolled = (user.courses as string[]).includes(courseId);
+
+        console.log("enrolll", isEnrolled, courseId);
+
         return isEnrolled;
-
       }
 
-      return false
- 
-
-      
-    } catch (error : any) {
-      console.error("Error in checkin enrollment in user serice :", error.message);
+      return false;
+    } catch (error: any) {
+      console.error(
+        "Error in checkin enrollment in user serice :",
+        error.message
+      );
       throw new Error(` ${error.message}`);
     }
   }
 
-  async MyCoursesService(userId: string , type : string) {
+  async MyCoursesService(userId: string, type: string) {
     try {
       const awsConfig = new AwsConfig();
 
-      const getCouses = await CouresRepository.getUserCourses(userId as string , type as string)
+      const getCouses = await CouresRepository.getUserCourses(
+        userId as string,
+        type as string
+      );
 
       const coursesWithUrls = await Promise.all(
         getCouses.map(async (course: ICourse) => {
@@ -366,62 +354,96 @@ export class UserService {
         })
       );
       return coursesWithUrls;
-
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   }
 
-  async addRatingService(userId : String , rating : number ,courseId  : any) {
+  async addRatingService(userId: String, rating: number, courseId: any) {
     try {
       console.log("rate serv");
-      
-      const addRating = await UserRepositary.addRatingRepo(userId as String , rating as number ,courseId as any)
+
+      const addRating = await UserRepositary.addRatingRepo(
+        userId as String,
+        rating as number,
+        courseId as any
+      );
       return addRating;
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   }
 
-  async getRatingService(userId : string) {
+  async getRatingService(userId: string) {
     try {
-      const getRating =  await UserRepositary.getRatingRepo(userId as string)
-      return getRating
-    } catch (error) {
-      
-    }
+      const getRating = await UserRepositary.getRatingRepo(userId as string);
+      return getRating;
+    } catch (error) {}
   }
 
-  async saveProfile(profile : Express.Multer.File , userId :string) {
+  async saveProfile(profile: Express.Multer.File, userId: string) {
     try {
       const awsConfig = new AwsConfig();
       const bucketName = "learn-sphere";
-      const profileUrl = await awsConfig.uploadFileToS3(bucketName , `users/profile/${userId}/`, profile)
-      const save = await UserRepositary.saveProfile(userId as string , profileUrl as string)
+      const profileUrl = await awsConfig.uploadFileToS3(
+        bucketName,
+        `users/profile/${userId}/`,
+        profile
+      );
+      const save = await UserRepositary.saveProfile(
+        userId as string,
+        profileUrl as string
+      );
       return save;
-    } catch (error : any) {
+    } catch (error: any) {
       console.error("Error in saving profile pic user serice :", error.message);
       throw new Error(` ${error.message}`);
     }
   }
 
-  async getProfileService(email:string) {
+  async getProfileService(email: string) {
     try {
       const awsConfig = new AwsConfig();
-      const user = await UserRepositary.existUser(email)
+      const user = await UserRepositary.existUser(email);
 
-      if(!user) {
+      if (!user) {
         console.log("no user");
-        
       }
-      console.log(user ,user?.profile,user?.userId);
-      
-      const profileUrl = await awsConfig.getfile(user?.profile as string, `users/profile/${user?.userId}`)
+      console.log(user, user?.profile, user?.userId);
 
-      return profileUrl
-      
-    } catch (error : any) {
-      console.error("Error in getting profile pic user serice :", error.message);
+      const profileUrl = await awsConfig.getfile(
+        user?.profile as string,
+        `users/profile/${user?.userId}`
+      );
+
+      return profileUrl;
+    } catch (error: any) {
+      console.error(
+        "Error in getting profile pic user serice :",
+        error.message
+      );
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  async tutorDataService(id: string) {
+    try {
+      const awsConfig = new AwsConfig();
+
+      const user = await UserRepositary.getUser(id as string);
+      const tutor = await TutorRepositary.getTutorDetail(user?.email as string);
+      let profileUrl = "";
+      if (user?.profile) {
+        profileUrl = await awsConfig.getfile(
+          user?.profile as string,
+          `users/profile/${user?.userId}`
+        );
+      }
+      const tutorData = {
+        name: user?.firstName + " " + user?.lastName,
+        email: user?.email,
+        profileUrl: profileUrl,
+        bio: tutor?.bio,
+      };
+      return tutorData;
+    } catch (error: any) {
+      console.error("Error in getting tutor data user serice :", error.message);
       throw new Error(` ${error.message}`);
     }
   }

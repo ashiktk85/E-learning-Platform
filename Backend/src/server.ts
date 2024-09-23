@@ -29,6 +29,12 @@ const corsOptions = {
     // optionsSuccessStatus: 200
 };
 
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    next();
+  });
+  
 app.use(cookieParser());
 app.use(express.json({ limit: '5gb' })); 
 app.use(express.urlencoded({ limit: '5gb', extended: true })); 

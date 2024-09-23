@@ -214,13 +214,16 @@ const ApplicantDetails = () => {
         <ModalContent>
           <ModalBody>
             {selectedFile && (
-              <iframe
-                className="w-full h-96 rounded-lg"
+            
+                 <iframe
+                className="w-1/2 h-96 rounded-lg justify-center"
                 src={selectedFile}
                 title="Document Preview"
               >
                 Your browser does not support iframes.
               </iframe>
+            
+             
             )}
           </ModalBody>
           <Button onClick={closeModal} className="ml-auto mr-6 mb-4">

@@ -266,6 +266,17 @@ export class UserController {
       res.status(500).json({ message: error.message });
     }
   }
-  
+
+  async getTutorDetails(req : Request, res : Response) {
+    try {
+       const {id} = req.params
+       const tutorData =  await this.userService.tutorDataService(id as string)
+       res.status(HTTP_statusCode.OK).json(tutorData)
+    } catch (error :any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+   
 }
 

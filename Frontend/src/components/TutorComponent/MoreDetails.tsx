@@ -6,6 +6,7 @@ import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 
 const url = "http://localhost:7000";
 
@@ -168,27 +169,31 @@ const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext 
 
      
       <Modal
-        isOpen={isUploading}
-        onRequestClose={() => {}}
-        contentLabel="Uploading"
-        className="fixed inset-0 flex justify-center items-center p-4"
-        overlayClassName="fixed inset-0 flex justify-center items-center"
-      >
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto text-center">
-          <h2 className="text-lg font-semibold">Uploading Course</h2>
-          <p className="mt-2">Please do not close or refresh the page.</p>
-          <div className="w-full mt-4 bg-gray-200 rounded h-4 relative">
-            <div
-              className="bg-green-600 h-full rounded transition-all duration-2000 ease-in-out pb-1"
-              style={{ width: `${uploadProgress}%` }}
-            >
-              <span className="absolute text-center pr-2 text-white text-sm">
-                {uploadProgress}%
-              </span>
-            </div>
-          </div>
+      isOpen={isUploading}
+      onRequestClose={() => {}}
+      shouldCloseOnOverlayClick={false} 
+      contentLabel="Uploading"
+      className="fixed inset-0 flex justify-center items-center p-4"
+      overlayClassName="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50"
+    >
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto text-center">
+        <h2 className="text-lg font-semibold">Uploading Course</h2>
+        <p className="mt-2">Please do not close or refresh the page.</p>
+
+     
+        <div className="mt-4 flex justify-center items-center">
+          <FaSpinner
+            className="animate-spin text-green-600"
+            size={40} 
+          />
         </div>
-      </Modal>
+
+     
+        <p className="mt-4 text-gray-700 text-sm">
+          uploading...
+        </p>
+      </div>
+    </Modal>
     </div>
   );
 };

@@ -15,14 +15,15 @@ import MyCourses from '../pages/UserPages/MyCourses';
 import Community from '../pages/UserPages/Community';
 import TutorsPage from '../pages/UserPages/TutorsPage';
 import TutorDetails from '../pages/UserPages/TutorDetails';
+import OrderHistory from '../pages/UserPages/OrderHistory';
 
 const UserRoutes = () => {
     return (
        <>
         <Routes >
                 <Route path = '' element = {<Home />} />
-                <Route path='/otp' element = {<OtpPage /> } />
-                <Route path="/login" element ={<UserLogin />} />
+                <Route path= '/otp' element = {<OtpPage /> } />
+                <Route path= "/login" element ={<UserLogin />} />
                 <Route path= '/profile' element = {<UserProtector><ProfilePage /></UserProtector>} />
                 <Route path= '/signup' element = {<SignUp />} />
                 <Route path = '/coursesPage' element = {<AllCourses />} />
@@ -33,6 +34,7 @@ const UserRoutes = () => {
                 <Route path = '/community' element = {<UserProtector ><Community /></UserProtector>} />
                 <Route path = '/tutors' element = {<TutorsPage />} />
                 <Route path = '/tutorDetails/:id' element = {<TutorDetails />} />
+                <Route path = '/orders' element = {<OrderHistory />} />
         </Routes>
        </>
     );

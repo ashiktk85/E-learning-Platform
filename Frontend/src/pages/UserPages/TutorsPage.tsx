@@ -80,7 +80,7 @@ const TutorsPage = () => {
                     className="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-start justify-end px-4 pb-10"
                     style={{
                       backgroundImage:
-                        'linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://images.pexels.com/photos/27439744/pexels-photo-27439744/free-photo-of-a-man-sitting-in-a-chair-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")',
+                        'linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://img.freepik.com/free-photo/abstract-colorful-splash-3d-background-generative-ai-background_60438-2509.jpg?t=st=1727064368~exp=1727067968~hmac=9bc0225167e7559956db652f7a96ccf2c940155dc2329a8e088daae286b9a6b2&w=1060")',
                     }}
                   >
                     <div className="flex flex-col gap-2 text-left">
