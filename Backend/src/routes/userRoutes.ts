@@ -38,7 +38,7 @@ route.get('/mycourses/:userId', userController.MyCourses.bind(userController));
 route.post('/add-rating/:userId', userController.addRating.bind(userController));
 route.get(`/get-rating/:userId`, userController.getRating.bind(userController));
 
-route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController)
-)
+route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController))
+route.post(`/walletAdd/:userId`,userController.addMoney.bind(userController))
 
 export default route;

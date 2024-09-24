@@ -55,7 +55,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="w-full h-screen flex">
-      <Toaster position="top-center" richColors />
+    
 
     
       <div className="relative w-1/4 h-full flex flex-col">

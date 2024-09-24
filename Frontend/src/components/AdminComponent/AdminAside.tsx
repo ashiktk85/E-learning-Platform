@@ -100,7 +100,7 @@ const AdminAside = () => {
   };
 
   return (
-    <div className="grid col-span-3 h-full">
+    <div className="grid col-span-3 h-full ">
       <div className="flex h-screen">
         <aside
           className={`bg-white text-black transition-all duration-300 rounded-md h-full border-r-2 ${

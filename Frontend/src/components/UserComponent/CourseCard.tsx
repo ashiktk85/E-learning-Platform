@@ -57,7 +57,7 @@ const CourseCard: React.FC<IcourseData> = ({
 
   return (
     <div className="flex flex-col gap-3 pb-3">
-      <Toaster richColors position="top-center"/>
+     
       <div
         className="w-[280px] bg-center bg-no-repeat aspect-video bg-cover rounded-xl cursor-pointer "
         style={{

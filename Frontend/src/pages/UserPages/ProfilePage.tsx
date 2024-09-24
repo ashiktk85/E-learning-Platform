@@ -11,6 +11,7 @@ import ProfileCourses from "../../components/UserComponent/ProfileCourses";
 import ProfileTutors from "../../components/UserComponent/ProfileTutors";
 import BlockChecker from "../../services/BlockChecker";
 import ProfileImage from "../../components/UserComponent/profileImg";
+import Wallet from "../../components/UserComponent/wallet";
 
 const ProfilePage = () => {
 
@@ -22,7 +23,7 @@ const ProfilePage = () => {
     { name: 'Personal Info', Component: <UserDetails /> },
     { name: 'Courses', Component: <ProfileCourses /> },
     { name: 'Tutors', Component: <ProfileTutors /> },
-    { name: 'Wallet' },
+    { name: 'Wallet', Component : <Wallet /> },
     { name: 'Logout' }
   ];
 
@@ -40,7 +41,7 @@ const ProfilePage = () => {
 
   return (
     <>
-      <Toaster position="bottom-center" richColors />
+      
       <div className="min-h-screen overflow-hidden bg-backgorund">
         <div className="relative">
           <div

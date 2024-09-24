@@ -447,4 +447,15 @@ export class UserService {
       throw new Error(` ${error.message}`);
     }
   }
+
+  async addMoneySerice(userId: string , data : any) {
+    try {
+        const newWllet = await UserRepositary.newPayment(userId as string, data as any)
+    } catch (error: any) {
+      console.error("Error in adding money user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  
 }

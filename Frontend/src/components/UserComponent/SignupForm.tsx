@@ -70,7 +70,7 @@ const SignupForm: React.FC = () => {
 
   return (
     <div className="w-full h-screen flex items-start">
-      <Toaster position="top-center" richColors />
+      
       <div className="relative w-1/4 h-full flex flex-col">
         <div className="absolute top-[20%] left-[10%] flex flex-col">
           <h1 className="text-4xl text-white font-bold my-4">

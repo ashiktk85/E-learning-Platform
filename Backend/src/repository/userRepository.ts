@@ -2,18 +2,14 @@ import UserModel, { IUser } from "../models/userModel";
 
 import { MongoServerError } from "mongodb";
 import bcrypt from "bcrypt";
-import { error } from "console";
-import jwt from "jsonwebtoken";
 import userModel from "../models/userModel";
-import sendTutorCredential from "../helper/tutorLoginMail";
 import TutorApplication from "../models/applicationModel";
 import TutorProfile from "../models/tutorProfileModel";
-import { createToken } from "../config/jwtConfig";
 import { Course } from "../models/courseModel";
-import Category from "../models/categoryModel";
 import orderModel from "../models/orderModel";
-import { application } from "express";
 import { Rating } from "../models/ratingModel";
+import { v4 as uuidv4 } from "uuid";
+import { Wallet } from "../models/walletModel";
 
 export class UserRepositary {
   static async existUser(email: string ): Promise<IUser | null> {
@@ -598,6 +594,40 @@ export class UserRepositary {
         "Error in saving profile  in user repo",
         error.message
       );
+      throw new Error(error.message);
+    }
+  }
+
+  static  async newPayment(userId: string, data: { amount: number }) {
+    try {
+      // Check if a wallet exists for the user
+      let wallet = await Wallet.findOne({ userId });
+
+      const transaction = {
+        transactionId: uuidv4(),
+        amount: data.amount,
+        transactionType: 'credit' as 'credit',
+        date: new Date(),
+      };
+
+      // If the wallet does not exist, create a new wallet
+      if (!wallet) {
+        wallet = new Wallet({
+          userId,
+          balance: data.amount, // Initialize balance with the added amount
+          transactions: [transaction], // Add the first transaction
+        });
+        await wallet.save();
+      } else {
+        // If the wallet exists, update its balance and add the transaction
+        wallet.balance += data.amount;
+        wallet.transactions.push(transaction); // Add transaction to the array
+        await wallet.save();
+      }
+
+      return wallet; // Return the updated wallet
+    } catch (error: any) {
+      console.error("Error in saving wallet in wallet repo", error.message);
       throw new Error(error.message);
     }
   }

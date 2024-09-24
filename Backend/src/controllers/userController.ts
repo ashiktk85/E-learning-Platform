@@ -277,6 +277,20 @@ export class UserController {
       res.status(500).json({ message: error.message });
     }
   }
+ 
+  async  addMoney (req : Request, res : Response) {
+    try {
+       const {userId} = req.params
+       const data = req.body
+       
+       
+       const wallet =  await this.userService.addMoneySerice(userId as string, data as any)
+      //  res.status(HTTP_statusCode.OK).json(tutorData)
+    } catch (error :any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
    
 }
 

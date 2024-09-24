@@ -60,10 +60,10 @@ const Checkout = () => {
     };
     fetchCourseData();
   }, [id]);
-
+  
   const handlePayment = async () => {
     if (courseData?.price === "Free") {
-      // If the course is free, proceed with saving the course directly
+     
       try {
         const res = await axios.post(`${Base_URL}/saveCourse`, {
           email: email,
