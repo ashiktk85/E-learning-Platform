@@ -44,7 +44,7 @@ export class AwsConfig {
         }
     }
 
-    async uploadFileToS3(bucketName: string, folderPath: string, file: Express.Multer.File): Promise<string> {
+    async uploadFileToS3(folderPath: string, file: Express.Multer.File): Promise<string> {
         try {
             const fileBuffer = file.buffer; 
 

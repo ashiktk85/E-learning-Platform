@@ -382,7 +382,7 @@ export class UserService {
       const awsConfig = new AwsConfig();
       const bucketName = "learn-sphere";
       const profileUrl = await awsConfig.uploadFileToS3(
-        bucketName,
+        
         `users/profile/${userId}/`,
         profile
       );

@@ -3,10 +3,12 @@ import { FaRegClock, FaStar } from "react-icons/fa";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { useNavigate } from "react-router-dom";
 
 const url = "http://localhost:7000";
 
 const CourseList: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }) => {
+  const navigate = useNavigate()
   const user = useSelector((state: RootState) => state.user);
   const userInfo = user.userInfo;
   const [courses, setCourses] = useState<any[]>([]);
@@ -56,7 +58,7 @@ const CourseList: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
               style={{
                 backgroundImage: `url(${course?.thumbnail})`,
               }}
-              // onClick={gotoCourseDetails}
+              onClick={() => navigate(`/tutor/course-edit/${course?.courseId}`)}
             ></div>
 
             <div className="w-3/4 flex justify-between">

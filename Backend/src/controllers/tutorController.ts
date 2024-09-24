@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { TutorServices } from "../services/tutorServices";
+import HTTP_statusCode from "../Enums/httpStatusCode";
 
 export class TutorContoller {
   private tutorServices: TutorServices;
@@ -149,5 +150,31 @@ export class TutorContoller {
   //   }
   // }
 
-  
+  async updateCourse(req: Request, res: Response) {
+    try {
+      const { courseId } = req.params
+      // console.log(req.body);
+      const newData = req.body
+      
+      const updatedCourses = await this.tutorServices.updateCourseService(courseId as string , newData)
+      return res.status(HTTP_statusCode.updated).json(updatedCourses)
+    } catch (error : any) {
+      console.error(error.message, "dsfsdf");
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async updateThumbnail(req: Request, res: Response) {
+    try {
+
+      const courseId = req.body.couresId
+      const newThumbnail = req.file
+      
+      const updateThumbnail = await this.tutorServices.updateThumbnail(courseId as string , newThumbnail)
+      // return res.status(HTTP_statusCode.updated).json(updatedCourses)
+    } catch (error : any) {
+      console.error(error.message, "dsfsdf");
+      res.status(500).json({ message: error.message });
+    }
+  }
 }

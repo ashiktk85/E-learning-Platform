@@ -218,6 +218,7 @@ export class TutorRepositary {
       throw error;
     }
   }
+  
 
   static async uploadProfileRepo(email : string , profileName :string) {
     try {

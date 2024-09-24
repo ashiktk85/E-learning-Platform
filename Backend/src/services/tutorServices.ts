@@ -9,6 +9,8 @@ import { AwsConfig } from "../config/awsFileConfigs";
 import { UserRepositary } from "../repository/userRepository";
 import { ICourse, ISection, IVideo } from "../models/courseModel";
 import compressVideo from "../helper/videoCompression";
+import { CouresRepository } from "../repository/courseRepository";
+import { String } from "aws-sdk/clients/batch";
 
 require('dotenv').config();
 
@@ -45,18 +47,18 @@ export class TutorServices {
         const fileUrls: { type: string, url: string }[] = [];
 
         if (files.idProof) {
-            const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/idProofs/', files.idProof[0]);
+            const url = await this.awsConfig.uploadFileToS3( 'tutorApplication/idProofs/', files.idProof[0]);
             fileUrls.push({ type: 'idProof', url });
         }
 
         if (files.resume) {
-            const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/resume/', files.resume[0]);
+            const url = await this.awsConfig.uploadFileToS3( 'tutorApplication/resume/', files.resume[0]);
             fileUrls.push({ type: 'resume', url });
         }
 
         if (files.certifications) {
             for (const certificate of files.certifications) {
-                const url = await this.awsConfig.uploadFileToS3(bucketName, 'tutorApplication/certifications/', certificate);
+                const url = await this.awsConfig.uploadFileToS3('tutorApplication/certifications/', certificate);
                 fileUrls.push({ type: 'certification', url });
             }
         }
@@ -98,13 +100,13 @@ export class TutorServices {
                     const folderPath = `${tutorFolderPath}videos/`;
                     
                     console.log(`Uploading video to ${folderPath}`);
-                    const url = await this.awsConfig.uploadFileToS3(bucketName, folderPath, file);
+                    const url = await this.awsConfig.uploadFileToS3( folderPath, file);
                     fileUrls.push({ type: 'video', url });
                 } else if (file.fieldname === 'thumbnail') {
                     const folderPath = `${tutorFolderPath}thumbnail/`;
     
                     console.log(`Uploading thumbnail to ${folderPath}`);
-                    const url = await this.awsConfig.uploadFileToS3(bucketName, folderPath, file);
+                    const url = await this.awsConfig.uploadFileToS3(folderPath, file);
                     fileUrls.push({ type: 'thumbnail', url });
                 }
             }
@@ -242,7 +244,39 @@ export class TutorServices {
     //         throw error;
     //     }
     //   }
+    async updateCourseService(courseId : string , newData: any) {
+        try {
+            const update = await CouresRepository.updateCourse(courseId as string ,  newData)
 
+            const newCourseDetail = {
+                name : update?.name,
+                category : update?.category,
+                language : update?.language,
+                description : update?.description
+            }
+            return newCourseDetail;
+        } catch (error) {
+            console.error('Error fetching courses with signed URLs:', error);
+            throw error;
+        }
+    }
+
+    async updateThumbnail(courseId : string , thumbnail : any) {
+        try {
+            const course = await UserRepositary.getCourse(courseId as String)
+            const thumbnailUrl = await aws.uploadFileToS3( `tutors/${course?.email}/courses/${course.courseId}/thumbnail`, thumbnail)
+            const update = await CouresRepository.updateCourse(courseId as string ,thumbnailUrl)
+
+            const signedUrl = await aws.getfile(thumbnailUrl, `tutors/${course?.email}/courses/${course.courseId}/thumbnail`)
+            return signedUrl;
+        } catch (error) {
+            console.error('Error fetching courses with signed URLs:', error);
+            throw error;
+        }
+    }
+
+
+    
     
 }
 

@@ -7,6 +7,7 @@ import ApplicationFinished from '../pages/TutorPages/ApplicationFinished';
 import TutorLogin from '../pages/TutorPages/TutorLogin';
 import TutorDashboard from '../pages/TutorPages/TutorDashboard';
 import AddSection from '../components/TutorComponent/CourseAddsection';
+import CourseEdit from '../pages/TutorPages/CourseEdit';
 
 
 const TutorRoutes = () => {
@@ -18,7 +19,8 @@ const TutorRoutes = () => {
                 <Route path = '/applicationcompleted' element = {<UserProtector > <ApplicationFinished /> </UserProtector>} />
                 <Route path=  '/login' element = {<UserProtector> <TutorLogin /> </UserProtector>} />
                 <Route path='/dashboard' element = {<UserProtector> <TutorDashboard /> </UserProtector>} />
-                {/* <Route path = '/add-sections' element = {<UserProtector> <AddSection /> </UserProtector>} /> */}
+                <Route path = '/course-edit/:id' element = {<UserProtector> <CourseEdit /> </UserProtector>} />
+
             </Routes>
         </div>
     );

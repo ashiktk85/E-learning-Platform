@@ -1,5 +1,6 @@
 enum HTTP_statusCode {
     OK = 200,
+    updated = 201,
     NoChange = 301,
     TaskFailed = 304,
     BadRequest = 400,
