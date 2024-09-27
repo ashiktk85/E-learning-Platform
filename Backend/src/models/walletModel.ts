@@ -3,8 +3,9 @@ import { Document, Schema, model } from 'mongoose';
 interface ITransaction {
   amount: number;
   transactionId : string;
-  transactionType: 'credit' | 'debit';
+  transactionType: 'credit' | 'course payment';
   date?: Date;
+  course?: string;
 }
 
 export interface IWallet extends Document {
@@ -18,7 +19,8 @@ export interface IWallet extends Document {
 const transactionSchema = new Schema<ITransaction>({
   amount: { type: Number, required: true },
   transactionId : {type : String , required : true},
-  transactionType: { type: String, enum: ['credit', 'debit'], required: true },
+  transactionType: { type: String, enum: ['credit', 'course payment'], required: true },
+  course: {type : String},
   date: { type: Date, default: Date.now },
 });
 

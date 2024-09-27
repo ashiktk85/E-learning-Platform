@@ -221,6 +221,12 @@ export class UserService {
         response?.thumbnail as string,
         `tutors/${response.email}/courses/${response.courseId}/thumbnail`
       );
+       let profileUrl =''
+      if(response?.tutorProfile) {
+
+         profileUrl = await awsConfig.getfile(response?.tutorProfile as string,`users/profile/${response?.tutorId}` )
+      }
+
 
       const sectionsWithUrls = await Promise.all(
         response.sections.map(async (section: any, index: number) => {
@@ -243,6 +249,7 @@ export class UserService {
         ...response,
         thumbnailUrl,
         sections: sectionsWithUrls,
+        profileUrl
       };
     } catch (error: any) {
       console.error("Error fetching course details:", error.message);
@@ -278,6 +285,12 @@ export class UserService {
         orderId: orderId,
         paymentStatus: "Completed",
       };
+
+      const course = await UserRepositary.getCourse(courseId as string)
+
+      const tutor = await UserRepositary.existUser(course?.email)
+      
+      const wallet = await UserRepositary.coursePaymentWallet(tutor?.userId as string , amount, course?.name )
 
       const saveOrder = await UserRepositary.saveOder(orderDetails);
 
@@ -451,11 +464,26 @@ export class UserService {
   async addMoneySerice(userId: string , data : any) {
     try {
         const newWllet = await UserRepositary.newPayment(userId as string, data as any)
+        console.log(newWllet);
+        
     } catch (error: any) {
       console.error("Error in adding money user serice :", error.message);
       throw new Error(` ${error.message}`);
     }
   }
+
+  
+
+  async getTransactionsSerivce(userId: string) {
+    try {
+        const wallet = await UserRepositary.transactions(userId as string)
+        return wallet
+    } catch (error: any) {
+      console.error("Error in getting transactions user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
 
   
 }

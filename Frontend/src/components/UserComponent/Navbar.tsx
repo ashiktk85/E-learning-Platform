@@ -25,7 +25,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black shadow-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white  shadow-md">
       <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
         <div
           className="text-2xl font-bold cursor-pointer text-[#7BC74D]"
@@ -38,7 +38,7 @@ const Navbar = () => {
             <button
               key={link.text}
               onClick={() => handleNavigation(link.path)}
-              className="text-white font-sans hover:text-[#7BC74D]  "
+              className="text-black font-sans hover:text-[#7BC74D]  "
             >
               {link.text}
             </button>

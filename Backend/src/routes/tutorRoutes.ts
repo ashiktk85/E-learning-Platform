@@ -36,5 +36,10 @@ route.get('/get-courses/:email', tutorController.getCourses.bind(tutorController
 
 route.put('/updateCourse/:courseId' ,tutorController.updateCourse.bind(tutorController))
 route.post('/editThumbnail',  upload.single('thumbnail'), tutorController.updateThumbnail.bind(tutorController))
+route.get('/tutorDashboard/:email', tutorController.getDashboard.bind(tutorController))
+
+
+// charts
+route.get('/chart', tutorController.ChartData.bind(tutorController))
 
 export default route;

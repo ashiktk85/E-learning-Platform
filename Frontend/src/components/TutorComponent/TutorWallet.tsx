@@ -19,7 +19,7 @@ interface Itransactions {
     date: string;
 }
 
-const Wallet = () => {
+const TutorWallet = () => {
     const {userInfo} = useSelector((state : RootState) => state.user);
     const name = userInfo?.firstName + " " + userInfo?.lastName;
     const email = userInfo?.email;
@@ -182,4 +182,4 @@ const Wallet = () => {
     );
 };
 
-export default Wallet;
+export default TutorWallet;

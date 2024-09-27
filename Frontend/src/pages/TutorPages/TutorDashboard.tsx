@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { FaHome, FaBook, FaPlusCircle, FaSignOutAlt } from 'react-icons/fa';
+import React, { Component, useState } from 'react';
+import { FaHome, FaBook, FaPlusCircle, FaSignOutAlt   } from 'react-icons/fa';
+import { IoWallet } from "react-icons/io5";
 import { IoPersonSharp } from 'react-icons/io5';
 import TutorMainPage from '../../components/TutorComponent/TutorMainPage';
 import TutorProfile from '../../components/TutorComponent/TutorProfile';
@@ -11,6 +12,8 @@ import CourseList from '../../components/TutorComponent/CourseList';
 import tutorAuth from '../../services/TutorChecker';
 import ConfirmModal from '../../components/common/TutorCommon/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
+import TutorWallet from '../../components/TutorComponent/TutorWallet';
+import Wallet from '../../components/UserComponent/wallet';
 
 const TutorDashboard: React.FC = () => {
   tutorAuth()
@@ -53,6 +56,7 @@ const TutorDashboard: React.FC = () => {
     { name: "Dashboard", icon: <FaHome size={24} />, Component: <TutorMainPage /> },
     { name: "Profile", icon: <IoPersonSharp size={24} />, Component: <TutorProfile /> },
     { name: "Courses", icon: <FaBook size={24} />, Component: <CourseList onNext={handleNext} /> },
+    {name : "Wallet" , icon : <IoWallet size={24}/>, Component : <Wallet />},
     { name: "Add Course", icon: <FaPlusCircle size={24} />, Component: <CourseCreation1 onNext={handleNext} /> },
     { name: "Logout", icon: <FaSignOutAlt size={24} /> },
   ];
@@ -117,7 +121,7 @@ const TutorDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#f8f9fa] flex-grow rounded-md shadow-lg p-10 flex flex-col ml-64 ">
+      <div className="bg-[#f8f9fa] flex-grow rounded-md shadow-lg p-10 flex flex-col ml-64 h-screen overflow-y-auto">
         <div className="relative">
           <div className="absolute top-0 left-0 p-10">
             <h1 className="text-4xl text-white font-bold my-4 pl-10">Start your Learning Journey.</h1>

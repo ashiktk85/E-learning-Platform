@@ -11,6 +11,7 @@ import cors from 'cors';
 import { createServer } from 'http'
 import { configSocketIO } from './config/socketConfig';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ const app : Application = express();
 const server = createServer(app)
 
 configSocketIO(server)
+
+app.use(morgan('dev'));
 
 const corsOptions = {
     origin: 'http://localhost:5173',

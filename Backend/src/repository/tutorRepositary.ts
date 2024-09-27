@@ -5,6 +5,7 @@ import { Course , Section , Video } from "../models/courseModel";
 import TutorProfile from "../models/tutorProfileModel";
 
 import userModel from "../models/userModel";
+import { Wallet } from "../models/walletModel";
 
 interface CourseData {
   courseId: string;
@@ -259,6 +260,75 @@ export class TutorRepositary {
       return tutor;
     } catch (error : any) {
       console.log("Error in getting tutro detail in tutor repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  static async getMonthlyUserEnrollments (year : number) {
+    try {
+      const enrollments = await Course.aggregate([
+        {$unwind : '$users'},
+        {
+          $match: {
+            createdAt: {
+              $gte: new Date(`${year}-01-01`),
+              $lt: new Date(`${year + 1}-01-01`),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' },
+            },
+            totalUsers: { $sum: 1 }, // Counts number of enrollments
+          },
+        },
+        {
+          $sort: { '_id.month': 1 }, // Sort by month
+        },
+      ]);
+
+      return enrollments;
+
+    } catch (error : any) {
+      console.log("Error in getting montly users in tutor repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  static async getMonthlyRevenue (year: number) {
+    try {
+      const revenue = await Wallet.aggregate([
+        {
+          $unwind: '$transactions',
+        },
+        {
+          $match: {
+            'transactions.transactionType': 'course payment',
+            'transactions.date': {
+              $gte: new Date(`${year}-01-01`),
+              $lt: new Date(`${year + 1}-01-01`),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$transactions.date' },
+              month: { $month: '$transactions.date' },
+            },
+            totalRevenue: { $sum: '$transactions.amount' }, 
+          },
+        },
+        {
+          $sort: { '_id.month': 1 },
+        },
+      ]);
+      return revenue;
+    } catch (error : any) {
+      console.log("Error in getting montly revenue in tutor repo", error.message); 
       throw new Error(error.message);
     }
   }

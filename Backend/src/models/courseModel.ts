@@ -12,6 +12,11 @@ interface ISection extends Document {
   videos: Types.ObjectId[]; 
 }
 
+interface IUser extends Document {
+  userId: Types.ObjectId;
+  joinDate: Date; // New field to track when the user joined
+}
+
 interface ICourse extends Document {
   courseId: string;
   email: string;

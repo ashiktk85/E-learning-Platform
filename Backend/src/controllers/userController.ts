@@ -88,7 +88,7 @@ export class UserController {
 
   async editUser(req : Request ,  res : Response) {
     try {
-      console.log("edit user controller datat" , req.body)
+      // console.log("edit user controller datat" , req.body)
       const {firstName , lastName, phone ,userId} = req.body
       const updatedUser = await this.userService.editUserService(firstName, lastName, phone, userId);
 
@@ -126,7 +126,7 @@ export class UserController {
   async   getCourseDetail(req : Request, res : Response) {
     try {
       const {id} = req.params
-      console.log(id , "id");
+      // console.log(id , "id");
       
       const courseData =  await this.userService.getCourseDetail(id as string)
       // console.log(courseData.sections[0].videos);
@@ -170,7 +170,7 @@ export class UserController {
   async checkEnrollement(req : Request, res : Response) {
     try {
       const  {courseId , email} = req.params
-      console.log(courseId , "cuu");
+      // console.log(courseId , "cuu");
       
 
       const response = await this.userService.checkEnrollementSevice(courseId as string, email as string)
@@ -206,8 +206,6 @@ export class UserController {
       const userId = req.params.userId;
       const { rating ,courseId } = req.body;
       
-      
-
       const addRating = await this.userService.addRatingService(userId as string , rating as number,courseId.courseId as string)
 
       res.status(201).json(addRating)
@@ -258,7 +256,7 @@ export class UserController {
     try {
      const {email} = req.params
      const profileUrl = await this.userService.getProfileService(email as string)
-     console.log(profileUrl);
+    //  console.log(profileUrl);
      
       res.status(HTTP_statusCode.OK).json(profileUrl)
     } catch (error : any) {
@@ -285,12 +283,28 @@ export class UserController {
        
        
        const wallet =  await this.userService.addMoneySerice(userId as string, data as any)
-      //  res.status(HTTP_statusCode.OK).json(tutorData)
+       res.status(HTTP_statusCode.OK).json(wallet)
     } catch (error :any) {
       console.error(error.message);
       res.status(500).json({ message: error.message });
     }
   }
+
+  async  getTransactions (req : Request, res : Response) {
+    try {
+       const {userId} = req.params
+       console.log(userId);
+       
+       const wallet =  await this.userService.getTransactionsSerivce(userId as string)
+       console.log(wallet,"wallet");
+       
+       res.status(HTTP_statusCode.OK).json(wallet)
+    } catch (error :any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
    
 }
 

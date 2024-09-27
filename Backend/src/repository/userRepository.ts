@@ -449,8 +449,6 @@ export class UserRepositary {
         throw new Error("Cannot find userTutor.");
       }
 
-      
-
       const CourseData = {
         id: course._id,
         name: course.name,
@@ -464,6 +462,9 @@ export class UserRepositary {
         thumbnail: course.thumbnail,
         tutorName: userTutor.firstName + userTutor.lastName,
         tutorBio: tutor.bio,
+        tutorEmail : tutor?.email,
+        tutorProfile : userTutor?.profile,
+        tutorId : userTutor?.userId,
         education: tutor.education,
         certifications: tutor.certifications,
         email: tutor.email,
@@ -602,33 +603,124 @@ export class UserRepositary {
     try {
       // Check if a wallet exists for the user
       let wallet = await Wallet.findOne({ userId });
+      const id = Math.floor(1000 + Math.random() * 9000).toString(); 
 
       const transaction = {
-        transactionId: uuidv4(),
+        transactionId: id,
         amount: data.amount,
         transactionType: 'credit' as 'credit',
         date: new Date(),
       };
 
-      // If the wallet does not exist, create a new wallet
+      
       if (!wallet) {
         wallet = new Wallet({
           userId,
-          balance: data.amount, // Initialize balance with the added amount
-          transactions: [transaction], // Add the first transaction
+          balance: data.amount, 
+          transactions: [transaction], 
         });
         await wallet.save();
       } else {
-        // If the wallet exists, update its balance and add the transaction
         wallet.balance += data.amount;
-        wallet.transactions.push(transaction); // Add transaction to the array
+        wallet.transactions.push(transaction); 
         await wallet.save();
       }
-
-      return wallet; // Return the updated wallet
+      return wallet;
     } catch (error: any) {
       console.error("Error in saving wallet in wallet repo", error.message);
       throw new Error(error.message);
     }
   }
+
+  static  async transactions(userId: string) {
+    try {
+      // Check if a wallet exists for the user
+      let wallet = await Wallet.findOne({ userId }).lean();
+
+      if (wallet) {
+       return wallet;
+      } else {
+       return null
+      }
+    } catch (error: any) {
+      console.error("Error in saving wallet in wallet repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  static  async incomeWallet(userId: string) {
+    try {
+      const result = await Wallet.aggregate([
+        {$match : {userId}},
+        {$unwind : "$transactions"},
+        {
+          $match : {
+            "transactions.transactionType": "course payment"
+          }
+        },
+        {
+          $group : { 
+            _id : null, 
+            totalAmount : {$sum : "$transactions.amount"}
+          }
+        }
+      ])
+
+      if(result && result.length > 0) {
+        return result[0].totalAmount
+      } else {
+        return 0
+      }
+      
+    } catch (error: any) {
+      console.error("Error in saving wallet in wallet repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  static async coursePaymentWallet(userId: string, amount: any, courseName: string) {
+    try {
+      // Check if a wallet exists for the user
+      let wallet = await Wallet.findOne({ userId });
+      const id = Math.floor(1000 + Math.random() * 9000).toString();
+  
+      // Ensure amount is a number
+      const parsedAmount = typeof amount === 'string' ? Number(amount) : amount;
+  
+      if (isNaN(parsedAmount)) {
+        throw new Error('Invalid amount. Must be a valid number.');
+      }
+  
+      const transaction = {
+        transactionId: id,
+        amount: parsedAmount,
+        transactionType: 'course payment' as 'course payment',
+        course: courseName,
+        date: new Date(),
+      };
+  
+      if (!wallet) {
+        // Create a new wallet if not found
+        wallet = new Wallet({
+          userId,
+          balance: parsedAmount, 
+          transactions: [transaction],
+        });
+        await wallet.save();
+      } else {
+        // Update existing wallet
+        wallet.balance += parsedAmount;
+        wallet.transactions.push(transaction);
+        await wallet.save();
+      }
+  
+      return wallet;
+    } catch (error: any) {
+      console.error("Error in saving wallet in wallet repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+  
+
+
 }

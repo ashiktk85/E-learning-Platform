@@ -40,5 +40,7 @@ route.get(`/get-rating/:userId`, userController.getRating.bind(userController));
 
 route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController))
 route.post(`/walletAdd/:userId`,userController.addMoney.bind(userController))
+route.get(`/getTransactions/:userId`, userController.getTransactions.bind(userController))
+
 
 export default route;
