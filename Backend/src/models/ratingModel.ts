@@ -1,23 +1,33 @@
-
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from "mongoose";
 
 interface IRating extends Document {
-  userId: Types.ObjectId; 
-  value: number; 
-  createdAt: Date;
+  courseId: string; 
+  userId: string;   
+  ratingValue: number;       
+  review: string;          
+  createdAt: Date;           
 }
 
 const ratingSchema = new Schema<IRating>({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User', 
+  courseId: {
+    type: String,
+    ref: 'Course',
     required: true,
   },
-  value: {
+  userId: {
+    type: String,
+    ref: 'User',
+    required: true,
+  },
+  ratingValue: {
     type: Number,
     required: true,
-    min: 1, 
-    max: 5, 
+    min: 1,
+    max: 5,
+  },
+  review: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,
@@ -26,5 +36,4 @@ const ratingSchema = new Schema<IRating>({
 });
 
 const Rating = mongoose.model<IRating>('Rating', ratingSchema);
-
-export { Rating, IRating };
+export default Rating;

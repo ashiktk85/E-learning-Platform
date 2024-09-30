@@ -1,6 +1,7 @@
 import Category from "../models/categoryModel";
 import { Course } from "../models/courseModel";
 import Report from "../models/reportModel";
+import userModel from "../models/userModel";
 
 export class adminRepository {
   static async createCategory(
@@ -104,22 +105,30 @@ export class adminRepository {
     }
   }
 
-  static async getCourses() {
+  static async getCourses(skip: number, limit: number) {
     try {
-      const Courses = await Course.find({}).lean();
+        
+      const totalCourses = await Course.countDocuments();
+        const courses = await Course.find({}).skip(skip).limit(limit).lean();
 
-      return Courses;
+        
+
+        return {
+            courses,
+            totalCourses,
+        };
     } catch (error: any) {
-      throw new Error(error.message);
+        throw new Error(error.message);
     }
-  }
+}
+
 
   static async blockCourseRepo(courseId: string) {
     try {
-        console.log(courseId ,"bb");
-        
+      console.log(courseId, "bb");
+
       const course = await Course.findOneAndUpdate(
-        {courseId : courseId},
+        { courseId: courseId },
         { isBlocked: true },
         { new: true }
       );
@@ -137,7 +146,7 @@ export class adminRepository {
   static async unBlockCourseRepo(courseId: string) {
     try {
       const course = await Course.findOneAndUpdate(
-        {courseId : courseId},
+        { courseId: courseId },
         { isBlocked: false },
         { new: true }
       );
@@ -146,7 +155,115 @@ export class adminRepository {
         throw new Error("Course dosent exist");
       }
 
-      return  "unblocked";
+      return "unblocked";
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async getDasboard() {
+    try {
+      const users = await userModel.find({ isBlocked: false }).countDocuments();
+      const courses = await Course.find({ isBlocked: false }).countDocuments();
+      const tutors = await userModel
+        .find({ isBlocked: false, tutor: true })
+        .countDocuments();
+
+      return { users, courses, tutors };
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async topTutors() {
+    try {
+      const topTutorsByStudents = await userModel.aggregate([
+        { $match: { tutor: true } },
+        {
+          $lookup: {
+            from: "courses",
+            localField: "email",
+            foreignField: "email",
+            as: "courses",
+          },
+        },
+        {
+          $unwind: "$courses",
+        },
+        {
+          $addFields: {
+            studentCount: { $size: "$courses.users" },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            totalStudents: { $sum: "$studentCount" },
+            totalCourses: { $sum: 1 },
+            name: { $first: "$firstName" },
+            email: { $first: "$email" },
+            profile: { $first: "$profile" },
+            userId: { $first: "$userId" },
+          },
+        },
+        { $sort: { totalStudents: -1 } },
+        { $limit: 5 },
+      ]);
+
+      return topTutorsByStudents;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async getTopCourses() {
+    try {
+      console.log("rep");
+      
+      const topCourses = await Course.aggregate([
+        {
+          $addFields: {
+            enrolledCount: { $size: "$users" } // Add a field to calculate enrolled users
+          }
+        },
+        {
+          $sort: { enrolledCount: -1 } // Sort by enrolled users count in descending order
+        },
+        {
+          $limit: 5 // Limit to top 5 courses
+        },
+        {
+          $lookup: {
+            from: 'users', // Lookup from the 'users' collection
+            localField: 'email', // Match the 'email' field in the 'Course' model
+            foreignField: 'email', // With the 'email' field in the 'User' model
+            as: 'userDetails' // Store the matched user data in 'userDetails'
+          }
+        },
+        {
+          $unwind: '$userDetails' // Unwind the array of user details to a single object
+        },
+        {
+          $project: {
+            _id: 1, 
+            name: 1, 
+            email: 1,
+            courseId: 1,
+            enrolledCount: 1, 
+            totalRatings: 1,
+            averageRating: 1,
+            thumbnail: 1,
+            'userDetails.profile': 1 ,
+            'userDetails.userId' : 1,
+            'userDetails.firstName' :1
+          }
+        }
+      ]);
+      
+      console.log(topCourses);
+      
+      return topCourses;
+      
     } catch (error: any) {
       throw new Error(error.message);
     }

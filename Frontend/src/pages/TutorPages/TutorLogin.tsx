@@ -60,7 +60,7 @@ const TutorLogin: React.FC = () => {
 
   return (
     <>
-      <Toaster richColors/>
+   
       <div
         className="w-full h-screen flex justify-center items-center bg-cover bg-center bg-green-400"
         style={

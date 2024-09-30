@@ -7,12 +7,13 @@ import TutorApplication from "../models/applicationModel";
 import TutorProfile from "../models/tutorProfileModel";
 import { Course } from "../models/courseModel";
 import orderModel from "../models/orderModel";
-import { Rating } from "../models/ratingModel";
+
 import { v4 as uuidv4 } from "uuid";
 import { Wallet } from "../models/walletModel";
+import Rating from "../models/ratingModel";
 
 export class UserRepositary {
-  static async existUser(email: string ): Promise<IUser | null> {
+  static async existUser(email: string): Promise<IUser | null> {
     try {
       const existUser = await UserModel.findOne({ email });
       // console.log("Existing user found ", existUser);
@@ -31,9 +32,9 @@ export class UserRepositary {
     }
   }
 
-  static async getUser(id: string ): Promise<IUser | null> {
+  static async getUser(id: string): Promise<IUser | null> {
     try {
-      const existUser = await UserModel.findOne({ userId : id });
+      const existUser = await UserModel.findOne({ userId: id });
       // console.log("Existing user found ", existUser);
 
       return existUser;
@@ -49,8 +50,6 @@ export class UserRepositary {
       }
     }
   }
-  
-  
 
   static async createUser(userData: any): Promise<IUser> {
     try {
@@ -183,7 +182,7 @@ export class UserRepositary {
         { tutor: true },
         {
           _id: 0,
-          userId : 1,
+          userId: 1,
           firstName: 1,
           lastName: 1,
           email: 1,
@@ -191,7 +190,7 @@ export class UserRepositary {
           createdAt: 1,
           roles: 1,
           isBlocked: 1,
-          profile : 1
+          profile: 1,
         }
       )
         .skip(skip)
@@ -462,9 +461,9 @@ export class UserRepositary {
         thumbnail: course.thumbnail,
         tutorName: userTutor.firstName + userTutor.lastName,
         tutorBio: tutor.bio,
-        tutorEmail : tutor?.email,
-        tutorProfile : userTutor?.profile,
-        tutorId : userTutor?.userId,
+        tutorEmail: tutor?.email,
+        tutorProfile: userTutor?.profile,
+        tutorId: userTutor?.userId,
         education: tutor.education,
         certifications: tutor.certifications,
         email: tutor.email,
@@ -525,104 +524,47 @@ export class UserRepositary {
     }
   }
 
-  static async addRatingRepo(userId: String, rating: number, courseId : String) {
+  static async saveProfile(userId: string, profileUrl: string) {
     try {
-      console.log("rate repo");
-      
-      const user = await UserModel.findOne({ userId: userId });
-
-      const newRating = new Rating({ userId : user?._id, value : rating });
-      console.log(courseId);
-      
-
-      const course = await Course.findOneAndUpdate(
-        { courseId : courseId }, 
-        { $push: { ratings: newRating._id } }, 
-        { new: true } 
-      );
-
-      if (!course) {
-        throw new Error("Course not found.");
-      }
-      const status = await newRating.save();
-      console.log(status);
-      
-      return true;
-    } catch (error: any) {
-      console.log(
-        "Error in saving rating data on user in user repo",
-        error.message
-      );
-      throw new Error(error.message);
-    }
-  }
-
-  static async getRatingRepo(userId : string) {
-    try {
-      const user = await userModel.findOne({userId : userId})
-      const rating = await Rating.findOne({userId : user?._id})
-
-      if(!rating) {
-        return 0;
-      }
-      
-
-      return rating?.value
-    } catch (error : any) {
-      console.log(
-        "Error in getting rating data on user in user repo",
-        error.message
-      );
-      throw new Error(error.message);
-    }
-  }
-
-  static async saveProfile(userId :string , profileUrl :string) {
-    try {
-
-      const update = await userModel.findOneAndUpdate({userId : userId},
+      const update = await userModel.findOneAndUpdate(
+        { userId: userId },
         {
-          $set : {
-            profile : profileUrl
-          }
+          $set: {
+            profile: profileUrl,
+          },
         }
-      )
+      );
 
       return true;
-      
     } catch (error: any) {
-      console.log(
-        "Error in saving profile  in user repo",
-        error.message
-      );
+      console.log("Error in saving profile  in user repo", error.message);
       throw new Error(error.message);
     }
   }
 
-  static  async newPayment(userId: string, data: { amount: number }) {
+  static async newPayment(userId: string, data: { amount: number }) {
     try {
       // Check if a wallet exists for the user
       let wallet = await Wallet.findOne({ userId });
-      const id = Math.floor(1000 + Math.random() * 9000).toString(); 
+      const id = Math.floor(1000 + Math.random() * 9000).toString();
 
       const transaction = {
         transactionId: id,
         amount: data.amount,
-        transactionType: 'credit' as 'credit',
+        transactionType: "credit" as "credit",
         date: new Date(),
       };
 
-      
       if (!wallet) {
         wallet = new Wallet({
           userId,
-          balance: data.amount, 
-          transactions: [transaction], 
+          balance: data.amount,
+          transactions: [transaction],
         });
         await wallet.save();
       } else {
         wallet.balance += data.amount;
-        wallet.transactions.push(transaction); 
+        wallet.transactions.push(transaction);
         await wallet.save();
       }
       return wallet;
@@ -632,15 +574,15 @@ export class UserRepositary {
     }
   }
 
-  static  async transactions(userId: string) {
+  static async transactions(userId: string) {
     try {
       // Check if a wallet exists for the user
       let wallet = await Wallet.findOne({ userId }).lean();
 
       if (wallet) {
-       return wallet;
+        return wallet;
       } else {
-       return null
+        return null;
       }
     } catch (error: any) {
       console.error("Error in saving wallet in wallet repo", error.message);
@@ -648,79 +590,87 @@ export class UserRepositary {
     }
   }
 
-  static  async incomeWallet(userId: string) {
+  static async incomeWallet(userId: string) {
     try {
       const result = await Wallet.aggregate([
-        {$match : {userId}},
-        {$unwind : "$transactions"},
+        { $match: { userId } },
+        { $unwind: "$transactions" },
         {
-          $match : {
-            "transactions.transactionType": "course payment"
-          }
+          $match: {
+            "transactions.transactionType": "course payment",
+          },
         },
         {
-          $group : { 
-            _id : null, 
-            totalAmount : {$sum : "$transactions.amount"}
-          }
-        }
-      ])
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$transactions.amount" },
+          },
+        },
+      ]);
 
-      if(result && result.length > 0) {
-        return result[0].totalAmount
+      if (result && result.length > 0) {
+        return result[0].totalAmount;
       } else {
-        return 0
+        return 0;
       }
-      
     } catch (error: any) {
       console.error("Error in saving wallet in wallet repo", error.message);
       throw new Error(error.message);
     }
   }
 
-  static async coursePaymentWallet(userId: string, amount: any, courseName: string) {
+  static async coursePaymentWallet(
+    userId: string,
+    amount: any,
+    courseName: string
+  ) {
     try {
       // Check if a wallet exists for the user
       let wallet = await Wallet.findOne({ userId });
       const id = Math.floor(1000 + Math.random() * 9000).toString();
-  
+
       // Ensure amount is a number
-      const parsedAmount = typeof amount === 'string' ? Number(amount) : amount;
-  
+      const parsedAmount = typeof amount === "string" ? Number(amount) : amount;
+
       if (isNaN(parsedAmount)) {
-        throw new Error('Invalid amount. Must be a valid number.');
+        throw new Error("Invalid amount. Must be a valid number.");
       }
-  
+
       const transaction = {
         transactionId: id,
         amount: parsedAmount,
-        transactionType: 'course payment' as 'course payment',
+        transactionType: "course payment" as "course payment",
         course: courseName,
         date: new Date(),
       };
-  
+
       if (!wallet) {
-        // Create a new wallet if not found
         wallet = new Wallet({
           userId,
-          balance: parsedAmount, 
+          balance: parsedAmount,
           transactions: [transaction],
         });
         await wallet.save();
       } else {
-        // Update existing wallet
         wallet.balance += parsedAmount;
         wallet.transactions.push(transaction);
         await wallet.save();
       }
-  
+
       return wallet;
     } catch (error: any) {
       console.error("Error in saving wallet in wallet repo", error.message);
       throw new Error(error.message);
     }
   }
-  
 
-
+  static async ratings(courseId: string) {
+    try {
+      const ratings = await Rating.find({ courseId }).lean();
+      return ratings;
+    } catch (error: any) {
+      console.error("Error in getting rating repo", error.message);
+      throw new Error(error.message);
+    }
+  }
 }

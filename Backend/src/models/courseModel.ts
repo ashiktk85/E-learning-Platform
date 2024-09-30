@@ -32,7 +32,9 @@ interface ICourse extends Document {
   thumbnail?: string;
   isBlocked : boolean;
   createdAt : Date;
-  users ?: []
+  users ?: [];
+  averageRating ?: number ;
+  totalRatings ?: number;
 }
 
 const videoSchema = new Schema<IVideo>({
@@ -108,7 +110,14 @@ const courseSchema = new Schema<ICourse>({
   type : [String],
   default:[]
 },
-
+averageRating: {
+  type: Number,
+  default: 0, 
+},
+totalRatings: {
+  type: Number,
+  default: 0,
+},
 },
 
 );

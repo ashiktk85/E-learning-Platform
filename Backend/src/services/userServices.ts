@@ -370,25 +370,7 @@ export class UserService {
     } catch (error) {}
   }
 
-  async addRatingService(userId: String, rating: number, courseId: any) {
-    try {
-      console.log("rate serv");
 
-      const addRating = await UserRepositary.addRatingRepo(
-        userId as String,
-        rating as number,
-        courseId as any
-      );
-      return addRating;
-    } catch (error) {}
-  }
-
-  async getRatingService(userId: string) {
-    try {
-      const getRating = await UserRepositary.getRatingRepo(userId as string);
-      return getRating;
-    } catch (error) {}
-  }
 
   async saveProfile(profile: Express.Multer.File, userId: string) {
     try {
@@ -419,12 +401,13 @@ export class UserService {
         console.log("no user");
       }
       console.log(user, user?.profile, user?.userId);
-
-      const profileUrl = await awsConfig.getfile(
-        user?.profile as string,
-        `users/profile/${user?.userId}`
-      );
-
+      let profileUrl = ""
+       if(user?.profile) {
+        profileUrl = await awsConfig.getfile(
+          user?.profile as string,
+          `users/profile/${user?.userId}`
+        );
+       }
       return profileUrl;
     } catch (error: any) {
       console.error(
@@ -484,6 +467,16 @@ export class UserService {
     }
   }
 
+  async getRatingsService(courseId: string) {
+    try {
+        const ratings = await UserRepositary.ratings(courseId as string)
+        return ratings
+    } catch (error: any) {
+      console.error("Error in getting ratings user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
 
+  
   
 }

@@ -103,7 +103,7 @@ const AdminAside = () => {
     <div className="grid col-span-3 h-full ">
       <div className="flex h-screen">
         <aside
-          className={`bg-white text-black transition-all duration-300 rounded-md h-full border-r-2 ${
+          className={`bg-white text-black transition-all duration-300 fixed rounded-md h-full border-r-2 ${
             isCollapsed ? "w-16" : "w-64"
           } flex flex-col p-4`}
         >

@@ -4,6 +4,7 @@ import { toast, Toaster } from "sonner";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
 import { updateUserBlockStatus } from "../../redux/actions/adminActions";
+import Avatar from '@mui/joy/Avatar';
 
 const url = "http://localhost:7000";
 
@@ -120,7 +121,7 @@ const UsersPage: React.FC = () => {
   );
 
   return (
-    <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden font-sans">
+    <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden overflow-hidden font-sans">
       <div className="layout-container flex h-full grow flex-col">
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f4] px-10 py-3">
           <div className="flex items-center gap-4 text-[#111418]">
@@ -162,6 +163,11 @@ const UsersPage: React.FC = () => {
                     <tr className="bg-white">
                       <th className="px-4 py-3 text-left text-[#111418] w-[400px] text-sm font-bold leading-normal">
                         S.No
+                    
+                      </th>
+                      <th className="pr-4 py-3 text-left text-[#111418] w-[400px] text-sm font-bold leading-normal">
+                        S.No
+                    
                       </th>
                       <th className="px-4 py-3 text-left text-[#111418] w-[400px] text-sm font-bold leading-normal">
                         Username
@@ -188,7 +194,14 @@ const UsersPage: React.FC = () => {
                       paginatedUsers.map((user, index) => (
                         <tr key={index} className="border-t border-[#dce0e5]">
                           <td className="px-4 py-3 text-[#111418] text-sm">
+                            
                             {(currentPage - 1) * itemsPerPage + index + 1}
+                            
+                           
+                           
+                          </td>
+                          <td className="pr-4 py-3 text-[#111418] text-sm">
+                          <Avatar />
                           </td>
                           <td className="px-4 py-3 text-[#111418] text-sm">
                             {user.firstName + " " + user.lastName}

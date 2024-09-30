@@ -200,37 +200,7 @@ export class UserController {
     }
   }
 
-  async addRating(req : Request, res : Response) {
-    try {
-      
-      const userId = req.params.userId;
-      const { rating ,courseId } = req.body;
-      
-      const addRating = await this.userService.addRatingService(userId as string , rating as number,courseId.courseId as string)
-
-      res.status(201).json(addRating)
-
-    } catch (error : any) {
-      console.error(error.message);
-      res.status(500).json({ message: error.message });
-    }
-  }
-
-  async getRating(req : Request, res : Response) {
-    try {
-      const userId = req.params.userId;
-      console.log("lklklklklklk",userId);
-      
-      const rating = await this.userService.getRatingService(userId as string)
-
-      console.log("con", rating);
-      res.status(200).json(rating)
-      
-    } catch (error : any) {
-      console.error(error.message);
-      res.status(500).json({ message: error.message });
-    }
-  }
+ 
 
   async saveProfilePic(req : Request, res : Response) {
     try {
@@ -304,6 +274,23 @@ export class UserController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async  getRatings (req : Request, res : Response) {
+    try {
+       const {courseId} = req.params
+      
+       
+       const ratings =  await this.userService.getRatingsService(courseId as string)
+       console.log(ratings)
+       
+       res.status(HTTP_statusCode.OK).json(ratings)
+    } catch (error :any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  
 
    
 }

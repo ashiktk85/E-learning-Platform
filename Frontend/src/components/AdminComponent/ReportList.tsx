@@ -175,7 +175,7 @@ const ReportList: React.FC = () => {
                           </td>
                           <td className="px-4 text-[#111418] text-sm ">
                             <button
-                              className="bg-black text-white w-12 rounded-sm"
+                              className=" bg-gradient-to-r from-stone-500 to-stone-700 text-white w-14 h-7 rounded-md "
                               onClick={() =>
                                 navigate(`/admin/reportDetail/${report.reportId}`)
                               }

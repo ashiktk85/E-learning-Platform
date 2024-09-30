@@ -351,29 +351,39 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
     } 
 
 
-    async getCourses() {
+    async getCourses(page: number, limit: number) {
         try {
-            const response = await adminRepository.getCourses();
-
+          
+            const skip = (page - 1) * limit;
+    
+           
+            const response = await adminRepository.getCourses(skip, limit);
+    
             const awsConfig = new AwsConfig();
-      
+    
+            
             const coursesWithUrls = await Promise.all(
-              response.map(async (course: ICourse) => {
-                const thumbnails = course.thumbnail
-                  ? await awsConfig.getfile(
-                      course.thumbnail,
-                      `tutors/${course.email}/courses/${course.courseId}/thumbnail`
-                    )
-                  : null;
-                return { ...course, thumbnail: thumbnails };
-              })
+                response.courses.map(async (course: ICourse) => {
+                    const thumbnails = course.thumbnail
+                        ? await awsConfig.getfile(
+                            course.thumbnail,
+                            `tutors/${course.email}/courses/${course.courseId}/thumbnail`
+                        )
+                        : null;
+                    return { ...course, thumbnail: thumbnails };
+                })
             );
-            return coursesWithUrls;
-        } catch (error : any) {
+    
+            return {
+                courses: coursesWithUrls,
+                totalCourses: response.totalCourses,
+            };
+        } catch (error: any) {
             console.error("Error during admin getting course detail in service:", error.message);
             throw new Error(error.message);
         }
     }
+    
 
     async blockCourseService(courseId : string) {
         try {
@@ -394,4 +404,81 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
             throw new Error(error.message);
         }
     }
+
+    async getDashboardService() {
+        try {
+            const dashboard = await adminRepository.getDasboard()
+           return dashboard
+            
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async getTopTutorsService() {
+        try {
+            const awsConfig = new AwsConfig();
+            const tutors = await adminRepository.topTutors();
+            
+            const updatedProfiles = await Promise.all(
+              tutors.map(async (tutor) => {
+                const profileUrl = tutor.profile 
+                  ? await awsConfig.getfile(tutor.profile, `users/profile/${tutor.userId}`) 
+                  : ''; 
+            
+                return {
+                  ...tutor, 
+                  profile: profileUrl 
+                };
+              })
+            );
+            
+            return updatedProfiles;
+            
+            
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async getTopCourseServices() {
+        try {
+         const awsConfig = new AwsConfig();
+          const topCourses = await adminRepository.getTopCourses()
+
+          const withThumbnail = await Promise.all(
+            topCourses.map(async (course) => {
+                const thumbnailUrl = await awsConfig.getfile(course?.thumbnail ,
+                     `tutors/${course.email}/courses/${course.courseId}/thumbnail` )
+
+                const profileUrl = course.userDetails?.profile ? 
+                 await awsConfig.getfile(course?.userDetails?.profile ,
+                    `users/profile/${course?.userDetails?.userId}`
+                )
+                : ""
+
+                     return {
+                        ...course,
+                        thumbnail : thumbnailUrl,
+                        profile : profileUrl
+                     }
+            })
+          )
+
+        
+          return withThumbnail;
+        } catch (error : any) {
+            console.error("Error during admin getting course detail in service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    
+
+    
+    
+
+    
 }

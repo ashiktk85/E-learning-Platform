@@ -3,6 +3,8 @@ import { Server as HttpServer } from "http";
 import mongoose from "mongoose";
 import Group from '../models/groupSchema';
 import { CommunityRepository } from "../repository/communityRepository";
+import Rating from "../models/ratingModel";
+import { Course } from "../models/courseModel";
 
 let io: SocketServer;
 
@@ -25,17 +27,11 @@ const configSocketIO = (server: HttpServer) => {
         socket.on('sendMessage', async (payload) => {
             try {
                 const { userId, courseId, message } = payload;
-
-                // Save the message in the repository
                 const saveData = await CommunityRepository.saveMessages(courseId, userId, message);
-
-                // Extract the latest message (last one in the array)
                 const latestMessage = saveData.messages[saveData.messages.length - 1];
-
-                // Fetch user details
                 const user = await CommunityRepository.fetchUserDetails(userId);
 
-                // Emit the message with user details to the room
+           
                 io.to(courseId).emit('receiveMessage', {
                     userId,
                     userDetails: user, 
@@ -47,10 +43,50 @@ const configSocketIO = (server: HttpServer) => {
                 console.error('Error saving message:', error);
             }
         });
-
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);
         });
+
+
+        socket.on('submitRating', async (payload) => {
+            const { courseId, userId, ratingValue, review } = payload;
+        
+            try {
+                
+                const existingRating = await Rating.findOne({ courseId, userId });
+                if (existingRating) {
+                    socket.emit('ratingError', 'You have already rated this course.');
+                    return;
+                }
+        
+                // Create a new rating
+                const newRating = new Rating({
+                    courseId,
+                    userId,
+                    ratingValue,
+                    review,
+                });
+        
+              
+                await newRating.save();
+        
+                
+                await Course.findOneAndUpdate(courseId, {
+                    $push: { ratings: newRating._id }
+                });
+        
+               
+                io.to(courseId.toString()).emit('receiveRating', {
+                    userId,
+                    ratingValue,
+                    review,
+                    createdAt: newRating.createdAt,
+                });
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+            }
+        });
+        
     });
 };
 

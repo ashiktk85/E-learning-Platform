@@ -1,28 +1,40 @@
-import React from 'react';
-import { Interface } from 'readline';
+import React from "react";
+import { Interface } from "readline";
+import { FaUsers, FaUserSecret , FaBook } from "react-icons/fa";
+import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 
 interface ICard {
-  name : string,
-  data : number
+  name: string;
+  data: number;
 }
 
-const AdminCard : React.FC<ICard> = ({name ,data}) => {
+const AdminCard: React.FC<ICard> = ({ name, data }) => {
+  const icon = () => {
+    switch (name) {
+      case "Users":
+        return <FaUsers fill="white" size={28} />;
+      case "Tutors":
+        return <FaUserSecret fill="white" size={24} />;
+        case "Courses":
+        return <FaBook fill="white" size={24} />;
+      case "Revenue":
+        return <RiMoneyRupeeCircleLine fill="white" size={28} />;
+      default:
+        return <FaUsers />;
+    }
+  };
   return (
-    <div className="relative overflow-hidden w-40 h-40 rounded-3xl cursor-pointer text-2xl font-bold bg-purple-400">
-      <div className="z-10 absolute w-full h-full peer"></div>
-      <div
-        className="absolute peer-hover:-top-20 peer-hover:-left-16 peer-hover:w-[140%] peer-hover:h-[140%] -top-32 -left-16 w-32 h-44 rounded-full bg-purple-300 transition-all duration-500"
-      ></div>
-      <div
-        className="absolute flex text-xl text-center items-end justify-end peer-hover:right-0 peer-hover:rounded-b-none peer-hover:bottom-0 peer-hover:items-center peer-hover:justify-center peer-hover:w-full peer-hover:h-full -bottom-32 -right-16 w-36 h-44 rounded-full bg-purple-300 transition-all duration-500"
-      >
-        {data}
+    <div className="relative overflow-hidden w-52 h-20 rounded-md cursor-pointer   bg-gray-50 shadow-lg py-4 px-4 border border-gray-200 flex">
+      <div className="w-12 h-12 bg-black rounded-full px-[10px] py-2">
+        {icon()}
       </div>
-      <div className="w-full h-full items-center justify-center flex uppercase">
-        {name}
+
+      <div className="px-5">
+        <h1 className="text-xl font-semibold">+ {data}</h1>
+        <p className="text-gray-500">{name}</p>
       </div>
     </div>
   );
-}
+};
 
 export default AdminCard;

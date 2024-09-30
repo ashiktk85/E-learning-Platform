@@ -1,7 +1,5 @@
-import React from 'react';
+import React from "react";
 
-const thumbnail = "https://images.pexels.com/photos/28451423/pexels-photo-28451423.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load";
-const title = "Introduction to cooking";
 
 interface Ivideo {
   _id: string;
@@ -19,107 +17,44 @@ interface Isection {
 interface PlayListProps {
   sections: Isection[] | undefined;
   setActiveVideo: (video: Ivideo) => void;
+  thumbnail : string | undefined;
 }
 
-const PlayList: React.FC<PlayListProps> = ({ sections, setActiveVideo }) => {
+const PlayList: React.FC<PlayListProps> = ({ sections, setActiveVideo ,thumbnail}) => {
   return (
     <div className="basis-1/3 pl-10 h-full overflow-y-auto">
-      {/* Playlist items */}
-      {/* The scroll will still be active with a fixed height */}
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-      <div className="flex justify-between mt-2">
-        <img
-          src={thumbnail}
-          className="h-20 w-1/4 rounded-md"
-          alt="thumbnail"
-        />
-        <div className="basis-3/5">
-          <h4 className="text-sm mb-1">{title}</h4>
-          <p>Course name</p>
-          <p>199k views</p>
-        </div>
-      </div>
-      
-     
-         </div>
+      {sections && sections.length > 0 ? (
+        sections.map((section) => (
+          <div key={section._id}>
+            {/* Section title */}
+            <h4 className="text-lg font-semibold mb-2">{section.title}</h4>
+
+            {section.videos.map((video) => (
+              <div
+                key={video._id}
+                className="flex gap-3 mt-2 cursor-pointer"
+                onClick={() => setActiveVideo(video)} // Set the active video when clicked
+              >
+                <img
+                  src={thumbnail}
+                  className="h-20 w-[150px] rounded-md"
+                  alt="thumbnail"
+                />
+                <div>
+                  <h4 className="text-sm mb-1">{video.title}</h4>
+                  <p>{section.title}</p> {/* Show section name */}
+                  <p>199k views</p>
+                </div>
+              </div>
+            ))}
+
+            <hr className="my-4" /> {/* Separate each section */}
+          </div>
+        ))
+      ) : (
+        <p>No videos available</p>
+      )}
+    </div>
   );
 };
 

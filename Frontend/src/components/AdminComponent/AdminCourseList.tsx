@@ -6,7 +6,6 @@ import { FaEye } from "react-icons/fa";
 import ConfirmationModal from "./ConfirmationModal";
 import { toast, Toaster } from "sonner";
 
-
 interface Icourse {
   price: string | number;
   thumbnail: string | undefined;
@@ -22,25 +21,35 @@ interface Icourse {
 
 const AdminCourseList = () => {
   const navigate = useNavigate();
-
+  
   const [courses, setCourses] = useState<Icourse[]>([]);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalAction, setModalAction] = useState<"block" | "unblock">("block");
   const [selectedCourse, setSelectedCourse] = useState<Icourse | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${Base_URL}/admin/getcourses`);
-        setCourses(response.data);
+        const response = await axios.get(`${Base_URL}/admin/getcourses`, {
+          params: {
+            page: currentPage,
+            limit: itemsPerPage,
+          },
+        });
+        setCourses(response.data.courses || []);
+        setTotalPages(response.data.totalPages || 1);
+        console.log(response.data);
+        
       } catch (error) {
         console.error(error);
       }
     };
-
-    fetchCourse();
-  }, []);
+    fetchCourses();
+  }, [currentPage]);
 
   const handleBlockClick = (course: Icourse) => {
     setSelectedCourse(course);
@@ -60,12 +69,10 @@ const AdminCourseList = () => {
       const url = `${Base_URL}/admin/${
         modalAction === "block" ? "block" : "unblock"
       }course/${selectedCourse.courseId}`;
-     const res =  await axios.patch(url);
-     if(res.data === "blocked") {
-      toast.success("Course Blocked")
-     } else if(res.data === "unblocked") {
-      toast.success("Course Unblocked")
-     }
+      const res = await axios.patch(url);
+      toast.success(
+        res.data === "blocked" ? "Course Blocked" : "Course Unblocked"
+      );
 
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
@@ -80,7 +87,8 @@ const AdminCourseList = () => {
     }
   };
 
-  const filterSearch = courses.filter((course) => {
+  // Filtering based on search input
+  const filteredCourses = courses.filter((course) => {
     return (
       (course?.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (course?.name?.toLowerCase() || "").includes(search.toLowerCase()) ||
@@ -88,8 +96,11 @@ const AdminCourseList = () => {
     );
   });
 
+  // Paginate filtered courses
+
+
   return (
-    <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden font-sans">
+    <div className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-hidden font-sans">
       <Toaster position="top-center" richColors />
       <div className="layout-container flex h-full grow flex-col">
         <div className="px-2 pt-10 pb-5">
@@ -148,14 +159,14 @@ const AdminCourseList = () => {
                 </tr>
               </thead>
               <tbody>
-                {courses.length === 0 ? (
+                {filteredCourses.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-4 text-gray-500">
-                      No Courses
+                    <td colSpan={8} className="text-center py-4 text-gray-500">
+                      No Courses Found
                     </td>
                   </tr>
                 ) : (
-                  filterSearch.map((course, index) => (
+                  filteredCourses.map((course, index) => (
                     <tr key={index} className="border-t border-[#dce0e5]">
                       <td className="pl-4 py-3 text-[#111418] text-sm">
                         <img
@@ -177,30 +188,38 @@ const AdminCourseList = () => {
                         {new Date(course.createdAt).toLocaleDateString()}
                       </td>
                       <td className="pl-4 py-3 text-[#111418] text-sm">
-                        {course.isBlocked ? <p className="font-bold text-red-500">Blocked</p> :
-                         <p className="font-bold text-green-500">Active</p>}
-                      </td>
-                      <td className="pl-4 py-3 text-[#111418] text-sm">
-                        <FaEye
-                          className="cursor-pointer"
-                          onClick={() => navigate(`/courses/${course.courseId}`)}
-                        />
+                        {course.isBlocked ? (
+                          <p className="font-bold text-red-500">Blocked</p>
+                        ) : (
+                          <p className="font-bold text-green-500">Active</p>
+                        )}
                       </td>
                       <td className="pl-4 py-3 text-[#111418] text-sm">
                         <button
                           onClick={() =>
-                            course.isBlocked
-                              ? handleUnblockClick(course)
-                              : handleBlockClick(course)
+                            navigate(`/admin/coursedetails/${course.courseId}`)
                           }
-                          className={`px-2 py-1 rounded w-20 ${
-                            course.isBlocked
-                              ? "bg-green-500 text-white"
-                              : "bg-gradient-to-r from-rose-400 to-red-500 text-white"
-                          }`}
+                          className="text-[#fd2c0f]"
                         >
-                          {course.isBlocked ? "Unblock" : "Block"}
+                          <FaEye />
                         </button>
+                      </td>
+                      <td className="pl-4 py-3 text-[#111418] text-sm">
+                        {course.isBlocked ? (
+                          <button
+                            onClick={() => handleUnblockClick(course)}
+                            className="bg-gradient-to-r from-amber-200 to-yellow-500 text-white px-4 py-2 rounded-md w-20"
+                          >
+                            Unblock
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleBlockClick(course)}
+                            className="bg-gradient-to-r from-rose-400 to-red-500 text-white px-4 py-2 rounded-md w-20"
+                          >
+                            Block
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -208,8 +227,28 @@ const AdminCourseList = () => {
               </tbody>
             </table>
           </div>
+          {/* Pagination */}
+          <div className="flex justify-center py-3 space-x-2">
+            {currentPage > 1 && (
+              <button
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="bg-gradient-to-r from-stone-500 to-stone-700 text-white font-bold py-2 px-4 rounded"
+              >
+               {"<"}
+              </button>
+            )}
+            {currentPage < totalPages && (
+              <button
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="bg-gradient-to-r from-stone-500 to-stone-700 text-white font-bold py-2 px-4 rounded"
+              >
+                {">"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
+      
       <ConfirmationModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}

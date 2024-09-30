@@ -4,6 +4,8 @@ import PlayList from '../../components/UserComponent/PlayList';
 import Navbar from '../../components/UserComponent/Navbar';
 import userAxiosInstance from '../../config/axiosInstance/userInstance';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 interface IcourseData {
   name: string;
@@ -23,6 +25,7 @@ interface IcourseData {
   courseId: string;
   price: string | number;
   profileUrl : string;
+  tutorId : string;
 }
 
 interface Ivideo {
@@ -42,6 +45,8 @@ interface Isection {
 
 const CoursePlayer2 = () => {
   const { courseId } = useParams<{ courseId: string }>();
+  const {userInfo} = useSelector((state : RootState) => state.user)
+  const userId = userInfo?.userId
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const [activeVideo, setActiveVideo] = useState<Ivideo | null>(null);
   console.log(courseData);
@@ -70,17 +75,22 @@ const CoursePlayer2 = () => {
     <>
     <Navbar />
     <div className="bg-[#f9f9f9] pl-[2%] pr-[2%] py-5 flex justify-between h-[100vh] pt-20">
-      <div className="flex-grow">
+      <div className="w-3/4">
         <VideoPlayer
          video={activeVideo} 
          tutorName={courseData?.tutorName}
-          tutorBio={courseData?.tutorBio}
+         tutorId={courseData?.tutorId}
           tutorProfile = {courseData?.profileUrl}
+          tags = {courseData?.tags}
+          description = {courseData?.description}
+          courseId = {courseId}
+          userId = {userId}
         />
       </div>
       <PlayList
       sections = {courseData?.sections}
       setActiveVideo = {setActiveVideo}
+      thumbnail = {courseData?.thumbnailUrl}
       />
     </div>
     </>

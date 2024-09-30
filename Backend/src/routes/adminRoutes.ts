@@ -27,6 +27,9 @@ route.patch('/unblockcourse/:courseId', adminController.unBlockCourse.bind(admin
 
 //
 route.get('/reportDetail/:reportId',adminController.reportDetail.bind(adminController))
+route.get('/dashboard' , adminController.getDashboard.bind(adminController))
+route.get('/top5-tutors', adminController.getTopTutors.bind(adminController))
+route.get('/top5-courses',adminController.getTopCourses.bind(adminController))
 
 
 export default route;

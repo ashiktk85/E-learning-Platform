@@ -29,7 +29,7 @@ async getUsers(req: Request, res: Response): Promise<void> {
         const limit = parseInt(req.query.limit as string, 10) || 10; 
 
         const { users, total } = await this.adminService.getUserListService(page, limit);
-        console.log("User list in controller", users);
+   
 
         res.status(200).json({
             users,
@@ -49,7 +49,7 @@ async getTutors(req: Request, res: Response): Promise<void> {
         const limit = parseInt(req.query.limit as string, 10) || 10; 
 
         const { users, total } = await this.adminService.getTutorsService(page, limit);
-        console.log("User list in controller", users);
+        
 
         res.status(200).json({
             users,
@@ -163,7 +163,7 @@ async getTutors(req: Request, res: Response): Promise<void> {
     async userReport(req : Request , res :Response) {
         try {
           const  {courseId ,videoId ,reason ,additionalInfo} = req.body;
-          console.log("e",courseId ,"e",videoId , "e", reason , "add" ,additionalInfo);
+        
           
             const reporting = await this.adminService.reportCourseService(courseId , videoId , reason , additionalInfo)
 
@@ -210,12 +210,19 @@ async getTutors(req: Request, res: Response): Promise<void> {
     }
 
 
-    async getCourses(req : Request , res :Response) {
+    async getCourses(req: Request, res: Response) {
         try {
-            const courses = await this.adminService.getCourses()
-
-            res.status(200).json(courses)
-        } catch (error : any) {
+            
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+    
+         
+            const { courses, totalCourses } = await this.adminService.getCourses(page, limit);
+            const totalPages = Math.ceil(totalCourses / limit);
+            console.log(totalPages,"tot")
+    
+            res.status(200).json({ courses, totalPages });
+        } catch (error: any) {
             res.status(500).json({ message: error.message });
         }
     }
@@ -246,6 +253,36 @@ async getTutors(req: Request, res: Response): Promise<void> {
         }
     }
 
+    async getDashboard(req : Request , res :Response) {
+        try {
+            const response = await this.adminService.getDashboardService()
+            res.status(200).json(response)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 
+    async getTopTutors(req : Request , res :Response) {
+        try {
+            const response = await this.adminService.getTopTutorsService()
+            // console.log(response);
+            
+            res.status(200).json(response)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 
+    async getTopCourses(req : Request , res :Response) {
+        try {
+            console.log("con");
+            
+            const response = await this.adminService.getTopCourseServices()
+            // console.log(response);
+            
+            res.status(200).json(response)
+        } catch (error : any) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }

@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { defaultProfile } from "../../assets/svgs/icons";
 import Box from "@mui/material/Box";
 import Rating from "@mui/material/Rating";
 import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+import { Base_URL } from "../../credentials";
+import { toast } from "sonner";
+import axios from "axios";
+import dayjs from "dayjs"; // For formatting dates
 
-const videoUrl =
-  "https://videos.pexels.com/video-files/9968971/9968971-sd_640_360_25fps.mp4";
-const title = "Homemade cooking";
+const socket = io(Base_URL);
 
 interface Ivideo {
   _id: string;
@@ -15,35 +19,91 @@ interface Ivideo {
   description: string;
 }
 
+interface IRating {
+  _id: string;
+  userId: string;
+  courseId: string;
+  ratingValue: number;
+  review: string;
+  createdAt: string; // Add timestamp for sorting
+}
+
 interface VideoPlayerProps {
   video: Ivideo | null;
   tutorName: string | undefined;
-  tutorBio: string | undefined;
-  tutorProfile : string | undefined;
+  tutorProfile: string | undefined;
+  tutorId: string | undefined;
+  tags: string[] | undefined;
+  description: string | undefined;
+  courseId: string | undefined;
+  userId: string | undefined;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , tutorProfile}) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  video,
+  tutorName,
+  tutorId,
+  tutorProfile,
+  tags,
+  userId,
+  courseId,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rating, setRating] = useState<number | null>(0); 
+  const [rating, setRating] = useState<number | null>(0);
   const [review, setReview] = useState<string>("");
+  const [ratings, setRatings] = useState<IRating[]>([]);
+  const navigate = useNavigate();
 
-  // Open modal to add rating and review
+  // Fetch existing ratings on load
+  useEffect(() => {
+    const fetchRatings = async () => {
+      try {
+        const { data } = await axios.get(`${Base_URL}/ratings/${courseId}`);
+        setRatings(data);
+      } catch (error) {
+        console.error("Error fetching ratings:", error);
+      }
+    };
+
+    fetchRatings();
+
+    socket.on("ratingAdded", (newRating: IRating) => {
+      setRatings((prevRatings) => [newRating, ...prevRatings]);
+    });
+
+    return () => {
+      socket.off("ratingAdded");
+    };
+  }, [courseId]);
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   // Handle review change
   const handleReviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setReview(e.target.value); 
+    setReview(e.target.value);
   };
 
   // Submit review
   const handleSubmitReview = () => {
-    console.log("Rating:", rating);
-    alert(rating)
-    console.log("Review:", review);
-    setIsModalOpen(false);
-    // Perform submission logic here (API call, etc.)
+    if (!courseId || !userId || !rating || !review) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    socket.emit("submitRating", {
+      courseId,
+      userId,
+      ratingValue: rating,
+      review,
+    });
+
+    handleCloseModal();
   };
+
+
+  const currentUserRating = ratings.find((r) => r.userId === userId);
+  const otherRatings = ratings.filter((r) => r.userId !== userId);
 
   return (
     <div className="basis-8/12">
@@ -54,12 +114,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , 
         autoPlay
         muted
       ></video>
-      <h3 className="mt-3 font-semibold text-xl">{video?.title}</h3>
+      <div className="flex justify-between">
+        <h3 className="mt-3 font-semibold text-xl">{video?.title}</h3>
+        <div className="flex pt-5 gap-4">
+          {tags &&
+            tags.length > 0 &&
+            tags.map((tag, index) => (
+              <p className="bg-green-200 px-10 rounded-full text-green-500" key={index}>
+                {tag}
+              </p>
+            ))}
+        </div>
+      </div>
 
       <div className="py-5">
-        <p className="text-sm mb-1 text-gray-500">
-         {video?.description}
-        </p>
+        <p className="text-sm mb-1 text-gray-500">{video?.description}</p>
       </div>
       <hr className="border-0 h-[1px] bg-[#ccc] my-3" />
 
@@ -71,12 +140,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , 
         />
         <div className="leading-4 w-full flex justify-between px-5">
           <div>
-            <p className="text-green-500 font-semibold text-lg">
-              {tutorName}
-            </p>
+            <p className="text-green-500 font-semibold text-lg">{tutorName}</p>
             <p className="text-sm text-gray-500">200 followers</p>
           </div>
-          <button className="bg-black text-white px-4 py-2 rounded cursor-pointer">
+          <button
+            className="bg-black text-white px-4 py-2 rounded cursor-pointer"
+            onClick={() => navigate(`/tutorDetails/${tutorId}`)}
+          >
             View Tutor
           </button>
         </div>
@@ -84,17 +154,41 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , 
 
       <hr />
 
-      {/* Ratings and Reviews Section */}
-      <div className="pl-14 mx-4">
-        <h4 className="text-sm text-gray-500 mt-4">Ratings and Reviews</h4>
+      <div className="mx-4 pb-10">
+        <h4 className="text-lg text-gray-500 mt-4">Ratings and Reviews</h4>
 
-        {/* Button to open the modal */}
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded my-4"
+          className="bg-gray-100 text-gray-500 px-4 py-2 rounded my-4"
           onClick={handleOpenModal}
         >
           Add Rating & Review
         </button>
+
+       
+        {currentUserRating && (
+          <div className="bg-blue-100 p-4 mb-4 rounded-lg">
+            <div className="flex items-center justify-between">
+              <Rating value={currentUserRating.ratingValue} readOnly />
+              <p className="text-sm text-gray-500">
+                {dayjs(currentUserRating.createdAt).format("MMM DD, YYYY")}
+              </p>
+            </div>
+            <p className="text-sm mt-2">{currentUserRating.review}</p>
+          </div>
+        )}
+
+       
+        {otherRatings.map((rating) => (
+          <div className="bg-gray-100 p-4 mb-4 rounded-lg" key={rating._id}>
+            <div className="flex items-center justify-between">
+              <Rating value={rating.ratingValue} readOnly />
+              <p className="text-sm text-gray-500">
+                {dayjs(rating.createdAt).format("MMM DD, YYYY")}
+              </p>
+            </div>
+            <p className="text-sm mt-2">{rating.review}</p>
+          </div>
+        ))}
 
         {/* Modal for adding rating and review */}
         {isModalOpen && (
@@ -103,15 +197,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , 
               <h2 className="text-xl font-bold mb-4">Rate & Review</h2>
 
               {/* Rating */}
-             
               <Box sx={{ "& > legend": { mt: 2 } }}>
                 <Typography component="legend">Rating</Typography>
                 <Rating
                   name="simple-controlled"
-                  value={rating} // Bind rating state
-                  onChange={(event, newValue) => {
-                    setRating(newValue); // Set the rating
-                  }}
+                  value={rating}
+                  onChange={(event, newValue) => setRating(newValue)}
                 />
               </Box>
 
@@ -119,7 +210,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ video, tutorName, tutorBio , 
               <label className="block mb-2">Review:</label>
               <textarea
                 value={review}
-                onChange={handleReviewChange} // Handle review change
+                onChange={handleReviewChange}
                 className="border rounded p-2 w-full mb-4 outline-none"
                 rows={4}
               ></textarea>

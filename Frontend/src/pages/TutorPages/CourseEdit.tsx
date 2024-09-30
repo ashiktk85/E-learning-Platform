@@ -6,6 +6,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Modal } from "@nextui-org/react";
 import { toast } from "sonner";
+import { IoIosArrowDropdown } from "react-icons/io";
+import { AiFillDelete } from "react-icons/ai";
 
 interface IcourseData {
   name: string;
@@ -142,7 +144,7 @@ const handleThumbnailUpload = async () => {
   }
 
   return (
-    <div className="w-full max-h-screen bg-gray-50">
+    <div className="w-full max-h-screen bg-gray-50 mb-20">
       <nav className="w-full h-20 flex justify-between items-center px-6 bg-white shadow">
         <h1 className="text-3xl font-bold text-green-500">Learn Sphere</h1>
         <div>
@@ -357,18 +359,23 @@ const handleThumbnailUpload = async () => {
         {courseData.sections.map((section) => (
           <div key={section._id} className="mt-4">
             <div
-              className="bg-gray-100 p-3 rounded-md h-20 cursor-pointer"
-              onClick={() => toggleSection(section._id)}
+              className="bg-gray-100 p-5 rounded-md h-20 cursor-pointer border-gray-500 flex justify-between"
+              
             >
               <h3 className="font-semibold">{section.title}</h3>
+              <div className="flex gap-3">
+                <IoIosArrowDropdown size={28} onClick={() => toggleSection(section._id)}/>
+                <AiFillDelete size={28} fill="red"/>
+              </div>
             </div>
             {openedSection === section._id && (
               <div className="ml-4 mt-2">
+                <h1 className="text-lg font-bold">Videos</h1>
                 {section.videos.length > 0 ? (
                   section.videos.map((video) => (
                     <div
                       key={video._id}
-                      className="flex justify-between items-center mt-2"
+                      className="flex justify-between items-center mt-2 border-b border-gray-200"
                     >
                       <span>{video.title}</span>
                       <button
@@ -377,6 +384,7 @@ const handleThumbnailUpload = async () => {
                       >
                         Edit
                       </button>
+                      
                     </div>
                   ))
                 ) : (
