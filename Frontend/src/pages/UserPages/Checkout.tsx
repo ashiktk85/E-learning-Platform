@@ -9,6 +9,7 @@ import { toast, Toaster } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import BlockChecker from "../../services/BlockChecker";
+import triggerConfetti from "../../utils/confetti";
 
 interface IcourseData {
   name: string;
@@ -85,7 +86,7 @@ const Checkout = () => {
       try {
         const options = {
           key: RAZOR_KEY,
-          amount: courseData?.price * 100, // Ensure that the price is multiplied by 100
+          amount: courseData?.price * 100, 
           currency: "INR",
           name: "Learnsphere",
           description: "Course Payment",
@@ -102,7 +103,7 @@ const Checkout = () => {
                 paymentId: response.razorpay_payment_id,
                 orderId: response.razorpay_order_id,
               });
-
+              triggerConfetti()
               toast.success("Payment successful and order created.");
               setTimeout(() => {
                 navigate("/coursesPage");

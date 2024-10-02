@@ -8,7 +8,11 @@ dotenv.config();
 const secret_key = process.env.SECRET_KEY as string;
 
 const createToken = (user_id: string, role: string): string => {
-    return jwt.sign({ user_id, role }, secret_key, { expiresIn: '10s' });
+    return jwt.sign({ user_id, role }, secret_key, { expiresIn: '30m' });
+};
+
+const createAdminToken = (email: string, role: string): string => {
+    return jwt.sign({ email, role }, secret_key, { expiresIn: '30m' });
 };
 
 const createRefreshToken = (user_id: string, role: string): string => {
@@ -72,4 +76,4 @@ const handleRefreshToken = async (req: Request, res: Response, next: NextFunctio
     };
 };
 
-export { createToken, verifyToken, createRefreshToken };
+export { createToken, verifyToken, createRefreshToken , createAdminToken};

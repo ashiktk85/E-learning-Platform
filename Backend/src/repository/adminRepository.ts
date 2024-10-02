@@ -38,7 +38,6 @@ export class adminRepository {
 
   static async saveReport(
     courseId: any,
-    videoId: any,
     reason: any,
     additionalInfo: any,
     tutorName: string,
@@ -48,7 +47,6 @@ export class adminRepository {
     try {
       const newReport = await new Report({
         courseId,
-        videoId,
         reason,
         additionalInfo,
         courseName,
@@ -92,7 +90,6 @@ export class adminRepository {
       const reportData = {
         reportId: report.reportId,
         courseId: report.courseId,
-        videoId: report.videoId,
         reason: report?.reason,
         additionalIndo: report?.additionalInfo,
         status: report?.status,
@@ -223,25 +220,25 @@ export class adminRepository {
       const topCourses = await Course.aggregate([
         {
           $addFields: {
-            enrolledCount: { $size: "$users" } // Add a field to calculate enrolled users
+            enrolledCount: { $size: "$users" } 
           }
         },
         {
-          $sort: { enrolledCount: -1 } // Sort by enrolled users count in descending order
+          $sort: { enrolledCount: -1 } 
         },
         {
-          $limit: 5 // Limit to top 5 courses
+          $limit: 5 
         },
         {
           $lookup: {
-            from: 'users', // Lookup from the 'users' collection
-            localField: 'email', // Match the 'email' field in the 'Course' model
-            foreignField: 'email', // With the 'email' field in the 'User' model
-            as: 'userDetails' // Store the matched user data in 'userDetails'
+            from: 'users', 
+            localField: 'email', 
+            foreignField: 'email',
+            as: 'userDetails' 
           }
         },
         {
-          $unwind: '$userDetails' // Unwind the array of user details to a single object
+          $unwind: '$userDetails' 
         },
         {
           $project: {
@@ -263,6 +260,41 @@ export class adminRepository {
       console.log(topCourses);
       
       return topCourses;
+      
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async getUserAndTutorStatsByMonth () {
+    try {
+      console.log("rep");
+      
+      const result = await userModel.aggregate([
+        {
+          
+          $project: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            tutor: 1,
+          },
+        },
+        {
+          
+          $group: {
+            _id: { year: "$year", month: "$month" },
+            totalUsers: { $sum: 1 },
+            totalTutors: { $sum: { $cond: [{ $eq: ["$tutor", true] }, 1, 0] } },
+          },
+        },
+        {
+          
+          $sort: { "_id.year": 1, "_id.month": 1 },
+        },
+      ]);
+    
+      return result;
+      
       
     } catch (error: any) {
       throw new Error(error.message);

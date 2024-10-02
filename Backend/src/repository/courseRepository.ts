@@ -1,3 +1,4 @@
+import mongoose, { Types } from "mongoose";
 import { Course, Section, Video } from "../models/courseModel";
 import TutorProfile from "../models/tutorProfileModel";
 
@@ -70,4 +71,47 @@ export class CouresRepository {
       throw new Error(error.message);
     }
   }
+
+  static async updateVid(_id : string, title : string , description : string) {
+    try {
+      const newData = {
+        title ,
+        description
+      }
+      
+      const updated = await Video.findOneAndUpdate(
+        { _id: _id },
+        {
+          $set: {
+            ...newData,
+          },
+        },
+        { new: true, upsert: true }
+      );
+      
+
+      return updated;
+    } catch (error: any) {
+      console.log("Error in updating course detail course repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  static async deleteVideoRepo(videoId: string, courseId: string) {
+    try {
+    
+      const video = await Video.findByIdAndDelete(videoId);
+      
+      return true;
+    } catch (error: any) {
+      console.log('Error in deleting video from course repo', error.message);
+      throw new Error(error.message);
+    }
+  }
+  
+
+
+  
+
+  
 }

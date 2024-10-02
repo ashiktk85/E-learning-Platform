@@ -59,7 +59,7 @@ const configSocketIO = (server: HttpServer) => {
                     return;
                 }
         
-                // Create a new rating
+                
                 const newRating = new Rating({
                     courseId,
                     userId,
@@ -74,6 +74,9 @@ const configSocketIO = (server: HttpServer) => {
                 await Course.findOneAndUpdate(courseId, {
                     $push: { ratings: newRating._id }
                 });
+
+                
+
         
                
                 io.to(courseId.toString()).emit('receiveRating', {

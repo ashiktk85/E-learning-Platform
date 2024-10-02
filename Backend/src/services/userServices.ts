@@ -277,7 +277,7 @@ export class UserService {
       const orderId = createUniquePass(10);
 
       const orderDetails = {
-        userId: user?._id,
+        userId: user?.userId,
         courseId: courseId,
         totalAmount: amount,
         currency: currency,
@@ -375,7 +375,6 @@ export class UserService {
   async saveProfile(profile: Express.Multer.File, userId: string) {
     try {
       const awsConfig = new AwsConfig();
-      const bucketName = "learn-sphere";
       const profileUrl = await awsConfig.uploadFileToS3(
         
         `users/profile/${userId}/`,
@@ -471,6 +470,30 @@ export class UserService {
     try {
         const ratings = await UserRepositary.ratings(courseId as string)
         return ratings
+    } catch (error: any) {
+      console.error("Error in getting ratings user serice :", error.message);
+      throw new Error(` ${error.message}`);
+    }
+  }
+
+  async getOrders(userId: string) {
+    try {
+      const awsConfig = new AwsConfig();
+        const orders = await UserRepositary.orders(userId as string)
+
+        const CompletedOrders = await Promise.all(
+          orders.map(async (order) => {
+            const {name , thumbnail , Category ,tutorEmail} = await UserRepositary.getCourse(order?.courseId);
+            const thumbnailUrl = await awsConfig.getfile(thumbnail as string ,`tutors/${tutorEmail}/courses/${order?.courseId}/thumbnail`)
+            return {
+              courseName : name,
+              thumbnail : thumbnailUrl,
+              Category,
+              ...order
+            }
+          })
+        )
+        return CompletedOrders;
     } catch (error: any) {
       console.error("Error in getting ratings user serice :", error.message);
       throw new Error(` ${error.message}`);

@@ -162,10 +162,11 @@ async getTutors(req: Request, res: Response): Promise<void> {
 
     async userReport(req : Request , res :Response) {
         try {
-          const  {courseId ,videoId ,reason ,additionalInfo} = req.body;
+          const  {courseId  ,reason ,additionalInfo} = req.body;
+          console.log(req.body)
         
           
-            const reporting = await this.adminService.reportCourseService(courseId , videoId , reason , additionalInfo)
+            const reporting = await this.adminService.reportCourseService(courseId  , reason , additionalInfo)
 
             if(reporting === true) {
               return  res.status(201).json(true)

@@ -54,7 +54,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [ratings, setRatings] = useState<IRating[]>([]);
   const navigate = useNavigate();
 
-  // Fetch existing ratings on load
+  
   useEffect(() => {
     const fetchRatings = async () => {
       try {
@@ -79,12 +79,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // Handle review change
+  
   const handleReviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReview(e.target.value);
   };
 
-  // Submit review
+  
   const handleSubmitReview = () => {
     if (!courseId || !userId || !rating || !review) {
       toast.error("All fields are required");
@@ -126,6 +126,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             ))}
         </div>
       </div>
+        
 
       <div className="py-5">
         <p className="text-sm mb-1 text-gray-500">{video?.description}</p>
@@ -190,7 +191,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
         ))}
 
-        {/* Modal for adding rating and review */}
+        
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
             <div className="bg-white rounded-lg p-8 w-96">

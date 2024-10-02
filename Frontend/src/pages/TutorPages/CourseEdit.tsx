@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Base_URL } from "../../credentials";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -8,6 +8,8 @@ import { Modal } from "@nextui-org/react";
 import { toast } from "sonner";
 import { IoIosArrowDropdown } from "react-icons/io";
 import { AiFillDelete } from "react-icons/ai";
+import { RiFileEditFill } from "react-icons/ri";
+import AddVideoModal from "../../components/TutorComponent/AddVideoModal";
 
 interface IcourseData {
   name: string;
@@ -44,13 +46,19 @@ interface Isection {
 }
 
 const CourseEdit: React.FC = () => {
+  const navigate = useNavigate()
   const { id: courseId } = useParams<{ id: string }>();
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
+  const [videoDeleteConfirmation, setVideoDeleteConfirmation] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [videoData, setVideoData] = useState<Ivideo | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [openedSection, setOpenedSection] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<Ivideo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [addVideoModal , setAddVideoModal] = useState<Boolean>(false)
+
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -64,14 +72,43 @@ const CourseEdit: React.FC = () => {
     fetchCourseData();
   }, [courseId]);
 
+  const handleDeleteVideo = async () => {
+    if (!selectedVideoId || !courseId) return;
+    
+    try {
+      await axios.delete(`${Base_URL}/tutor/deleteVideo`, {
+        data: {
+          videoId: selectedVideoId,
+          courseId: courseId
+        }
+      });
+
+    
+      setCourseData((prevData) => {
+        if (!prevData) return null;
+        
+        return {
+          ...prevData,
+          sections: prevData.sections.map((section) => ({
+            ...section,
+            videos: section.videos.filter(video => video._id !== selectedVideoId)
+          }))
+        };
+      });
+
+      toast.success("Video deleted successfully!");
+      setVideoDeleteConfirmation(false);
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      toast.error("Error deleting video.");
+    }
+  };
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-const handleThumbnailChangeClick = () => {
-  if (fileInputRef.current) {
-    fileInputRef.current.click(); 
-  }
-};
+
 
 const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   const file = event.target.files?.[0];
@@ -80,33 +117,33 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
-const handleThumbnailUpload = async () => {
-  if (!selectedFile) return;
 
-  
 
-  try {
-    const formData = new FormData()
-    formData.append("thumbnail", selectedFile)
-    formData.append("courseId", courseId as string)
-    const response = await axios.post(
-      `${Base_URL}/tutor/editThumbnail/`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
-    toast.success("Thumbnail uploaded successfully");
-    setCourseData((prevData) => {
-      if (!prevData) return null;
-    
-      return {
-        ...prevData,
-        thumbnailUrl: response.data.newThumbnailUrl, 
-      };
+const handleSaveVideo = (newVideoData: Ivideo) => {
+  setCourseData((prevData) => {
+    if (!prevData) return null;
+
+    const updatedSections = prevData.sections.map((section) => {
+      if (section._id === selectedSection) {
+        return {
+          ...section,
+          videos: [...section.videos, newVideoData],
+        };
+      }
+      return section;
     });
-    
-  } catch (error) {
-    toast.error("Error uploading thumbnail");
-  }
+
+    return { ...prevData, sections: updatedSections };
+  });
+
+  setAddVideoModal(false);
+  setOpenedSection(selectedSection);  
+  toast.success("Video added successfully!");
+};
+
+
+const handleCancelAddVideo = () => {
+  setAddVideoModal(false);
 };
 
 
@@ -134,6 +171,8 @@ const handleThumbnailUpload = async () => {
     setIsModalOpen(true);
   };
 
+ 
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedVideo(null);
@@ -148,7 +187,9 @@ const handleThumbnailUpload = async () => {
       <nav className="w-full h-20 flex justify-between items-center px-6 bg-white shadow">
         <h1 className="text-3xl font-bold text-green-500">Learn Sphere</h1>
         <div>
-          <button className="bg-gradient-to-r from-lime-400 to-lime-500 text-white px-4 py-2 ml-4 rounded-md hover:bg-green-600">
+          <button className="bg-gradient-to-r from-lime-400 to-lime-500 text-white px-4 py-2 ml-4 rounded-md hover:bg-green-600"
+          onClick={() => navigate('/tutor/dashboard')}
+          >
             Back
           </button>
         </div>
@@ -161,31 +202,19 @@ const handleThumbnailUpload = async () => {
             className="object-cover rounded-md h-3/4"
             alt="Course Thumbnail"
           />
-          <button
-            className="w-20 h-10 bg-green-500 rounded-sm text-white mt-10 font-medium"
-            onClick={handleThumbnailChangeClick} // Trigger file input on click
-          >
-            Change
-          </button>
+        
 
-          {/* Hidden file input for selecting the image */}
+         
           <input
             type="file"
             ref={fileInputRef}
             style={{ display: "none" }}
             accept="image/*"
-            onChange={handleFileChange} // Handle file selection
+            onChange={handleFileChange} 
           />
 
-          {/* Show an upload button if a file is selected */}
-          {selectedFile && (
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-              onClick={handleThumbnailUpload}
-            >
-              Upload
-            </button>
-          )}
+         
+       
         </section>
 
         <section className="h-full w-1/2 bg-gray-100 py-5 px-10 border border-black rounded-md">
@@ -354,18 +383,20 @@ const handleThumbnailUpload = async () => {
         </section>
       </div>
 
-      <div className="w-full px-24 py-5">
+         <div className="w-full px-24 py-5">
         <h2 className="text-xl font-bold">Sections</h2>
-        {courseData.sections.map((section) => (
+        {courseData?.sections.map((section) => (
           <div key={section._id} className="mt-4">
-            <div
-              className="bg-gray-100 p-5 rounded-md h-20 cursor-pointer border-gray-500 flex justify-between"
-              
-            >
+            <div className="bg-gray-100 p-5 rounded-md h-20 cursor-pointer border-gray-500 flex justify-between">
               <h3 className="font-semibold">{section.title}</h3>
               <div className="flex gap-3">
-                <IoIosArrowDropdown size={28} onClick={() => toggleSection(section._id)}/>
-                <AiFillDelete size={28} fill="red"/>
+                <IoIosArrowDropdown size={28} onClick={() => toggleSection(section._id)} />
+                  <button className="w-16 h-8 bg-black rounded-md text-white text-[12px]"
+                  onClick={() => {
+                    setSelectedSection(section._id)
+                    setAddVideoModal(true)
+                  }}
+                  >Add Video</button>
               </div>
             </div>
             {openedSection === section._id && (
@@ -375,16 +406,21 @@ const handleThumbnailUpload = async () => {
                   section.videos.map((video) => (
                     <div
                       key={video._id}
-                      className="flex justify-between items-center mt-2 border-b border-gray-200"
+                      className="flex justify-between items-center mt-2 border-b border-gray-200 pb-3"
                     >
                       <span>{video.title}</span>
-                      <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded-md"
-                        onClick={() => handleVideoEditClick(video)}
-                      >
-                        Edit
-                      </button>
-                      
+                      <div className="flex gap-4">
+                        <RiFileEditFill size={20} onClick={() => handleVideoEditClick(video)} className="cursor-pointer" />
+                        <AiFillDelete
+                          size={20}
+                          fill="red"
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setSelectedVideoId(video._id);
+                            setVideoDeleteConfirmation(true);
+                          }}
+                        />
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -395,28 +431,79 @@ const handleThumbnailUpload = async () => {
           </div>
         ))}
       </div>
-      {selectedVideo && isModalOpen && (
+
+      
+      {videoDeleteConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Delete Video</h2>
+            <p>Are you sure you want to delete this video?</p>
+            <div className="mt-4 flex justify-end gap-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                onClick={handleDeleteVideo}
+              >
+                Yes, Delete
+              </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-md"
+                onClick={() => setVideoDeleteConfirmation(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+{selectedVideo && isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 h-1/2 flex gap-5">
-            <div>
+            <div className="w-1/2">
               <h2 className="text-xl font-bold mb-4">Edit Video</h2>
               <video
                 src={selectedVideo.url}
                 controls
-                className="w-full h-48 mb-4"
+                className="w-full h-48 mb-4 rounded-md"
               />
             </div>
             <Formik
               initialValues={{
+                _id : selectedVideo._id,
                 title: selectedVideo.title,
                 description: selectedVideo.description,
               }}
-              onSubmit={(values) => {
-                console.log("Updated video data:", values);
-                closeModal();
+              onSubmit={async(values) => {
+                try {
+                  const response = await axios.put(
+                    `${Base_URL}/tutor/updateVideo/${courseId}`,
+                    {
+                      _id: values._id,
+                      title: values.title,
+                      description: values.description,
+                    }
+                  );
+  
+                  setCourseData((prevData) => {
+                    if (!prevData) return null;
+              
+                    const updatedSections = prevData.sections.map((section) => {
+                      const updatedVideos = section.videos.map((video) =>
+                        video._id === values._id ? response.data : video
+                      );
+                      return { ...section, videos: updatedVideos };
+                    });
+              
+                    return { ...prevData, sections: updatedSections };
+                  });
+                  toast.success("video updated");
+                  closeModal();
+                } catch (error) {
+                  toast.error("Error updating video");
+                }
               }}
             >
-              <Form>
+              <Form className="w-1/2">
                 <div className="mb-4">
                   <label className="block font-semibold">Video Title</label>
                   <Field
@@ -430,7 +517,7 @@ const handleThumbnailUpload = async () => {
                   <Field
                     name="description"
                     as="textarea"
-                    className="w-full px-3 py-2 border rounded-md"
+                    className="w-full px-3 py-2 border rounded-md h-32"
                   />
                 </div>
                 <div className="flex justify-end">
@@ -453,7 +540,19 @@ const handleThumbnailUpload = async () => {
           </div>
         </div>
       )}
+
+
+   {selectedSection && addVideoModal && (
+        <AddVideoModal
+          onSave={handleSaveVideo}
+          onCancel={handleCancelAddVideo}
+          sectionId= {selectedSection}
+          courseId={courseId || undefined}
+        />
+      )}
     </div>
+
+
   );
 };
 

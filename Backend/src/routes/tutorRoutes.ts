@@ -37,6 +37,10 @@ route.get('/get-courses/:email', tutorController.getCourses.bind(tutorController
 route.put('/updateCourse/:courseId' ,tutorController.updateCourse.bind(tutorController))
 route.post('/editThumbnail',  upload.single('thumbnail'), tutorController.updateThumbnail.bind(tutorController))
 route.get('/tutorDashboard/:email', tutorController.getDashboard.bind(tutorController))
+route.put('/updateVideo/:courseId', tutorController.editVideo.bind(tutorController))
+route.delete('/deleteVideo', tutorController.deleteVideo.bind(tutorController))
+
+route.post('/add-video/:sectionId', upload.single("file"), tutorController.addVideo.bind(tutorController))
 
 
 // charts

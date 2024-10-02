@@ -40,6 +40,7 @@ route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController
 route.post(`/walletAdd/:userId`,userController.addMoney.bind(userController))
 route.get(`/getTransactions/:userId`, userController.getTransactions.bind(userController))
 route.get('/ratings/:courseId',userController.getRatings.bind(userController))
+route.get('/get-orders/:userId',userController.getOrders.bind(userController))
 
 
 export default route;

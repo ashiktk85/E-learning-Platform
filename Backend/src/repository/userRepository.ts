@@ -625,11 +625,11 @@ export class UserRepositary {
     courseName: string
   ) {
     try {
-      // Check if a wallet exists for the user
+      
       let wallet = await Wallet.findOne({ userId });
       const id = Math.floor(1000 + Math.random() * 9000).toString();
 
-      // Ensure amount is a number
+      
       const parsedAmount = typeof amount === "string" ? Number(amount) : amount;
 
       if (isNaN(parsedAmount)) {
@@ -673,4 +673,17 @@ export class UserRepositary {
       throw new Error(error.message);
     }
   }
+  
+  static async orders(userId: string) {
+    try {
+      const orders = await orderModel.find({ userId }).lean();
+      return orders;
+    } catch (error: any) {
+      console.error("Error in getting rating repo", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+
+  
 }

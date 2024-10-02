@@ -49,7 +49,7 @@ const CoursePlayer2 = () => {
   const userId = userInfo?.userId
   const [courseData, setCourseData] = useState<IcourseData | null>(null);
   const [activeVideo, setActiveVideo] = useState<Ivideo | null>(null);
-  console.log(courseData);
+
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -76,6 +76,7 @@ const CoursePlayer2 = () => {
     <Navbar />
     <div className="bg-[#f9f9f9] pl-[2%] pr-[2%] py-5 flex justify-between h-[100vh] pt-20">
       <div className="w-3/4">
+    
         <VideoPlayer
          video={activeVideo} 
          tutorName={courseData?.tutorName}
@@ -91,7 +92,9 @@ const CoursePlayer2 = () => {
       sections = {courseData?.sections}
       setActiveVideo = {setActiveVideo}
       thumbnail = {courseData?.thumbnailUrl}
+      courseId = {courseId}
       />
+   
     </div>
     </>
   );

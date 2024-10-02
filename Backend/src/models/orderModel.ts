@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
 
 const OrderSchema = new Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: String, required: true },
   courseId: { type: String, required: true },
   totalAmount: { type: Number, required: true },
   currency: { type: String, default: 'INR' },
@@ -16,7 +16,7 @@ const OrderSchema = new Schema({
 );
 
 interface IOrder extends Document {
-  userId: mongoose.Schema.Types.ObjectId;
+  userId: string;
   courseId: string;
   totalAmount: number;
   currency: string;

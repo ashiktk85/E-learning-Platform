@@ -355,4 +355,45 @@ export class TutorServices {
       throw error;
     }
   }
+
+  async updateVideo(_id : string, title : string , description : string) {
+    try {
+     
+        const updatedVideo = await CouresRepository.updateVid(_id as string, title as string , description as string)
+      return updatedVideo;
+      
+    } catch (error) {
+      console.error("Error fetching monthly  data:", error);
+      throw error;
+    }
+  }
+
+  async deleteVideo(videoId : string, courseId : string ) {
+    try {
+     
+        const response = await CouresRepository.deleteVideoRepo(videoId as string, courseId as string )
+      return response;
+      
+    } catch (error) {
+      console.error("Error fetching monthly  data:", error);
+      throw error;
+    }
+  }
+
+  
+
+  async addVideoService(name : string, description : string , newVideo : any, sectionId : string , courseId : string) {
+    try {
+      const { tutorEmail } = await UserRepositary.getCourse(courseId)
+      const tutorFolderPath = `tutors/${tutorEmail}/courses/${courseId}/videos/`
+       const url = await this.awsConfig.uploadFileToS3(tutorFolderPath , newVideo)
+
+       const update = await TutorRepositary.addVideo(name , description , url, sectionId ,courseId)
+       return update
+      
+    } catch (error) {
+      console.error("Error fetching monthly  data:", error);
+      throw error;
+    }
+  }
 }

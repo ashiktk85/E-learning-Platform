@@ -332,5 +332,45 @@ export class TutorRepositary {
       throw new Error(error.message);
     }
   }
+
+  static async addVideo (name : string, description : string , newVideo : string, sectionId : string , courseId : string) {
+    try {
+      
+      const video = new Video({
+        title: name,
+        description: description,
+        videoUrl: newVideo
+      });
+  
+      
+      const savedVideo = await video.save();
+  
+     
+      const updatedSection = await Section.findByIdAndUpdate(
+        sectionId,
+        { $push: { videos: savedVideo._id } },
+        { new: true, runValidators: true }
+      );
+  
+      if (!updatedSection) {
+        throw new Error('Section not found');
+      }
+  
+     
+      await Course.findOneAndUpdate(
+       { courseId},
+        { $addToSet: { sections: sectionId } },
+        { new: true, runValidators: true }
+      );
+  
+      
+      return savedVideo;
+    } catch (error : any) {
+      console.log("Error in getting montly revenue in tutor repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  
 }
 

@@ -290,6 +290,21 @@ export class UserController {
     }
   }
 
+  async  getOrders (req : Request, res : Response) {
+    try {
+       const {userId} = req.params
+      
+       
+       const orders =  await this.userService.getOrders(userId as string)
+       console.log(orders)
+       
+       res.status(HTTP_statusCode.OK).json(orders)
+    } catch (error :any) {
+      console.error(error.message);
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   
 
    

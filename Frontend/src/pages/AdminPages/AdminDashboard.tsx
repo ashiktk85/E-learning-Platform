@@ -19,18 +19,37 @@ interface Dashboard {
   revenue: number;
 }
 
+interface DataItem {
+  name: string; 
+  users: number;
+  tutors: number; 
+}
+
+
 const Dashboard = () => {
   const { adminInfo }: any = useSelector((state: RootState) => state.admin);
 
   const [data, setData] = useState<Dashboard | null>(null);
 
+  const [chartData, setChartData] = useState<DataItem[]>([]); 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(`${Base_URL}/admin/dashboard`);
-        setData(data);
-        console.log(data);
-      } catch (error) {}
+        setData(data.dashboard);
+
+        
+        const transformedData = data.barGraphData.map((item: any) => ({
+          name: `${item._id.month}-${item._id.year}`, 
+          users: item.totalUsers,
+          tutors: item.totalTutors,
+        }));
+        setChartData(transformedData);
+        
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchData();
   }, []);
@@ -61,7 +80,7 @@ const Dashboard = () => {
 
         <main className="w-full h-[350px] flex gap-5 mt-14">
           <div className="h-full w-1/2  py-5 px-3">
-            <CustomBarChart />
+            <CustomBarChart chartData = {chartData}/>
           </div>
           <div className="h-full w-1/2  py-5 px-3">
             <CustomLineChart />

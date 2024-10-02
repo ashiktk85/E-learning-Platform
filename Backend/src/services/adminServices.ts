@@ -268,7 +268,7 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
         }
     }
 
-    async reportCourseService(courseId: any , videoId: any , reason: any , additionalInfo: any) {
+    async reportCourseService(courseId: any  , reason: any , additionalInfo: any) {
         try {
             const coures = await UserRepositary.getCourse(courseId)
             if(!coures) {
@@ -285,7 +285,7 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
 
             const reportId = uuidv4()
 
-            const res = await adminRepository.saveReport(courseId , videoId , reason , additionalInfo , tutorName , courseName , reportId)
+            const res = await adminRepository.saveReport(courseId  , reason , additionalInfo , tutorName , courseName , reportId)
 
           return res;
             
@@ -408,7 +408,10 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
     async getDashboardService() {
         try {
             const dashboard = await adminRepository.getDasboard()
-           return dashboard
+            const barGraphData = await adminRepository.getUserAndTutorStatsByMonth()
+            console.log(barGraphData);
+            
+           return {dashboard  , barGraphData}
             
         } catch (error : any) {
             console.error("Error during admin getting course detail in service:", error.message);

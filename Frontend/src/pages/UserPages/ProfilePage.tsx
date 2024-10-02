@@ -21,8 +21,8 @@ const ProfilePage = () => {
 
   const menuItems = [
     { name: 'Personal Info', Component: <UserDetails /> },
-    { name: 'Courses', Component: <ProfileCourses /> },
-    { name: 'Tutors', Component: <ProfileTutors /> },
+    // { name: 'Courses', Component: <ProfileCourses /> },
+    // { name: 'Tutors', Component: <ProfileTutors /> },
     { name: 'Wallet', Component : <Wallet /> },
     { name: 'Logout' }
   ];

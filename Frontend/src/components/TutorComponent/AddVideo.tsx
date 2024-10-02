@@ -1,14 +1,14 @@
 import React from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-// Adjust import according to your file structure
+
 
 interface Video {
     id: string;
     name: string;
     description: string;
     file: File | null;
-    thumbnail: string | null; // Allow null for the thumbnail
+    thumbnail: string | null; 
   }
 
 interface VideoModalProps {

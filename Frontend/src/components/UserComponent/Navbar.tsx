@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../../redux/store";
 
 const Navbar = () => {
+  const {userInfo} = useSelector((state : RootState) => state.user)
+  const userId = userInfo?.userId
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
@@ -14,7 +18,7 @@ const Navbar = () => {
     { text: "Plans", path: "/plans" },
     { text: "Courses", path: "/coursesPage" },
     { text: "Be a Tutor", path: "/tutor" },
-    { text: "Orders", path: "/orders" },
+    { text: "Orders", path: `/my-orders/${userId}` },
     { text: "Contact", path: "/contact" },
     { text: "Profile", path: "/profile" },
   ];
@@ -25,20 +29,20 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white  shadow-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90  shadow-md">
       <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
         <div
-          className="text-2xl font-bold cursor-pointer text-[#7BC74D]"
+          className="text-2xl font-bold cursor-pointer text-green-500"
           onClick={() => navigate("/")}
         >
-          E-Learn
+          Learn Sphere
         </div>
         <div className="hidden md:flex space-x-6">
           {LINKS.map((link) => (
             <button
               key={link.text}
               onClick={() => handleNavigation(link.path)}
-              className="text-black font-sans hover:text-[#7BC74D]  "
+              className="text-white font-sans hover:text-[#7BC74D]  "
             >
               {link.text}
             </button>
@@ -51,7 +55,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white shadow-md md:hidden">
           <ul className="flex flex-col items-center space-y-4 py-4">
