@@ -48,7 +48,7 @@ const TutorMainPage = () => {
 
   return (
     <>
-      <div className="w-full h-screen">
+      <div className="w-full h-screen ">
         <div className="w-full h-20 font-poppins">
           <h2 className="text-black font-bold">
             Welcome Back, {tutor?.name || "Tutor"}!
@@ -70,13 +70,13 @@ const TutorMainPage = () => {
           <div className="h-52 mt-0 ml-2 mr-2 w-3/4">
             <div className="flex w-full gap-2 h-full">
               <div className="w-full h-full flex-col gap-2">
-                {/* Use the StudentCard component for "New students" */}
+         
                 <StudentCard
                   title="New students"
                   value={tutor?.students as number}
                   percentageChange='"80% increase in the past 20 days"'
                 />
-                {/* Use the StudentCard component for "Total students" */}
+     
                 <StudentCard
                   title="Total Courses"
                   value={tutor?.totalCourses as number}
@@ -115,7 +115,7 @@ const TutorMainPage = () => {
         </div>
          
         </section>
-        <section className="w-full h-3/4 bg-gray-200 mb-20"></section>
+        {/* <section className="w-full h-3/4 bg-gray-200 mb-20"></section> */}
       </div>
     </>
   );

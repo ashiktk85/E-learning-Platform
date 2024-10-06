@@ -54,7 +54,7 @@ const AdminAside = () => {
     { icon: <FaChalkboardTeacher />, label: "Tutor Applications", path: "/admin/tutorapplications" },
     { icon: <FaBook />, label: "Courses", path: "/admin/courses" },
     { icon: <FaBook />, label: "Category", path: "/admin/category" },
-    { icon: <FaWallet />, label: "Wallet", path: "/admin/wallet" },
+    // { icon: <FaWallet />, label: "Wallet", path: "/admin/wallet" },
     { icon: <FaFlag />, label: "Reports", path: "/admin/reports" },
   ];
 

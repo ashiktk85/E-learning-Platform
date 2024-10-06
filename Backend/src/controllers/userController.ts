@@ -108,7 +108,7 @@ export class UserController {
 
   async getCourses(req: Request, res: Response) {
     try {
-        const { category, page = "1", limit = "10" } = req.query as { category?: string; page?: string; limit?: string };
+        const { category, page = "1", limit = "10", filter } = req.query as { category?: string; page?: string; limit?: string; filter?: string };
       
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);

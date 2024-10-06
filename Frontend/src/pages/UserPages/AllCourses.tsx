@@ -19,10 +19,9 @@ interface Category {
 }
 
 const AllCourses: React.FC = () => {
+  BlockChecker();
 
-  BlockChecker()
-  
-  const {userInfo} = useSelector((state : RootState) => state.user)
+  const { userInfo } = useSelector((state: RootState) => state.user);
   const [courses, setCourses] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<any[]>([]);
@@ -32,6 +31,8 @@ const AllCourses: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const coursesPerPage = 8;
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [sortOption, setSortOption] = useState<string>("All"); // Add sort option state
 
   const fetchCourses = useCallback(async () => {
     try {
@@ -73,24 +74,45 @@ const AllCourses: React.FC = () => {
 
   const applyFilters = () => {
     let filtered = courses;
-    
+
     if (selectedCategory !== "All") {
       filtered = filtered.filter(course => course.category === selectedCategory);
     }
-    
+
     if (searchQuery) {
       filtered = filtered.filter(course => course.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }
-    
+
+    // Sorting logic
+    if (sortOption === 'price +') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOption === 'price -') {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortOption === 'Aa-Zz') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortOption === 'Zz-Aa') {
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
     setFilteredCourses(filtered);
     setTotalPages(Math.ceil(filtered.length / coursesPerPage));
   };
 
   useEffect(() => {
     applyFilters();
-  }, [selectedCategory, searchQuery, courses]);
+  }, [selectedCategory, searchQuery, courses, sortOption]); // Add sortOption to dependencies
 
   const displayedCourses = filteredCourses.slice((currentPage - 1) * coursesPerPage, currentPage * coursesPerPage);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
+  };
+
+  const handleFilterClick = (option: string) => {
+    setSortOption(option); // Set the selected sorting option
+    setIsDropdownOpen(false);
+    setCurrentPage(1); // Reset to the first page when sorting
+  };
 
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'poppins, "Noto Sans", sans-serif' }}>
@@ -111,7 +133,6 @@ const AllCourses: React.FC = () => {
 
         <div className="pl-10 flex flex-1 justify-center py-5 bg-[#fefefe]">
           <div className="layout-content-container flex flex-col max-w-[1200px] flex-1">
-            
             <div className="p-4 mb-6">
               <div
                 className="flex min-h-[280px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-start justify-end px-4 pb-10"
@@ -137,43 +158,73 @@ const AllCourses: React.FC = () => {
                     <div className="flex items-center justify-center rounded-r-xl border-l-0 border border-[#dce1e5] bg-white pr-[7px]">
                       <button
                         onClick={applyFilters}
-                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#1d8cd7] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#3f7fff] text-white text-sm font-medium tracking-tight transition duration-200 hover:bg-[#006aff] focus:bg-[#006aff]"
                       >
                         Search
                       </button>
                     </div>
                   </div>
                 </label>
+                <div className="flex items-center">
+                 
+                </div>
               </div>
-            </div>
+              <div className="flex justify-between pt-10">
+              <h1 className="text-3xl font-bold text-[#2a2a2a]">All Courses</h1>
 
-            <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#111418] text-2xl font-black leading-tight tracking-[-0.033em] min-w-72">All courses</p>
-              <button
+              <div className="flex gap-3">
+         
+              <div className="relative inline-block text-left">
+                    <div>
+                      <button
+                        type="button"
+                        className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none  "
+                        onClick={toggleDropdown}
+                      >
+                        Sort By
+                      </button>
+                    </div>
+                    {isDropdownOpen && (
+                      <div className="absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                          <p className="block px-4 py-2 text-sm text-gray-700 cursor-pointer" onClick={() => handleFilterClick('price +')}>Price: Low to High</p>
+                          <p className="block px-4 py-2 text-sm text-gray-700 cursor-pointer" onClick={() => handleFilterClick('price -')}>Price: High to Low</p>
+                          <p className="block px-4 py-2 text-sm text-gray-700 cursor-pointer" onClick={() => handleFilterClick('Aa-Zz')}>Alphabetically: A-Z</p>
+                          <p className="block px-4 py-2 text-sm text-gray-700 cursor-pointer" onClick={() => handleFilterClick('Zz-Aa')}>Alphabetically: Z-A</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <button
                 onClick={() => navigate("/mycourses")}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em]"
               >
                 <span className="truncate">My Courses</span>
               </button>
+
+              </div>
+
+          
+              </div>
+
             </div>
 
             {displayedCourses.length === 0 ? (
-              <p className="text-center text-xl font-normal py-20">No courses available for this category.</p>
+              <div className="mt-5 text-lg">No courses available</div>
             ) : (
-              <div className="grid grid-cols-4 gap-5 px-4 py-3">
-                {displayedCourses.map((course) => (
-                  <CourseCard
-                    key={course._id}
-                    courseName={course.name}
-                    thumbnail={course.thumbnail}
-                    courseId={course.courseId}
-                    price={course.price}
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedCourses.map(course => (
+                   <CourseCard
+                   key={course._id}
+                   courseName={course.name}
+                   thumbnail={course.thumbnail}
+                   courseId={course.courseId}
+                   price={course.price}
+                 />
                 ))}
               </div>
             )}
-
-          
+            
             <div className="flex justify-center py-4">
               <button
                 onClick={() => setCurrentPage(prevPage => Math.max(prevPage - 1, 1))}

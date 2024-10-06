@@ -186,7 +186,7 @@ export class UserService {
     }
   }
 
-  async getCoursesService(category: string, page: number, limit: number) {
+  async getCoursesService(category: string , page: number, limit: number , filter?: string) {
     try {
       const response = await UserRepositary.getCourses(category, page, limit);
 

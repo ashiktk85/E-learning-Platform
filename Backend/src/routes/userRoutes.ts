@@ -5,6 +5,7 @@ import { verifyToken } from "../config/jwtConfig";
 import { refreshTokenHandler } from "../config/refreshTokenVerify";
 import { CourseAuth } from "../config/CourseAuth";
 import multer from "multer";
+import isBlocked from "../config/userAuth";
 
 const route = Router();
 const userService = new UserService();
@@ -22,7 +23,7 @@ route.post('/signUp', userController.createUser.bind(userController));
 route.post('/otpVerification', userController.otpVerification.bind(userController));
 route.post('/verifyLogin', userController.verifyLogin.bind(userController));
 route.post('/resendOtp', userController.resendOtp.bind(userController));
-route.put('/editUser', verifyToken, userController.editUser.bind(userController));
+route.put('/editUser', verifyToken,isBlocked , userController.editUser.bind(userController));
 route.post('/save-userProfile', upload.single('profileImage'), userController.saveProfilePic.bind(userController));
 route.get('/getProfile/:email' , userController.getProfile.bind(userController))
 route.post('/refresh-token', refreshTokenHandler);
@@ -31,7 +32,7 @@ route.post('/refresh-token', refreshTokenHandler);
 route.get('/get-courses', userController.getCourses.bind(userController));
 route.get("/getCourse/:id", userController.getCourseDetail.bind(userController));
 route.post('/createorder', userController.coursePayment.bind(userController));
-route.post('/saveCourse', userController.saveCourse.bind(userController));
+route.post('/saveCourse',isBlocked, userController.saveCourse.bind(userController));
 route.get('/check-enrollment/:email/:courseId', CourseAuth, userController.checkEnrollement.bind(userController));
 route.get('/mycourses/:userId', userController.MyCourses.bind(userController));
 

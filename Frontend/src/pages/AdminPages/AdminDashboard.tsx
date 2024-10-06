@@ -79,12 +79,12 @@ const Dashboard = () => {
         </div>
 
         <main className="w-full h-[350px] flex gap-5 mt-14">
-          <div className="h-full w-1/2  py-5 px-3">
+          <div className="h-full w-full py-5 px-3">
             <CustomBarChart chartData = {chartData}/>
           </div>
-          <div className="h-full w-1/2  py-5 px-3">
+          {/* <div className="h-full w-1/2  py-5 px-3">
             <CustomLineChart />
-          </div>
+          </div> */}
         </main>
 
           <h1 className="mt-16 mb-3 text-xl font-bold">Top 5 Tutors</h1>

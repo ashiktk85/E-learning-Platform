@@ -1,5 +1,6 @@
 import React from "react";
 import {Card, CardHeader, CardBody, CardFooter, Image, Button} from "@nextui-org/react";
+import Reveal from '../../../public/Animation/Animated'
 
 export default function Home2() {
   return (

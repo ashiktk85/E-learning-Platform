@@ -390,8 +390,9 @@ export class UserRepositary {
     }
   }
 
-  static async getCourses(category: string, page: number, limit: number) {
+  static async getCourses(category: string, page: number, limit: number , filter?: string) {
     try {
+      
       let filter: { isBlocked: boolean; category?: string } = {
         isBlocked: false,
       };
@@ -544,7 +545,7 @@ export class UserRepositary {
 
   static async newPayment(userId: string, data: { amount: number }) {
     try {
-      // Check if a wallet exists for the user
+     
       let wallet = await Wallet.findOne({ userId });
       const id = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -576,7 +577,7 @@ export class UserRepositary {
 
   static async transactions(userId: string) {
     try {
-      // Check if a wallet exists for the user
+      
       let wallet = await Wallet.findOne({ userId }).lean();
 
       if (wallet) {

@@ -33,11 +33,6 @@ const CoursesHome = () => {
    
     useEffect(() => {
         fetchCourses();
-        const intervalId = setInterval(() => {
-            fetchCourses(); 
-        }, 10000);
-
-        return () => clearInterval(intervalId); 
     }, [fetchCourses]);
 
   

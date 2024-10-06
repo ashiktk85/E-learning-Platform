@@ -66,11 +66,13 @@ const Checkout = () => {
     if (courseData?.price === "Free") {
       try {
         const res = await axios.post(`${Base_URL}/saveCourse`, {
+          userId : userInfo?.userId,
           email: email,
-          courseId: courseData?.courseId,
+          courseId: id,
         });
 
         if (res) {
+          triggerConfetti()
           toast.success("Course purchased successfully.", {
             action: {
               label: "OK",

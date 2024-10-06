@@ -142,7 +142,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         <div className="leading-4 w-full flex justify-between px-5">
           <div>
             <p className="text-green-500 font-semibold text-lg">{tutorName}</p>
-            <p className="text-sm text-gray-500">200 followers</p>
+            <p className="text-sm text-gray-500">ashiktk85@gmail.com</p>
           </div>
           <button
             className="bg-black text-white px-4 py-2 rounded cursor-pointer"

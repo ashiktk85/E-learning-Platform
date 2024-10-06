@@ -15,9 +15,11 @@ import { AwsConfig } from "../config/awsFileConfigs";
 
 import { UserRepositary } from "../repository/userRepository";
 import { ICourse, ISection, IVideo } from "../models/courseModel";
-import compressVideo from "../helper/videoCompression";
+
 import { CouresRepository } from "../repository/courseRepository";
 import { String } from "aws-sdk/clients/batch";
+import { compressVideo } from "../helper/videoCompression";
+import fs from 'fs';
 
 require("dotenv").config();
 
@@ -101,10 +103,11 @@ export class TutorServices {
 
       for (const file of files) {
         console.log("Processing File:", file);
+        
 
         if (file.fieldname.startsWith("sections")) {
           const folderPath = `${tutorFolderPath}videos/`;
-
+         
           console.log(`Uploading video to ${folderPath}`);
           const url = await this.awsConfig.uploadFileToS3(folderPath, file);
           fileUrls.push({ type: "video", url });
@@ -137,6 +140,66 @@ export class TutorServices {
     }
   }
 
+  // async  createCourseService(files: Express.Multer.File[], courseData: any, email: string) {
+  //   try {
+  //     const bucketName = "learn-sphere";
+  //     const fileUrls: { type: string; url: string }[] = [];
+  //     let courseId = uuidv4();
+  
+  //     courseData = Object.assign({}, courseData);
+  
+  //     console.log("Course Data:", courseData);
+  //     console.log("Files:", files);
+  
+  //     courseId = courseId + `-${courseData.courseName}`;
+  //     const tutorFolderPath = `tutors/${email}/courses/${courseId}/`;
+  
+  //     for (const file of files) {
+  //       console.log("Processing File:", file);
+  
+  //       if (!file.buffer) {
+  //         throw new Error(`Invalid file buffer for file: ${file.fieldname}`);
+  //       }
+  
+  //       if (file.fieldname.includes('videos')) {
+  //         const folderPath = `${tutorFolderPath}videos/`;
+  
+  //         console.log("Compressing video...");
+  //         const compressedFile = await compressVideo(file);
+          
+  //         console.log(`Uploading compressed video to ${folderPath}`);
+  //         const url = await this.awsConfig.uploadFileToS3(folderPath, compressedFile);
+  //         fileUrls.push({ type: "video", url });
+  //       } else if (file.fieldname === 'thumbnail') {
+  //         const folderPath = `${tutorFolderPath}thumbnail/`;
+  
+  //         console.log(`Uploading thumbnail to ${folderPath}`);
+  //         const url = await this.awsConfig.uploadFileToS3(folderPath, file);
+  //         fileUrls.push({ type: "thumbnail", url });
+  //       }
+  //     }
+  
+  //     console.log("All files uploaded. File URLs:", fileUrls);
+  
+  //     const combinedData = {
+  //       courseId,
+  //       ...courseData,
+  //       files: fileUrls,
+  //     };
+  
+  //     const res = await TutorRepositary.saveCourse(
+  //       combinedData as any,
+  //       email as string
+  //     );
+  //     console.log("Course saved successfully:", res);
+  //     return res;
+  //   } catch (error) {
+  //     console.error("Error creating course:", error);
+  //     throw error;
+  //   }
+  // }
+
+  
   async verifyLoginService(
     applicationId: string,
     passcode: string
@@ -397,3 +460,7 @@ export class TutorServices {
     }
   }
 }
+function unlinkAsync(compressedFilePath: string) {
+  throw new Error("Function not implemented.");
+}
+

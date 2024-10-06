@@ -1,35 +1,40 @@
 import ffmpeg from 'fluent-ffmpeg';
-import * as fs from 'fs';
-import * as path from 'path';
+import ffmpegStatic from 'ffmpeg-static';
 import { PassThrough } from 'stream';
 
-async function compressVideo(file: Express.Multer.File): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-        const tempFilePath = path.join(__dirname, 'temp', file.originalname);
+export const compressVideo = async (file: any): Promise<Buffer> => {
+  if (!file || !file.buffer) {
+    throw new Error('No file provided or file buffer is missing');
+  }
 
-      
-        const bufferStream = new PassThrough();
-        bufferStream.end(file.buffer);
+  const inputBuffer = file.buffer;
+  const outputStream = new PassThrough();
+  ffmpeg.setFfmpegPath(ffmpegStatic as any);
 
-        const command = ffmpeg(bufferStream)
-            .outputOptions('-preset', 'fast') 
-            .outputOptions('-crf', '28') 
-            .outputOptions('-movflags', 'faststart') 
-            .save(tempFilePath)
-            .on('end', () => {
-                fs.readFile(tempFilePath, (err, data) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        fs.unlinkSync(tempFilePath); 
-                        resolve(data);
-                    }
-                });
-            })
-            .on('error', (err: any) => {
-                reject(err);
-            });
+  const chunks: Buffer[] = [];
+
+  try {
+    return await new Promise<Buffer>((resolve, reject) => {
+      ffmpeg()
+        .input(inputBuffer)
+        .inputFormat(file.mimetype.split('/')[1]) // Use mimetype to set input format
+        .videoCodec('libx264')
+        .outputOptions(['-preset fast', '-crf 28'])
+        .format('mp4')
+        .pipe(outputStream, { end: true });
+
+      outputStream.on('data', (chunk) => chunks.push(chunk));
+      outputStream.on('end', () => {
+        const compressedBuffer = Buffer.concat(chunks);
+        resolve(compressedBuffer);
+      });
+
+      outputStream.on('error', (err) => {
+        reject(new Error('Compression failed: ' + err.message));
+      });
     });
-}
+  } catch (error : any) {
+    throw new Error(`Compression failed: ${error.message}`);
+  }
+};
 
-export default compressVideo;
