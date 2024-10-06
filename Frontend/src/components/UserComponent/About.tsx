@@ -2,7 +2,7 @@ import React from "react";
 import blog from "../../assets/userbanner/blog-3_1296x.webp";
 import overlayImage1 from "../../assets/userbanner/Web_Photo_Editor.jpg";
 import overlayImage2 from "../../assets/userbanner/Web_Photo_Editor.jpg";
-import Reveal from '../../../public/Animation/Animated'
+
 
 const About = () => {
   return (
@@ -10,7 +10,7 @@ const About = () => {
       <div className="container mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
        
         <div className="relative flex flex-col items-center justify-center gap-6">
-          <Reveal>
+
           <div className="relative w-[500px] h-[300px] transition-transform duration-500 transform hover:scale-105 hover:translate-y-[-10px] z-10">
             <img
               src={blog}
@@ -23,7 +23,7 @@ const About = () => {
               </p>
             </div>
           </div>
-          </Reveal>
+          
 
           
         </div>

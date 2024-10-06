@@ -4,7 +4,7 @@ import overlayImage1 from '../../assets/userbanner/Web_Photo_Editor.jpg';
 import overlayImage2 from '../../assets/userbanner/Web_Photo_Editor.jpg'; 
 import { useNavigate } from 'react-router-dom';
 import photography from '../../assets/userbanner/photography.webp'
-import Reveal from '../../../public/Animation/Animated'
+
 
 
 const HeroSection = () => {
