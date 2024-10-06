@@ -18,7 +18,7 @@ const HeroSection = () => {
     <section className="relative flex h-screen items-center justify-center bg-[#f5f5f7] px-4">
       <div className="grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2">
         
-        <Reveal >
+        {/* <Reveal > */}
         <div className="flex flex-col justify-center text-center md:text-left gap-8">
           <h1 className="text-5xl font-extrabold text-[#7BC74D] md:text-6xl">
             Empower Your Learning Journey
@@ -38,9 +38,9 @@ const HeroSection = () => {
             </button>
           </div>
         </div>
-        </Reveal>
+        {/* </Reveal> */}
 
-        <Reveal >
+        {/* <Reveal > */}
         <div className="relative flex items-center justify-center ">
           
           <div className="relative w-[550px] h-[450px] transition-transform duration-500 transform hover:scale-110 hover:translate-y-[-10px] z-10">
@@ -82,7 +82,7 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-        </Reveal>
+        {/* </Reveal> */}
       </div>
     </section>
   );
