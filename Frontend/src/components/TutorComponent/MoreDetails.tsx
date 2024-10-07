@@ -7,8 +7,9 @@ import { useSelector } from "react-redux";
 import { toast, Toaster } from "sonner";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }) => {
   const user = useSelector((state: RootState) => state.user);
@@ -61,7 +62,7 @@ const MoreDetails: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext 
     setIsUploading(true);
 
     try {
-      const response = await axios.post(`${url}/tutor/create-course/${userInfo?.email}`, updatedData, {
+      const response = await axios.post(`${Base_URL}/tutor/create-course/${userInfo?.email}`, updatedData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

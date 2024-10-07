@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { toast, Toaster } from "sonner";
 import IcourseData from "../../Types/course";
 import { useCourseContext } from "../../context/courseContext";
-const url = "http://localhost:7000";
+import { Base_URL } from "../../credentials";
+
 
 interface Category {
   _id: string;
@@ -29,7 +30,7 @@ const CourseCreation1: React.FC<{ onNext: (itemName: string) => void }> = ({ onN
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${url}/admin/categories`);
+        const response = await fetch(`${Base_URL}/admin/categories`);
         if (!response.ok) {
           throw new Error("Failed to fetch categories.");
         }

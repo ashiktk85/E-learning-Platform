@@ -2,7 +2,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
-const url = "http://localhost:7000";
+const url = "https://api.kevinhills.shop";
 const userAxiosInstance = axios.create({
   baseURL: url,
   withCredentials: true,

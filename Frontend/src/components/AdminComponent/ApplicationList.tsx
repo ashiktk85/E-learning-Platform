@@ -2,8 +2,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@nextui-org/react';
+import { Base_URL } from '../../credentials';
 
-const url = "http://localhost:7000";
+
 
 interface IApplication {
   email: string;
@@ -33,7 +34,7 @@ const ApplicationList: React.FC<ApplicationListProps> = ({ setApplicationCount }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<IApplication[]>(`${url}/admin/getapplications`);
+        const response = await axios.get<IApplication[]>(`${Base_URL}/admin/getapplications`);
         setApplications(response.data);
         setFilteredApplications(response.data); 
         setApplicationCount(response.data.length);
@@ -57,7 +58,7 @@ const ApplicationList: React.FC<ApplicationListProps> = ({ setApplicationCount }
 
   const handleViewClick = async (applicationId: string) => {
     try {
-      const response = await axios.get(`${url}/admin/applicationview/${applicationId}`);
+      const response = await axios.get(`${Base_URL}/admin/applicationview/${applicationId}`);
       navigate('/admin/applicationdetails', { state: { applicationData: response.data } });
     } catch (error) {
       console.error('Error fetching application details', error);

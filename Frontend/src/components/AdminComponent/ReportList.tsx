@@ -6,8 +6,9 @@ import { AppDispatch } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import { MdArrowForwardIos } from "react-icons/md";
 import { MdArrowBackIos } from "react-icons/md";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 interface IReport {
   reportId: string;
@@ -37,7 +38,7 @@ const ReportList: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${url}/admin/getReports`, {
+        const response = await axios.get(`${Base_URL}/admin/getReports`, {
           params: {
             page: currentPage,
             limit: items,

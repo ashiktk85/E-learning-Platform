@@ -15,8 +15,9 @@ import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { acceptApplicaitonThunk } from "../../redux/actions/adminActions";
+import { Base_URL } from "../../credentials";
 
-const url = 'http://localhost:7000';
+
 
 const ApplicantDetails = () => {
  
@@ -41,7 +42,7 @@ const ApplicantDetails = () => {
   useEffect(() => {
     const checkTutorStatus = async () => {
       try {
-        const response = await axios.get(`${url}/admin/checktutorstatus/${applicationData.email}`);
+        const response = await axios.get(`${Base_URL}/admin/checktutorstatus/${applicationData.email}`);
         const tutorStatus = response?.data;
         setIsTutor(tutorStatus);
 

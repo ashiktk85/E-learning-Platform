@@ -28,6 +28,7 @@ app.use(morgan('dev'));
 
 const corsOptions = {
     origin: 'http://localhost:5173',
+    // origin: "https://learnsphere-nine.vercel.app/",
     credentials: true,
     // optionsSuccessStatus: 200
 };

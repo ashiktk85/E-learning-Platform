@@ -9,8 +9,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast, Toaster } from "sonner";
 import ProfileImg from "../UserComponent/profileImg";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 interface ProfileData {
   bio: string;
@@ -43,7 +44,7 @@ const TutorProfile = () => {
     const getTutorData = async () => {
       try {
         const response = await axios.get(
-          `${url}/tutor/applicationdata/${userInfo?.email}`
+          `${Base_URL}/tutor/applicationdata/${userInfo?.email}`
         );
         setProfileData(response.data);
 
@@ -92,7 +93,7 @@ const TutorProfile = () => {
       try {
         const email = userInfo?.email;
 
-        const response = await axios.post(`${url}/tutor/editprofile`, {
+        const response = await axios.post(`${Base_URL}/tutor/editprofile`, {
           values,
           email,
         });

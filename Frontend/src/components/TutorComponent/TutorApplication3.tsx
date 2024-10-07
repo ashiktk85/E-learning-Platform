@@ -2,10 +2,11 @@ import React from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-const url = 'http://localhost:7000';
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '../../redux/store';
 import { userInfo } from 'os';
+import { Base_URL } from '../../credentials';
 
 interface FormData {
   
@@ -72,7 +73,7 @@ const TutorApplicationSubmit: React.FC<TutorApplicationSubmitProps> = ({ previou
             
             console.log("ljbkjvkjvjhvkjvbjh",formDataToSend)
 
-            const response = await axios.post(`${url}/tutor/tutorapplication`, formDataToSend, 
+            const response = await axios.post(`${Base_URL}/tutor/tutorapplication`, formDataToSend, 
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',

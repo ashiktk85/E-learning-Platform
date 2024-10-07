@@ -96,13 +96,6 @@ export class UserRepositary {
       if (!isMatch) {
         throw new Error("Invalid password");
       }
-
-      // const accessToken = jwt.sign(
-      //   { id: user.userId, email: user.email },
-      //   process.env.SECRET_KEY!,
-      //   { expiresIn: "1h" }
-      // );
-
       return user;
     } catch (error: any) {
       throw new Error(error.message);
@@ -432,8 +425,6 @@ export class UserRepositary {
         path: "sections",
         populate: { path: "videos" },
       });
-
-      // console.log(course , "sss");
 
       if (!course) {
         throw new Error("Cannot find course.");

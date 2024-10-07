@@ -88,10 +88,8 @@ export class UserController {
 
   async editUser(req : Request ,  res : Response) {
     try {
-      // console.log("edit user controller datat" , req.body)
       const {firstName , lastName, phone ,userId} = req.body
       const updatedUser = await this.userService.editUserService(firstName, lastName, phone, userId);
-
       if (updatedUser) {
         res.status(200).json({ message: 'User updated successfully', data: updatedUser });
       } else {
@@ -108,11 +106,9 @@ export class UserController {
 
   async getCourses(req: Request, res: Response) {
     try {
-        const { category, page = "1", limit = "10", filter } = req.query as { category?: string; page?: string; limit?: string; filter?: string };
-      
+        const { category, page = "1", limit = "10", filter } = req.query as { category?: string; page?: string; limit?: string; filter?: string };    
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
-
         const courses = await this.userService.getCoursesService(category as string, pageNumber, limitNumber);
         res.status(200).json(courses);
     } catch (error: any) {
@@ -126,11 +122,7 @@ export class UserController {
   async   getCourseDetail(req : Request, res : Response) {
     try {
       const {id} = req.params
-      // console.log(id , "id");
-      
       const courseData =  await this.userService.getCourseDetail(id as string)
-      // console.log(courseData.sections[0].videos);
-      
       res.status(200).json(courseData)
     } catch (error : any) {
       console.error(error.message);
@@ -141,12 +133,7 @@ export class UserController {
   async coursePayment(req : Request, res : Response) {
     try {
       const {amount,currency,email,courseId,} = req.body
-
-      console.log(amount);
-      
-
       const order = await this.userService.CoursePaymentService(amount as number,currency,email,courseId)
-
       res.status(201).json({ message: 'Order created successfully', order })
     } catch (error : any) {
       console.error(error.message);
@@ -157,9 +144,7 @@ export class UserController {
   async saveCourse (req : Request, res : Response) {
     try {
       const { email, courseId } = req.body
-
       const response = await this.userService.saveCourseService(courseId as string ,email as string)
-
       res.status(201).json(true)
     } catch (error : any) {
       console.error(error.message);
@@ -170,13 +155,7 @@ export class UserController {
   async checkEnrollement(req : Request, res : Response) {
     try {
       const  {courseId , email} = req.params
-      // console.log(courseId , "cuu");
-      
-
-      const response = await this.userService.checkEnrollementSevice(courseId as string, email as string)
-
-        // console.log(response);
-        
+      const response = await this.userService.checkEnrollementSevice(courseId as string, email as string)   
       res.status(200).json(response)
     } catch (error : any) {
       console.error(error.message);

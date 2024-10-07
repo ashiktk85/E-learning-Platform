@@ -10,7 +10,8 @@ import { toast, Toaster } from "sonner";
 import { useNavigate } from "react-router-dom";
 import userAxiosInstance from "../../config/axiosInstance/userInstance";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-const url = "http://localhost:7000";
+import { Base_URL } from "../../credentials";
+
 
 const TutorLogin: React.FC = () => {
     const navigate = useNavigate()
@@ -35,7 +36,7 @@ const TutorLogin: React.FC = () => {
       try {
         console.log("Form values:", values);
         const { applicationId, passcode } = values;
-        const response = await axios.post(`${url}/tutor/login`, {
+        const response = await axios.post(`${Base_URL}/tutor/login`, {
           applicationId,
           passcode,
         });

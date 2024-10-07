@@ -2,8 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setCredentials, clearCredentials } from '../slices/authSlice';
 import userAxiosInstance from '../../config/axiosInstance/userInstance';
 import { RootState } from '../store';
+import { Base_URL } from '../../credentials';
 
-const url = "http://localhost:7000";
+
 
 export const refreshAccessToken = createAsyncThunk(
   'auth/refreshAccessToken',
@@ -18,7 +19,7 @@ export const refreshAccessToken = createAsyncThunk(
 
     try {
   
-      const response = await userAxiosInstance.post(`${url}/refresh-token`, {}, {
+      const response = await userAxiosInstance.post(`${Base_URL}/refresh-token`, {}, {
         withCredentials: true, 
       });
 

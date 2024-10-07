@@ -4,8 +4,9 @@ import { toast, Toaster } from "sonner";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
 import { updateUserBlockStatus } from "../../redux/actions/adminActions";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 interface User {
   isBlocked: boolean;
@@ -37,7 +38,7 @@ const TutorList: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${url}/admin/getTutors`, {
+        const response = await axios.get(`${Base_URL}/admin/getTutors`, {
           params: {
             page: currentPage,
             limit: itemsPerPage,

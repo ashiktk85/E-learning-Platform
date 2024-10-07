@@ -6,8 +6,9 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
 import Modal from "react-modal";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 // Define the Category type
 interface Category {
@@ -31,7 +32,7 @@ const CategoryList: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${url}/admin/categories`);
+        const response = await axios.get(`${Base_URL}/admin/categories`);
         setCategories(response.data);
         console.log(response.data);
       } catch (error: any) {
@@ -69,7 +70,7 @@ const CategoryList: React.FC = () => {
     onSubmit: async (values, { resetForm }) => {
       try {
         const { categoryName, description } = values;
-        const response = await axios.post(`${url}/admin/createcategory`, {
+        const response = await axios.post(`${Base_URL}/admin/createcategory`, {
           categoryName,
           description,
         });

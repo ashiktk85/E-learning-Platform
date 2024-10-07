@@ -17,7 +17,7 @@ export const compressVideo = async (file: any): Promise<Buffer> => {
     return await new Promise<Buffer>((resolve, reject) => {
       ffmpeg()
         .input(inputBuffer)
-        .inputFormat(file.mimetype.split('/')[1]) // Use mimetype to set input format
+        .inputFormat(file.mimetype.split('/')[1]) 
         .videoCodec('libx264')
         .outputOptions(['-preset fast', '-crf 28'])
         .format('mp4')

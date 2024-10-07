@@ -4,8 +4,9 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
+import { Base_URL } from "../../credentials";
 
-const url = "http://localhost:7000";
+
 
 const CourseList: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }) => {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ const CourseList: React.FC<{ onNext: (itemName: string) => void }> = ({ onNext }
 
   const fetchCourses = useCallback(async () => {
     try {
-      const response = await axios.get(`${url}/tutor/get-courses/${userInfo?.email}`);
+      const response = await axios.get(`${Base_URL}/tutor/get-courses/${userInfo?.email}`);
       const newCourses = response.data;
 
 

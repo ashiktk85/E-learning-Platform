@@ -1,3 +1,4 @@
+import { AwsConfig } from "../config/awsFileConfigs";
 import Group from "../models/groupSchema";
 import userModel from "../models/userModel";
 
@@ -72,19 +73,30 @@ export class CommunityRepository {
     }
   }
 
-  // Function to fetch user details by userId
+  
   static async fetchUserDetails(userId: string) {
     try {
+      const awsConfig = new AwsConfig()
       const user = await userModel.findOne({ userId }).exec();
       if (!user) throw new Error('User not found');
+
+      let profileUrl = "";
+      if (user?.profile) {
+        profileUrl = await awsConfig.getfile(
+          user?.profile as string,
+          `users/profile/${user?.userId}`
+        );
+      }
+
       return { 
         firstName: user.firstName, 
         lastName: user.lastName, 
-        email: user.email 
+        email: user.email,
+        profileUrl 
       };
     } catch (error) {
       console.error('Error fetching user details:', error);
-      return null; // Return null or a default user object if details aren't found
+      return null; 
     }
   }
 }

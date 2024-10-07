@@ -3,8 +3,9 @@ import axios from 'axios';
 import { User } from '../../Types/user';
 import userAxiosInstance from '../../config/axiosInstance/userInstance';
 import { user } from '@nextui-org/react';
+import { Base_URL } from '../../credentials';
 
-const url = 'http://localhost:7000';
+
 
 interface UpdateUserInfoPayload {
   userId: string;
@@ -25,7 +26,7 @@ export const registerUser = (userData: {
 }) => {
   return async () => {
     try {
-      const response = await axios.post(`${url}/signUp`, userData);
+      const response = await axios.post(`${Base_URL}/signUp`, userData);
       console.log(response, "this is response");
       if (response.data.status === true) {
         localStorage.setItem('userEmail' , userData.email)
@@ -48,7 +49,7 @@ export const verifyOtp = (otp : string) => {
   return async () => {
     try {
       const email = localStorage.getItem('userEmail')
-      const response = await axios.post(`${url}/otpVerification` , {email ,otp})   
+      const response = await axios.post(`${Base_URL}/otpVerification` , {email ,otp})   
       if(response.data.message === "verified") {
         localStorage.clear()
         return true;
@@ -69,7 +70,7 @@ export const login = createAsyncThunk<{ accessToken: string; userInfo: User }, {
   'user/authLogin',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${url}/verifyLogin`, { email, password } , {withCredentials : true});
+      const response = await axios.post(`${Base_URL}/verifyLogin`, { email, password } , {withCredentials : true});
       return response.data.cred;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Login failed');
@@ -84,7 +85,7 @@ export const resendOtp = createAsyncThunk<boolean>(
       const email = localStorage.getItem('userEmail');
       if (!email) throw new Error('No email found in localStorage');
 
-      const response = await axios.post(`${url}/resendOtp`, { email });
+      const response = await axios.post(`${Base_URL}/resendOtp`, { email });
       return response.status === 200;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to resend OTP');
@@ -96,7 +97,7 @@ export const updateUserInfo = createAsyncThunk<User | 'no change', UpdateUserInf
   'user/updateUserInfo',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await userAxiosInstance.put(`${url}/edituser`, userData 
+      const response = await userAxiosInstance.put(`${Base_URL}/edituser`, userData 
        );
       if (response.data.message === 'No changes found') {
         return 'no change';
