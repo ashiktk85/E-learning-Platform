@@ -15,6 +15,7 @@ import { CouresRepository } from "../repository/courseRepository";
 import { ParamsDictionary } from "express-serve-static-core";
 import { S3Client } from "@aws-sdk/client-s3";
 import { TutorRepositary } from "../repository/tutorRepositary";
+import { adminRepository } from "../repository/adminRepository";
 
 const s3Client = new S3Client({
   region: "eu-north-1",
@@ -127,6 +128,7 @@ export class UserService {
         phone: user.phone,
         isBlocked: user.isBlocked,
         tutor: user.tutor,
+        kyc : user?.kyc
       };
 
       return { userInfo, accessToken, refreshToken };
@@ -257,53 +259,63 @@ export class UserService {
     }
   }
 
-  async CoursePaymentService(
-    amount: number,
-    currency: any,
-    email: string,
-    courseId: string
-  ) {
-    try {
-      const options = {
-        amount: amount * 100,
-        currency,
-        receipt: `receipt_${Math.floor(Math.random() * 1000)}`,
-      };
-      console.log(options.amount);
 
-      const user = await UserRepositary.existUser(email);
+    async CoursePaymentService(
+      amount: number,
+      currency: string,
+      email: string,
+      courseId: string
+    ) {
+      try {
+        console.log("her....")
+        const adminShare = amount * 0.05;
+        const tutorShare = amount * 0.95;
+  
+        const options = {
+          amount: amount * 100, 
+          currency,
+          receipt: `receipt_${Math.floor(Math.random() * 1000)}`,
+        };
+  
+        const user = await UserRepositary.existUser(email);
+        const paymentId = createUniquePass(10);
+        const orderId = createUniquePass(10);
+  
+        const orderDetails = {
+          userId: user?.userId || "", 
+          courseId: courseId,
+          totalAmount: amount,
+          currency: currency,
+          paymentId: paymentId,
+          orderId: orderId,
+          paymentStatus: "Completed",
+        };
+  
+        const course = await UserRepositary.getCourse(courseId);
+        const tutor = await UserRepositary.existUser(course?.email || ""); 
 
-      const paymentId = createUniquePass(10);
-      const orderId = createUniquePass(10);
-
-      const orderDetails = {
-        userId: user?.userId,
-        courseId: courseId,
-        totalAmount: amount,
-        currency: currency,
-        paymentId: paymentId,
-        orderId: orderId,
-        paymentStatus: "Completed",
-      };
-
-      const course = await UserRepositary.getCourse(courseId as string)
-
-      const tutor = await UserRepositary.existUser(course?.email)
-      
-      const wallet = await UserRepositary.coursePaymentWallet(tutor?.userId as string , amount, course?.name )
-
-      const saveOrder = await UserRepositary.saveOder(orderDetails);
-
-      const addCourseUser = await UserRepositary.saveCourse(courseId, email);
-
-      const order = await razorpay.orders.create(options);
-
-      return order;
-    } catch (error: any) {
-      console.error("Error in payment course :", error.message);
-      throw new Error(` ${error.message}`);
+        const adminTransaction = {
+          courseId : courseId,
+          course : course?.name,
+          tutorId : tutor?.userId,
+          tutor : tutor?.firstName,
+          transactionId : uuidv4()
+        }
+  
+        await UserRepositary.coursePaymentWallet(tutor?.userId || "", tutorShare, course?.name || "");
+        await adminRepository.adminPaymentWallet(adminShare , adminTransaction); 
+  
+        await UserRepositary.saveOder(orderDetails);
+        await UserRepositary.saveCourse(courseId, email);
+  
+        const order = await razorpay.orders.create(options);
+        return order;
+      } catch (error: any) {
+        console.error("Error in payment course :", error.message);
+        throw new Error(`Error processing payment: ${error.message}`);
+      }
     }
-  }
+  
 
   async saveCourseService(courseId: string, email: string) {
     try {
@@ -446,7 +458,7 @@ export class UserService {
   async addMoneySerice(userId: string , data : any) {
     try {
         const newWllet = await UserRepositary.newPayment(userId as string, data as any)
-        console.log(newWllet);
+       
         
     } catch (error: any) {
       console.error("Error in adding money user serice :", error.message);

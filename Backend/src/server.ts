@@ -12,6 +12,7 @@ import { createServer } from 'http'
 import { configSocketIO } from './config/socketConfig';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import { asyncContextMiddleware } from './config/awsFileConfigs';
 
 dotenv.config();
 
@@ -27,8 +28,7 @@ configSocketIO(server)
 app.use(morgan('dev'));
 
 const corsOptions = {
-    origin: 'http://localhost:5173',
-    // origin: "https://learnsphere-nine.vercel.app/",
+    origin: process.env.BASE_URL,
     credentials: true,
     // optionsSuccessStatus: 200
 };
@@ -38,6 +38,8 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     next();
   });
+
+  app.use(asyncContextMiddleware);
   
 app.use(cookieParser());
 app.use(express.json({ limit: '5gb' })); 

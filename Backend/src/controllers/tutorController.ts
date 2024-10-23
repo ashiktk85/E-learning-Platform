@@ -53,7 +53,9 @@ export class TutorContoller {
       }
     } catch (error: any) {
       console.error(error.message);
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
@@ -65,12 +67,13 @@ export class TutorContoller {
       );
 
       console.log(response);
-      
 
       res.status(200).json(response);
     } catch (error: any) {
       console.error(error.message);
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
@@ -81,12 +84,13 @@ export class TutorContoller {
 
       const response = await this.tutorServices.editProfileService(data as any);
       console.log(response, "usssss");
-      
 
       res.status(200).json(response);
     } catch (error: any) {
       console.error(error.message);
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
@@ -94,49 +98,50 @@ export class TutorContoller {
     try {
       const courseData = req.body;
 
-      const { email } = req.params
+      const { email } = req.params;
 
-     
+      const files = req.files as Express.Multer.File[];
+      // files.forEach((file) => {
+      //   console.log(file.originalname, file.buffer);
+      // });
 
-     
-        const files = req.files as Express.Multer.File[];
-        // files.forEach((file) => {
-        //   console.log(file.originalname, file.buffer);
-        // });
-     
-
-      const response = await this.tutorServices.createCourseService(files as any,courseData as any ,email as string)
+      const response = await this.tutorServices.createCourseService(
+        files as any,
+        courseData as any,
+        email as string
+      );
 
       res.status(200).json(response);
     } catch (error: any) {
       console.error(error.message, "dsfsdf");
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
-
   async getCourses(req: Request, res: Response) {
     try {
-        const {email} = req.params
-        const response = await this.tutorServices.getCoursesWithSignedUrls(email)
+      const { email } = req.params;
+      const response = await this.tutorServices.getCoursesWithSignedUrls(email);
 
-        // console.log(response, "res");
+      // console.log(response, "res");
 
-        res.status(200).json(response);
-        
-        
-    } catch (error : any) {
-        console.error(error.message, "dsfsdf");
-        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
-    } 
+      res.status(200).json(response);
+    } catch (error: any) {
+      console.error(error.message, "dsfsdf");
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
+    }
   }
 
   // async uploadProfile(req: Request, res: Response) {
   //   try {
   //     const { email } = req.body;
-  //     const file  = req.file ; 
+  //     const file  = req.file ;
   //     console.log(email, file);
-      
+
   //     if (!email || !file) {
   //       return res.status(400).json({ message: "Email and file are required." });
   //     }
@@ -152,103 +157,157 @@ export class TutorContoller {
 
   async updateCourse(req: Request, res: Response) {
     try {
-      const { courseId } = req.params
+      const { courseId } = req.params;
       // console.log(req.body);
-      const newData = req.body
-      
-      const updatedCourses = await this.tutorServices.updateCourseService(courseId as string , newData)
-      return res.status(HTTP_statusCode.updated).json(updatedCourses)
-    } catch (error : any) {
+      const newData = req.body;
+
+      const updatedCourses = await this.tutorServices.updateCourseService(
+        courseId as string,
+        newData
+      );
+      return res.status(HTTP_statusCode.updated).json(updatedCourses);
+    } catch (error: any) {
       console.error(error.message, "dsfsdf");
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
   async updateThumbnail(req: Request, res: Response) {
     try {
+      const courseId = req.body.couresId;
+      const newThumbnail = req.file;
 
-      const courseId = req.body.couresId
-      const newThumbnail = req.file
-      
-      const updateThumbnail = await this.tutorServices.updateThumbnail(courseId as string , newThumbnail)
+      const updateThumbnail = await this.tutorServices.updateThumbnail(
+        courseId as string,
+        newThumbnail
+      );
       // return res.status(HTTP_statusCode.updated).json(updatedCourses)
-    } catch (error : any) {
+    } catch (error: any) {
       console.error(error.message, "dsfsdf");
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
   async getDashboard(req: Request, res: Response) {
     try {
+      const { email } = req.params;
 
-      const {email} = req.params
-      
-      const getDashboardData = await this.tutorServices.getDashboard(email as string)
-      return res.status(HTTP_statusCode.OK).json(getDashboardData)
-    } catch (error : any) {
+      const getDashboardData = await this.tutorServices.getDashboard(
+        email as string
+      );
+      return res.status(HTTP_statusCode.OK).json(getDashboardData);
+    } catch (error: any) {
       console.error(error.message, "dsfsdf");
-      res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
-  async ChartData (req : Request, res : Response) {
+  async ChartData(req: Request, res: Response) {
     try {
-      const year = parseInt(req.query.year as string) || new Date().getFullYear();
-      const chartdata = await this.tutorServices.getMonthlyData(year as number)
-      res.status(HTTP_statusCode.OK).json(chartdata)
-    } catch (error : any) {
-        console.error(error.message, );
-        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      const year =
+        parseInt(req.query.year as string) || new Date().getFullYear();
+      const chartdata = await this.tutorServices.getMonthlyData(year as number);
+      res.status(HTTP_statusCode.OK).json(chartdata);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
-  async editVideo (req : Request, res : Response) {
+  async editVideo(req: Request, res: Response) {
     try {
-      
-      const {_id , title , description} = req.body
-      
-      const updateVieo = await this.tutorServices.updateVideo(_id , title , description)
-      res.status(HTTP_statusCode.OK).json(updateVieo)
-    } catch (error : any) {
-        console.error(error.message, );
-        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+      const { _id, title, description } = req.body;
+
+      const updateVieo = await this.tutorServices.updateVideo(
+        _id,
+        title,
+        description
+      );
+      res.status(HTTP_statusCode.OK).json(updateVieo);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
     }
   }
 
-  async deleteVideo (req : Request, res : Response) {
+  async deleteVideo(req: Request, res: Response) {
     try {
-      
-      const {videoId, courseId } = req.body
+      const { videoId, courseId } = req.body;
       // console.log(req.body , req.body.data);
-      
-      
-      const deleted = await this.tutorServices.deleteVideo(videoId , courseId)
-      res.status(HTTP_statusCode.OK).json(deleted)
-    } catch (error : any) {
-        console.error(error.message, );
-        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
-    }
-  }
-  
-  async addVideo (req : Request, res : Response) {
-    try {
-      
-    const {sectionId} = req.params;
-    const {name , description , courseId} = req.body
-    console.log(req.file);
-    
-    const newVideo = req.file
-    
-      
-      
-      const added = await this.tutorServices.addVideoService(name , description , newVideo , sectionId , courseId)
-      res.status(HTTP_statusCode.updated).json(added)
-    } catch (error : any) {
-        console.error(error.message, );
-        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
-    }
-  }
-  
 
-  
+      const deleted = await this.tutorServices.deleteVideo(videoId, courseId);
+      res.status(HTTP_statusCode.OK).json(deleted);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
+    }
+  }
+
+  async addVideo(req: Request, res: Response) {
+    try {
+      const { sectionId } = req.params;
+      const { name, description, courseId } = req.body;
+      console.log(req.file);
+
+      const newVideo = req.file;
+
+      const added = await this.tutorServices.addVideoService(
+        name,
+        description,
+        newVideo,
+        sectionId,
+        courseId
+      );
+      res.status(HTTP_statusCode.updated).json(added);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
+    }
+  }
+
+  async kycVerification(req: Request, res: Response) {
+    try {
+      const { email } = req.params;
+      const data = req.body;
+      const response = await this.tutorServices.kycVerify(
+        email as string,
+        data as any
+      );
+      res.status(HTTP_statusCode.updated).json(response);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
+    }
+  }
+
+  async checkKyc(req: Request, res: Response) {
+    try {
+      const { email } = req.params;
+      const response = await this.tutorServices.kycStatusCheck(email)
+      console.log(response);
+      
+      res.status(HTTP_statusCode.updated).json(response);
+    } catch (error: any) {
+      console.error(error.message);
+      res
+        .status(HTTP_statusCode.InternalServerError)
+        .json({ message: error.message });
+    }
+  }
 }

@@ -4,6 +4,7 @@ import { TutorContoller } from "../controllers/tutorController";
 import multer from "multer";
 import { TutorServices } from "../services/tutorServices";
 import { verifyToken } from "../config/jwtConfig";
+import { UserController } from "../controllers/userController";
 
 const route = Router();
 
@@ -32,6 +33,8 @@ route.get('/applicationdata/:email' , tutorController.getTutorDetails.bind(tutor
 route.post('/editprofile' , tutorController.editProfile.bind(tutorController))
 route.post('/create-course/:email', upload.any() ,tutorController.createCourse.bind(tutorController))
 route.get('/get-courses/:email', tutorController.getCourses.bind(tutorController))
+route.post('/kyc-verification/:email', tutorController.kycVerification.bind(tutorController))
+route.get('/kyc-status/:email', tutorController.checkKyc.bind(tutorController))
 // route.post('/uploadProfilePic',  upload.single("profilePic") ,tutorController.uploadProfile.bind(tutorController))
 
 route.put('/updateCourse/:courseId' ,tutorController.updateCourse.bind(tutorController))

@@ -51,15 +51,12 @@ const configSocketIO = (server: HttpServer) => {
         socket.on('submitRating', async (payload) => {
             const { courseId, userId, ratingValue, review } = payload;
         
-            try {
-                
+            try { 
                 const existingRating = await Rating.findOne({ courseId, userId });
                 if (existingRating) {
                     socket.emit('ratingError', 'You have already rated this course.');
                     return;
-                }
-        
-                
+                } 
                 const newRating = new Rating({
                     courseId,
                     userId,
@@ -67,18 +64,11 @@ const configSocketIO = (server: HttpServer) => {
                     review,
                 });
         
-              
                 await newRating.save();
-        
-                
                 await Course.findOneAndUpdate(courseId, {
                     $push: { ratings: newRating._id }
                 });
 
-                
-
-        
-               
                 io.to(courseId.toString()).emit('receiveRating', {
                     userId,
                     ratingValue,

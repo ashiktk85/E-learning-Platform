@@ -312,6 +312,7 @@ export class UserRepositary {
           isBlocked: 1,
           tutor: 1,
           tutorCredentials: 1,
+          kyc : 1
         }
       );
 
@@ -322,6 +323,12 @@ export class UserRepositary {
       if (passcode !== user.tutorCredentials?.passwordHash) {
         throw new Error("Wrong passcode");
       }
+      console.log(user?.kyc);
+      
+      if (user?.kyc !== 'verified') {
+        throw new Error("Complete KYC to login");
+      }
+
 
       const userInfo = {
         firstName: user.firstName,

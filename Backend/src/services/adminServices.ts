@@ -11,6 +11,7 @@ import { createToken } from "../config/jwtConfig";
 import { Course, ICourse } from "../models/courseModel";
 import { v4 as uuidv4 } from "uuid";
 import { profile } from "console";
+import sendTutorLoginCredentials from "../helper/tutorMail";
 
 require('dotenv').config();
 
@@ -214,6 +215,7 @@ async getTutorsService(page: number, limit: number): Promise<{ users: any[]; tot
             
 
             const updateUser = await UserRepositary.addTutorToUserModel(data.email as string ,  uniquePass as any)
+            await sendTutorLoginCredentials(data.email as string, uniquePass as any)
             // const tutorProfile = await 
             console.log(updateUser , "services");
             

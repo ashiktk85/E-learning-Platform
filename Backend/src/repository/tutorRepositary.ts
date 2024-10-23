@@ -2,6 +2,7 @@ import TutorApplication, {
   ITutorApplication,
 } from "../models/applicationModel";
 import { Course , Section , Video } from "../models/courseModel";
+import KycModel from "../models/kycModel";
 import TutorProfile from "../models/tutorProfileModel";
 
 import userModel from "../models/userModel";
@@ -370,6 +371,26 @@ export class TutorRepositary {
       throw new Error(error.message);
     }
   }
+
+  static async saveKyc (userId : string, data : any) {
+    try {
+      const kycData = {
+        ...data,
+        userId
+      }
+      const saveKyc = new KycModel(kycData)
+      saveKyc.save()
+
+      const updateStatus = await userModel.findOneAndUpdate({userId}, { $set : {kyc : 'verified'}})
+
+      return true;
+    } catch (error : any) {
+      console.log("Error in getting montly revenue in tutor repo", error.message); 
+      throw new Error(error.message);
+    }
+  }
+
+  
 
   
 }

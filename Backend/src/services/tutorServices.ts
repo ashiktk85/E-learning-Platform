@@ -20,6 +20,7 @@ import { CouresRepository } from "../repository/courseRepository";
 import { String } from "aws-sdk/clients/batch";
 import { compressVideo } from "../helper/videoCompression";
 import fs from 'fs';
+import userModel from "../models/userModel";
 
 require("dotenv").config();
 
@@ -368,12 +369,17 @@ export class TutorServices {
 
       const tutorProfile = await TutorRepositary.getTutorDetail(email);
       if (!tutorProfile) throw new Error("TutorProfile dosent exist.");
+      let profileUrl = ""
 
-      const profileUrl = await awsConfig.getfile(
-        userTutor?.profile as string,
-        `users/profile/${userTutor?.userId}`
-      );
+      if(userTutor?.profile) {
+          profileUrl = await awsConfig.getfile(
+          userTutor?.profile as string,
+          `users/profile/${userTutor?.userId}`
+        );
+      }
 
+      
+        
       const courses = await TutorRepositary.getCoursesByTutor(email);
 
       const totalCourses = courses.length;
@@ -407,7 +413,8 @@ export class TutorServices {
     try {
       const userEnrollments = await TutorRepositary.getMonthlyUserEnrollments(year);
       const revenue = await TutorRepositary.getMonthlyRevenue(year);
-
+        
+      
       return {
         enrollments : userEnrollments,
         revenue
@@ -459,8 +466,41 @@ export class TutorServices {
       throw error;
     }
   }
+
+  async kycVerify(email : string, data : any) {
+    try {
+      console.log(email);
+      
+      const userTutor = await UserRepositary.existUser(email as any)
+
+      if(!userTutor) throw new Error("No user found")
+
+      const saveKyc = await TutorRepositary.saveKyc(userTutor?.userId , data)
+      
+      return true;
+    } catch (error) {
+      console.error("Error in saving kyc service:", error);
+      throw error;
+    }
+  }
+
+  async kycStatusCheck(email : string) {
+    try {
+      const user = await UserRepositary.existUser(email as string)
+      let boolean = false;
+      if(user?.kyc) user?.kyc === 'verified' ? boolean = true : boolean = false; 
+
+      return boolean
+    } catch (error) {
+      console.error("Error in saving kyc service:", error);
+      throw error;
+    }
+  }
+
+  
+  
+
+
 }
-function unlinkAsync(compressedFilePath: string) {
-  throw new Error("Function not implemented.");
-}
+
 

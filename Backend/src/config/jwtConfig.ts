@@ -19,20 +19,15 @@ const createRefreshToken = (user_id: string, role: string): string => {
     return jwt.sign({ user_id, role }, secret_key, { expiresIn: '7d' });
 };
 
+
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-       console.log(req.cookies, "cookies");
-       
-        
-       const accessToken: string = req.cookies.AccessToken;
-        console.log(accessToken , "accerss");
-        
+        const accessToken: string = req.cookies.AccessToken;
         if (accessToken) {
             jwt.verify(accessToken, secret_key, async (err, decoded) => {
                 if (err) {
                     await handleRefreshToken(req, res, next);
                 } else {
-                   
                     const { role } = decoded as jwt.JwtPayload;
                     if (role !== "user") { 
                         return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Insufficient role.' });
@@ -48,6 +43,30 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     };
 };
 
+
+const verifyAdminToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const adminToken: string = req.cookies.AdminToken;
+        if (adminToken) {
+            jwt.verify(adminToken, secret_key, async (err, decoded) => {
+                if (err) {
+                    return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Admin token expired or invalid.' });
+                } else {
+                    const { role } = decoded as jwt.JwtPayload;
+                    if (role !== "admin") {
+                        return res.status(HTTP_statusCode.NoAccess).json({ message: 'Access denied. Admin privileges required.' });
+                    }
+                    next();
+                };
+            });
+        } else {
+            return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Admin token not provided.' });
+        }
+    } catch (error) {
+        res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Admin token not valid.' });
+    };
+};
+
 const handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string = req.cookies.RefreshToken;
     if (refreshToken) {
@@ -56,16 +75,14 @@ const handleRefreshToken = async (req: Request, res: Response, next: NextFunctio
                 return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Refresh token not valid.' });
             } else {
                 const { user_id, role } = decoded as jwt.JwtPayload;
-                
                 if (!user_id || !role) {
                     return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. Token payload invalid.' });
                 } else {
-                   
                     const newAccessToken = createToken(user_id, role);
                     res.cookie("AccessToken", newAccessToken, {
                         httpOnly: true,
                         sameSite: 'strict',
-                        maxAge: 15 * 60 * 1000,
+                        maxAge: 15 * 60 * 1000, 
                     });
                     next();
                 };
@@ -76,4 +93,4 @@ const handleRefreshToken = async (req: Request, res: Response, next: NextFunctio
     };
 };
 
-export { createToken, verifyToken, createRefreshToken , createAdminToken};
+export { createToken, verifyToken, verifyAdminToken, createRefreshToken, createAdminToken };

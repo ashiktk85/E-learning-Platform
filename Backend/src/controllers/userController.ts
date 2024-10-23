@@ -59,13 +59,17 @@ export class UserController {
 
       res.cookie("RefreshToken", result.refreshToken, {
         httpOnly: true,
-        sameSite: 'strict',
+        secure: true, 
+        sameSite: 'none', 
         maxAge: 7 * 24 * 60 * 60 * 1000,
+         path: '/'
      });
      res.cookie("AccessToken", result.accessToken, {
         httpOnly: true,
-        sameSite: 'strict',
+        secure: true, 
+        sameSite: 'none',
         maxAge: 15 * 60 * 1000,
+         path: '/'
      });
   
       const { userInfo } = result;

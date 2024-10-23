@@ -9,23 +9,24 @@ import userModel from "../models/userModel";
 const userService = new UserService();
 
 
-async function isBlocked(req: Request, res: Response, next: NextFunction) {
+async function userAuth(req: Request, res: Response, next: NextFunction) {
    try {
-      const userId = req.body.userId;
-      console.log(userId);
-      
-      if (!userId) {
-         return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. User ID not found.' });
-      };
-      const user = await userModel.findOne({userId})
-      console.log("user is blocked => ", isBlocked)
-      if (user?.isBlocked === true) {
-         return res.status(HTTP_statusCode.Unauthorized).json({ message: 'Access denied. User is blocked.' });
+      const userId = req.headers['userid'];
+      console.log(userId , "user");
+      if(userId) {
+         const user = await userModel.findOne({userId})
+         console.log(user);
+         
+         if(user?.isBlocked === true) {
+            return res.status(HTTP_statusCode.NoAccess).json({message : 'User Blocked'})
+         }
       }
-      next();
+
+      next()
+      
    } catch (error) {
       return res.status(HTTP_statusCode.InternalServerError).json({ message: 'Server error.' });
    }
 }
 
-export default isBlocked;
+export default userAuth;

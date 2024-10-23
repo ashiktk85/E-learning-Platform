@@ -5,7 +5,7 @@ import { verifyToken } from "../config/jwtConfig";
 import { refreshTokenHandler } from "../config/refreshTokenVerify";
 import { CourseAuth } from "../config/CourseAuth";
 import multer from "multer";
-import isBlocked from "../config/userAuth";
+import userAuth from "../config/userAuth";
 
 const route = Router();
 const userService = new UserService();
@@ -23,25 +23,25 @@ route.post('/signUp', userController.createUser.bind(userController));
 route.post('/otpVerification', userController.otpVerification.bind(userController));
 route.post('/verifyLogin', userController.verifyLogin.bind(userController));
 route.post('/resendOtp', userController.resendOtp.bind(userController));
-route.put('/editUser', verifyToken,isBlocked , userController.editUser.bind(userController));
-route.post('/save-userProfile', upload.single('profileImage'), userController.saveProfilePic.bind(userController));
-route.get('/getProfile/:email' , userController.getProfile.bind(userController))
+route.put('/editUser', verifyToken ,userAuth, userController.editUser.bind(userController));
+route.post('/save-userProfile',verifyToken,userAuth, upload.single('profileImage'), userController.saveProfilePic.bind(userController));
+route.get('/getProfile/:email' ,verifyToken ,userAuth, userController.getProfile.bind(userController))
 route.post('/refresh-token', refreshTokenHandler);
 
 // Courses
 route.get('/get-courses', userController.getCourses.bind(userController));
-route.get("/getCourse/:id", userController.getCourseDetail.bind(userController));
+route.get("/getCourse/:id",verifyToken,userAuth, userController.getCourseDetail.bind(userController));
 route.post('/createorder', userController.coursePayment.bind(userController));
-route.post('/saveCourse',isBlocked, userController.saveCourse.bind(userController));
+route.post('/saveCourse', verifyToken ,userAuth, userController.saveCourse.bind(userController));
 route.get('/check-enrollment/:email/:courseId', CourseAuth, userController.checkEnrollement.bind(userController));
-route.get('/mycourses/:userId', userController.MyCourses.bind(userController));
+route.get('/mycourses/:userId',userAuth , userController.MyCourses.bind(userController));
 
 
 route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController))
-route.post(`/walletAdd/:userId`,userController.addMoney.bind(userController))
+route.post(`/walletAdd/:userId`,verifyToken ,userAuth,userController.addMoney.bind(userController))
 route.get(`/getTransactions/:userId`, userController.getTransactions.bind(userController))
-route.get('/ratings/:courseId',userController.getRatings.bind(userController))
-route.get('/get-orders/:userId',userController.getOrders.bind(userController))
+route.get('/ratings/:courseId', verifyToken ,userAuth,userController.getRatings.bind(userController))
+route.get('/get-orders/:userId', verifyToken ,userAuth ,  userController.getOrders.bind(userController))
 
 
 export default route;

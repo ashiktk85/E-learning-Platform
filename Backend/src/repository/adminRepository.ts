@@ -1,7 +1,9 @@
+import AdminTransaction from "../models/adminTransactions";
 import Category from "../models/categoryModel";
 import { Course } from "../models/courseModel";
 import Report from "../models/reportModel";
 import userModel from "../models/userModel";
+import { CouresRepository } from "./courseRepository";
 
 export class adminRepository {
   static async createCategory(
@@ -300,4 +302,31 @@ export class adminRepository {
       throw new Error(error.message);
     }
   }
+
+  static async adminPaymentWallet (adminShare : any, data :any) {
+    try {
+     console.log(data)
+      const transactionData = {
+        transactionId : data.transactionId,
+        amount : adminShare,
+        course : {
+          courseId : data.courseId,
+          courseName : data.course, 
+        tutor : {
+          tutorId : data.tutorId,
+          tutorName : data.tutor
+        }
+      },
+      status : 'completed',
+      }
+
+      const transaction =  new AdminTransaction(transactionData)
+      await transaction.save()
+      
+    } catch (error : any) {
+      console.log("error in saving admin share", error.message);
+      throw new (error.message)
+    }
+  }
 }
+
