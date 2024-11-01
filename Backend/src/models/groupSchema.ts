@@ -5,6 +5,7 @@ const messageSchema = new mongoose.Schema({
   message: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
   courseId: { type: String, required: true }, 
+  deleted : {type : Boolean, default : false}
 });
 
 const groupSchema = new mongoose.Schema({

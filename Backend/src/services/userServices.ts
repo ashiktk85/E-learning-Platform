@@ -407,7 +407,8 @@ export class UserService {
     try {
       const awsConfig = new AwsConfig();
       const user = await UserRepositary.existUser(email);
-
+          
+          
       if (!user) {
         console.log("no user");
       }

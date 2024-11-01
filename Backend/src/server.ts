@@ -26,6 +26,7 @@ const server = createServer(app)
 configSocketIO(server)
 
 app.use(morgan('dev'));
+console.log(process.env.BASE_URL);
 
 const corsOptions = {
     origin: process.env.BASE_URL,

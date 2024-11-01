@@ -15,7 +15,9 @@ import Rating from "../models/ratingModel";
 export class UserRepositary {
   static async existUser(email: string): Promise<IUser | null> {
     try {
-      const existUser = await UserModel.findOne({ email });
+      const existUser = await UserModel.findOne({ email : email });
+  
+      
       // console.log("Existing user found ", existUser);
 
       return existUser;
@@ -402,7 +404,7 @@ export class UserRepositary {
       } else if (category && category === "All") {
         filter = { isBlocked: false };
       }
-
+ 
       const skip = (page - 1) * limit;
       const totalCourses = await Course.countDocuments(filter).exec();
       const totalPages = Math.ceil(totalCourses / limit);

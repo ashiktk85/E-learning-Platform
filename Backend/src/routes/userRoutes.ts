@@ -30,7 +30,7 @@ route.post('/refresh-token', refreshTokenHandler);
 
 // Courses
 route.get('/get-courses', userController.getCourses.bind(userController));
-route.get("/getCourse/:id",verifyToken,userAuth, userController.getCourseDetail.bind(userController));
+route.get("/getCourse/:id",userAuth, userController.getCourseDetail.bind(userController));
 route.post('/createorder', userController.coursePayment.bind(userController));
 route.post('/saveCourse', verifyToken ,userAuth, userController.saveCourse.bind(userController));
 route.get('/check-enrollment/:email/:courseId', CourseAuth, userController.checkEnrollement.bind(userController));
@@ -40,7 +40,7 @@ route.get('/mycourses/:userId',userAuth , userController.MyCourses.bind(userCont
 route.get('/tutorDetail/:id', userController.getTutorDetails.bind(userController))
 route.post(`/walletAdd/:userId`,verifyToken ,userAuth,userController.addMoney.bind(userController))
 route.get(`/getTransactions/:userId`, userController.getTransactions.bind(userController))
-route.get('/ratings/:courseId', verifyToken ,userAuth,userController.getRatings.bind(userController))
+route.get('/ratings/:courseId' ,userAuth,userController.getRatings.bind(userController))
 route.get('/get-orders/:userId', verifyToken ,userAuth ,  userController.getOrders.bind(userController))
 
 

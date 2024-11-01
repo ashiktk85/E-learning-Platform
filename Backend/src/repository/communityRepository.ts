@@ -24,13 +24,15 @@ export class CommunityRepository {
       }, {} as { [key: string]: any });
 
       const messagesWithUserDetails = userMessages.map(userMsg => ({
+        _id : userMsg._id,
         userId: userMsg.userId,
         userDetails: userMap[userMsg.userId] || null,
         message: userMsg.message,
-        timestamp: userMsg.timestamp
+        timestamp: userMsg.timestamp,
+        deleted : userMsg.deleted
       }));
 
-      console.log(messagesWithUserDetails, "Fetched messages with user details");
+      // console.log(messagesWithUserDetails, "Fetched messages with user details");
       return messagesWithUserDetails;
     } catch (error: any) {
       console.log("Error in getting messages from community repository:", error.message);
@@ -99,4 +101,34 @@ export class CommunityRepository {
       return null; 
     }
   }
-}
+
+  static async deleteMessage(messageId: string, courseId : string): Promise<void> {
+    try {
+      const group = await Group.findOne({ courseId });
+
+    if (group) {
+   
+      const message = group.messages.find((msg) => msg._id && msg._id.toString() === messageId);
+      console.log(message , messageId );
+      
+
+      if (message) {
+     
+        message.deleted = true;
+
+        
+        await group.save();
+        console.log("mdg delted");
+        
+      } else {
+        console.log('Message not found in the group');
+      }
+    } else {
+      console.log('Group not found');
+    }
+    }catch (error) {
+      console.error("Error deleting message:", error);
+      throw error;
+    }
+  }
+  }

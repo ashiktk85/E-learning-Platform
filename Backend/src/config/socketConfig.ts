@@ -5,13 +5,17 @@ import Group from '../models/groupSchema';
 import { CommunityRepository } from "../repository/communityRepository";
 import Rating from "../models/ratingModel";
 import { Course } from "../models/courseModel";
+import dotenv from 'dotenv';
+import userModel from "../models/userModel";
+
+dotenv.config();
 
 let io: SocketServer;
 
 const configSocketIO = (server: HttpServer) => {
     io = new SocketServer(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: process.env.BASE_URL,
             methods: ["GET", "POST"],
         },
     });
@@ -31,26 +35,50 @@ const configSocketIO = (server: HttpServer) => {
                 const latestMessage = saveData.messages[saveData.messages.length - 1];
                 const user = await CommunityRepository.fetchUserDetails(userId);
 
-           
                 io.to(courseId).emit('receiveMessage', {
                     userId,
-                    userDetails: user, 
+                    userDetails: user,
                     message: latestMessage.message,
                     timestamp: latestMessage.timestamp,
+                    messageId: latestMessage._id,
                 });
 
             } catch (error) {
                 console.error('Error saving message:', error);
             }
         });
+
+        socket.on('typing', async(payload) => {
+            const user = await userModel.findOne({userId : payload.userId})
+            console.log("user ", user);
+            console.log("pay ", payload);
+            
+            io.to(payload.courseId).emit('userTyping', payload.userId , user?.firstName);
+        });
+
+        socket.on('stopTyping', (payload) => {
+            io.to(payload.courseId).emit('userStoppedTyping', payload.userId);
+        });
+
+        socket.on('deleteMessage', async (payload) => {
+            try {
+                console.log(payload, "payload");
+                
+                const { messageId, courseId } = payload;
+                await CommunityRepository.deleteMessage(messageId , courseId);
+                io.to(courseId).emit('messageDeleted', messageId);
+            } catch (error) {
+                console.error('Error deleting message:', error);
+            }
+        });
+
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);
         });
 
-
         socket.on('submitRating', async (payload) => {
             const { courseId, userId, ratingValue, review } = payload;
-        
+
             try { 
                 const existingRating = await Rating.findOne({ courseId, userId });
                 if (existingRating) {
@@ -63,9 +91,9 @@ const configSocketIO = (server: HttpServer) => {
                     ratingValue,
                     review,
                 });
-        
+
                 await newRating.save();
-                await Course.findOneAndUpdate(courseId, {
+                await Course.findByIdAndUpdate(courseId, {
                     $push: { ratings: newRating._id }
                 });
 
@@ -79,7 +107,6 @@ const configSocketIO = (server: HttpServer) => {
                 console.error('Error submitting rating:', error);
             }
         });
-        
     });
 };
 

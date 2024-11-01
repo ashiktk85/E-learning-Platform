@@ -18,7 +18,7 @@ async function userAuth(req: Request, res: Response, next: NextFunction) {
          console.log(user);
          
          if(user?.isBlocked === true) {
-            return res.status(HTTP_statusCode.NoAccess).json({message : 'User Blocked'})
+            return res.status(HTTP_statusCode.NoAccess).json('User Blocked')
          }
       }
 
