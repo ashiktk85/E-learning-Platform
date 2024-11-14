@@ -37,6 +37,8 @@ app.use(
     skip: (req: Request, res: Response) => res.statusCode < 400, 
   })
 );
+
+app.use(morgan('dev'))
 console.log(process.env.BASE_URL);
 app.use(cors({
   origin: ["https://learnsphere.kevinhills.shop", 'http://localhost:5173'],

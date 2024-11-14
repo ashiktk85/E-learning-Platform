@@ -29,7 +29,7 @@ import IUserService from "../interfaces/user.service.interface";
 
    otpVerification = async(req: Request, res: Response) => {
     try {
-      const {email , otp} = req.body.data;
+      const {email , otp} = req.body;
       await this.userService.otpVerify(email,otp);
       res.status(HTTP_statusCode.OK).json({ message: "verified" });
     } catch (error: any) {

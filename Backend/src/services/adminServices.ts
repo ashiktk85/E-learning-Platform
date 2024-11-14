@@ -195,6 +195,7 @@ class AdminServices implements IAdminServices {
           try {
               const application = await this.adminRepository.findApplication(id);
               const user = await this.userRepository.findUser(application?.email as string)
+              if(!user) throw new Error("User doesnt exist.")
               const uniquePass = createUniquePass(6)
               const updateUser = await this.adminRepository.addTutorCredential(user.email as string ,  uniquePass as any)
               await sendTutorLoginCredentials(user.email as string, uniquePass as any)

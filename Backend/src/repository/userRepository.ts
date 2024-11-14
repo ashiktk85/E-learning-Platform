@@ -22,12 +22,10 @@ class UserRepositary implements IUserRepository {
     this.courseRepo = new BaseRepository(coureModel)
   }
 
-  async findUser(email: string): Promise<IUser> {
+  async findUser(email: string): Promise<IUser | null> {
       try {
         const user = await this.userRepo.find({email : email})
-        if(!user) {
-          throw new Error("User dosent exist.")
-        }
+     
         return user;
       } catch ( error : any) {
       console.error('Error fetching user in user-controller:', error.message);

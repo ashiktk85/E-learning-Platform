@@ -44,7 +44,7 @@ route.post('/refresh-token', refreshTokenHandler);
 // // Courses
 route.get('/get-courses', userController.getCourses.bind(userController));
 route.get("/getCourse/:id", verifyToken,userAuth, userController.courseDetails.bind(userController));
-route.post('/createorder', verifyToken ,userController.coursePayment.bind(userController));
+route.post('/createorder' ,userController.coursePayment.bind(userController));
 route.post('/saveCourse', verifyToken ,userAuth, userController.saveCourse.bind(userController));
 route.get('/check-enrollment/:email/:courseId', verifyToken ,CourseAuth, userController.checkEnrollement.bind(userController));
 route.get('/mycourses/:userId',userAuth , userController.MyCourses.bind(userController));

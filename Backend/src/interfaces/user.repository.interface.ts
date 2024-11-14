@@ -2,7 +2,7 @@ import { ICleanedUser, ICourse, ICourseDetail, IOrder, IRating, ITutorInfo, ITut
 
 
 export interface IUserRepository {
-    findUser(email : string) : Promise<IUser>;
+    findUser(email : string) : Promise<IUser | null>;
     findUserById(userId: string): Promise<IUser>
     getCourse(id: string): Promise<ICourse>;
     validateLoginUser(email: string,password: string): Promise<ICleanedUser>;
