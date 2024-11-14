@@ -1,15 +1,28 @@
 import { Router } from "express";
-import { UserController } from "../controllers/userController";
-import { UserService } from "../services/userServices";
+import  UserController  from "../controllers/userController";
+import  UserService  from "../services/userServices";
 import { verifyToken } from "../config/jwtConfig";
 import { refreshTokenHandler } from "../config/refreshTokenVerify";
 import { CourseAuth } from "../config/CourseAuth";
 import multer from "multer";
 import userAuth from "../config/userAuth";
+import UserRepositary from "../repository/userRepository";
+import userModel from "../models/userModel";
+import { Course } from "../models/courseModel";
+import AdminRepository from "../repository/adminRepository";
+import categoryModel from "../models/categoryModel";
+import TutorApplication from "../models/applicationModel";
+import Report from "../models/reportModel";
+import { CouresRepository } from "../repository/courseRepository";
+
 
 const route = Router();
-const userService = new UserService();
-const userController = new UserController(userService);
+const userRepository = new UserRepositary(userModel , Course)
+const courseRepository = new CouresRepository()
+const adminRepository = new AdminRepository(userModel,Course,categoryModel,TutorApplication ,Report)
+const userService = new UserService(userRepository , adminRepository ,courseRepository)
+
+const userController = new UserController(userService)
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -28,12 +41,12 @@ route.post('/save-userProfile',verifyToken,userAuth, upload.single('profileImage
 route.get('/getProfile/:email' ,verifyToken ,userAuth, userController.getProfile.bind(userController))
 route.post('/refresh-token', refreshTokenHandler);
 
-// Courses
+// // Courses
 route.get('/get-courses', userController.getCourses.bind(userController));
-route.get("/getCourse/:id",userAuth, userController.getCourseDetail.bind(userController));
-route.post('/createorder', userController.coursePayment.bind(userController));
+route.get("/getCourse/:id", verifyToken,userAuth, userController.courseDetails.bind(userController));
+route.post('/createorder', verifyToken ,userController.coursePayment.bind(userController));
 route.post('/saveCourse', verifyToken ,userAuth, userController.saveCourse.bind(userController));
-route.get('/check-enrollment/:email/:courseId', CourseAuth, userController.checkEnrollement.bind(userController));
+route.get('/check-enrollment/:email/:courseId', verifyToken ,CourseAuth, userController.checkEnrollement.bind(userController));
 route.get('/mycourses/:userId',userAuth , userController.MyCourses.bind(userController));
 
 
@@ -42,6 +55,8 @@ route.post(`/walletAdd/:userId`,verifyToken ,userAuth,userController.addMoney.bi
 route.get(`/getTransactions/:userId`, userController.getTransactions.bind(userController))
 route.get('/ratings/:courseId' ,userAuth,userController.getRatings.bind(userController))
 route.get('/get-orders/:userId', verifyToken ,userAuth ,  userController.getOrders.bind(userController))
+route.post('/add-rating',  userController.addRating.bind(userController));
+
 
 
 export default route;

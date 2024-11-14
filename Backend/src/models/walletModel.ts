@@ -1,20 +1,5 @@
 import { Document, Schema, model } from 'mongoose';
-
-interface ITransaction {
-  amount: number;
-  transactionId : string;
-  transactionType: 'credit' | 'course payment';
-  date?: Date;
-  course?: string;
-}
-
-export interface IWallet extends Document {
-  userId: string;
-  balance: number;
-  transactions: ITransaction[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { ITransaction, IWallet } from '../interfaces/common.interfaces';
 
 const transactionSchema = new Schema<ITransaction>({
   amount: { type: Number, required: true },

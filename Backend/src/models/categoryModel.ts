@@ -1,12 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
-
-interface ICategory extends Document {
-  name: string;
-  description?: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Schema, model } from 'mongoose';
+import { ICategory } from '../interfaces/common.interfaces';
 
 const categorySchema = new Schema<ICategory>({
   name: {

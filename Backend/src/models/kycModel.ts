@@ -1,18 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
-
-
-interface IKyc extends Document {
-  userId: string;
-  accountHolderName: string;
-  bankName: string;
-  accountNumber: string;
-  accountType: 'savings' | 'current';
-  ifscCode: string;
-  branchName?: string;
-  currency: string;
-  panCard?: string;
-}
-
+import { Schema, model } from 'mongoose';
+import { IKyc } from '../interfaces/common.interfaces';
 
 const kycSchema = new Schema<IKyc>({
   userId: {

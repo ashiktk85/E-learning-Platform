@@ -1,36 +1,48 @@
 import { Request, Response } from "express";
-import { AdminService } from "../services/adminServices";
-import { emitKeypressEvents } from "readline";
+import { IAdminServices } from "../interfaces/admin.service.interface";
+import HTTP_statusCode from "../Enums/httpStatusCode";
 
-export class AdminController {
-    private adminService : AdminService;
+ class AdminController {
+    private adminService : IAdminServices;
 
-    constructor (adminService : AdminService) {
+    constructor (adminService : IAdminServices) {
         this.adminService = adminService
     }
 
-    async adminLogin(req : Request , res : Response) : Promise<| void> {
+     login = async(req : Request , res : Response) => {
         try {
             const {email , password} = req.body;
-            console.log(email, password);
-            const data = await this.adminService.adminLoginService(email , password);
+            console.log("admin login details",email, password);
+            const serviceResponse = await this.adminService.login(email , password)
             
-            res.status(200).json({ message: "admin  Login successful", data });   
+            res.cookie("AdminRefreshToken", serviceResponse.adminRefreshToken, {
+                httpOnly: true,
+                sameSite: 'none',
+                secure: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+             });
+             res.cookie("AdminAccessToken", serviceResponse.adminAccessToken, {
+                httpOnly: true,
+                sameSite: 'none',
+                secure: true,
+                maxAge: 15 * 60 * 1000,
+             });
+             res.status(HTTP_statusCode.OK).send(serviceResponse);   
         } catch ( error : any) {
-            res.status(500).json({ message: error.message });
+           console.log("Admin := login error",error);
+           if(error.message === "Invalid email") {
+                res.status(HTTP_statusCode.NotFound).json({message : "Email is wrong"})
+           } else if(error.message === "Invalid password") {
+            res.status(HTTP_statusCode.NotFound).json({message : "password is wrong"})
+       }
         }
     }
 
-
-async getUsers(req: Request, res: Response): Promise<void> {
+    getUsers = async(req: Request, res: Response) => {
     try {
-       
         const page = parseInt(req.query.page as string, 10) || 1; 
         const limit = parseInt(req.query.limit as string, 10) || 10; 
-
-        const { users, total } = await this.adminService.getUserListService(page, limit);
-   
-
+        const { users, total } = await this.adminService.getUsersList(page, limit);
         res.status(200).json({
             users,
             total,
@@ -38,254 +50,229 @@ async getUsers(req: Request, res: Response): Promise<void> {
             totalPages: Math.ceil(total / limit),
         });
     } catch (error: any) {
-        console.error("Error fetching users in controller:", error.message);
-        res.status(500).json({ message: error.message });
+        console.log("Admin := getusers error",error);
+        if(error.message === 'Invalid page number') {
+            res.status(HTTP_statusCode.BadRequest).json({message : "Invalid page number"})
+        } else if (error.message === 'Invalid limit value') {
+            res.status(HTTP_statusCode.BadRequest).json({message : 'Invalid limit value'})
+        }
+        res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
     }
 }
 
-async getTutors(req: Request, res: Response): Promise<void> {
+    getTutors = async(req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string, 10) || 1; 
         const limit = parseInt(req.query.limit as string, 10) || 10; 
-
-        const { users, total } = await this.adminService.getTutorsService(page, limit);
-        
-
+        const { tutors, total } = await this.adminService.getTutors(page, limit);
         res.status(200).json({
-            users,
+            tutors,
             total,
             currentPage: page,
             totalPages: Math.ceil(total / limit),
         });
     } catch (error: any) {
-        console.error("Error fetching users in controller:", error.message);
+        console.log("Admin := getusers error in controller",error);
+        if(error.message === 'Invalid page number') {
+            res.status(HTTP_statusCode.BadRequest).json({message : "Invalid page number"})
+        } else if (error.message === 'Invalid limit value') {
+            res.status(HTTP_statusCode.BadRequest).json({message : 'Invalid limit value'})
+        }
         res.status(500).json({ message: error.message });
     }
-}
+    }
 
 
-    async blockUser(req : Request , res : Response) : Promise<any | void> {
+     blockUser = async(req : Request , res : Response) => {
         try {
-           const { email } = req.params
-           console.log(email, "em");
-           
-            const response = await this.adminService.blockUserService(email)
-            // console.log(response)
-            res.status(200).json(response)
+           const { email } = req.params 
+            const status = await this.adminService.blockUser(email)
+            res.status(HTTP_statusCode.updated).json(status)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            console.log("Admin := getusers error in controller",error);
+            if(error.message === 'User not found') {
+                res.status(HTTP_statusCode.NotFound).json({message : 'User not found'})
+            } else if(error.message === 'User is already blocked') {
+                res.status(HTTP_statusCode.NotFound).json({message : 'User is already blocked'})
+            }
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     } 
 
-    async unblockUser(req : Request , res : Response) : Promise<any | void> {
+    unblockUser = async(req : Request , res : Response) => {
         try {
-           const { email } = req.params
-            const response = await this.adminService.unblockeUserService(email)
-            // console.log(response);
-            res.status(200).json(response)  
+           const { email } = req.params 
+            const status = await this.adminService.unBlockUser(email)
+            res.status(HTTP_statusCode.updated).json(status)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            console.log("Admin := getusers error in controller",error);
+            if(error.message === 'User not found') {
+                res.status(HTTP_statusCode.NotFound).json({message : 'User not found'})
+            } else if(error.message === 'User is already unblocked') {
+                res.status(HTTP_statusCode.NotFound).json({message : 'User is already unblocked'})
+            }
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     } 
 
-    async getApplicationsController(req : Request , res : Response) : Promise<any | void> {
+
+
+     getApplications = async(req : Request , res : Response) => {
         try {
-
-            const getApplications = await this.adminService.getApplicationService()
-
-            // console.log("user list contriller", getApplications);
-            res.status(200).json(getApplications)
-            
+            const getApplications = await this.adminService.getApplications()
+            res.status(HTTP_statusCode.OK).json(getApplications)        
         } catch (error : any ) {
-            res.status(500).json({ message: error.message });
+            console.log("Admin := getusers error in controller",error);
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async getOneApplication(req : Request , res : Response) : Promise<any | void> {
+     findApplication = async(req : Request , res : Response) => {
         try {
             const {id} =  req.params;
-            const applicant = await this.adminService.getOneApplicationService(id)
-            res.status(200).json(applicant)
+            const applicant = await this.adminService.findApplication(id)
+            res.status(HTTP_statusCode.OK).json(applicant)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            console.log("Admin := getusers error in controller",error);
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async acceptApplication(req : Request , res : Response) {
+     acceptApplication = async(req : Request , res : Response) => {
         try {
-            const { id } = req.params
-            console.log("id " , id);
+            const { id } = req.params;
             const response  = await this.adminService.acceptApplicaiton(id)       
-            if(response) {
-                res.status(200).json(response)
-            }   
-        } catch (error) {
-            
+            res.status(HTTP_statusCode.updated).json(response)   
+        } catch (error : any) {
+            console.log("Admin := getusers error in controller",error);
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async checkTutorStatus(req : Request , res : Response) : Promise<boolean | void> {
+     checkTutorStatus= async(req : Request , res : Response) =>  {
         try {
             const { email } = req.params
-            console.log("id " , email);
-            const response  = await this.adminService.checkStatus(email)
-          
-            
-            
-                res.status(200).json(response)
-                
+            const response  = await this.adminService.checkTutorStatus(email)
+            res.status(HTTP_statusCode.OK).json(response)       
         } catch (error :any) {
-            res.status(500).json({ message: error.message });
+            console.log("Admin := getusers error in controller",error);
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async createCategory(req : Request , res :Response) : Promise<any> {
+     createCategory = async(req : Request , res :Response) => {
         try {
             const {categoryName , description} = req.body
-            const response = await this.adminService.createCategoryService(categoryName as string , description as string)
-            if(response) {
-                res.status(200).json(response)
-            }
+            const response = await this.adminService.createCategory(categoryName as string , description as string)
+            res.status(HTTP_statusCode.updated).json(response)
         } catch ( error : any) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-
-    async getCategories(req : Request , res : Response) : Promise<any> {
-        try {
-            const response = await this.adminService.getCategoriesService()
-             if(response) {
-                res.status(200).json(response)
+            console.log("Admin := getusers error in controller",error);
+            if (error.message === "Category already exists.") {
+                return res.status(HTTP_statusCode.Conflict).json({ message: error.message });
             }
-        } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async userReport(req : Request , res :Response) {
+     getCategories = async(req : Request , res : Response) => {
+        try {
+            const response = await this.adminService.getCategories()
+            res.status(HTTP_statusCode.OK).json(response)   
+        } catch (error : any) {
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+        }
+    }
+
+    reportCourse = async(req : Request , res :Response) => {
         try {
           const  {courseId  ,reason ,additionalInfo} = req.body;
-          console.log(req.body)
-        
-          
-            const reporting = await this.adminService.reportCourseService(courseId  , reason , additionalInfo)
-
-            if(reporting === true) {
-              return  res.status(201).json(true)
-            } 
-
-            res.json(false)
-
+          const report = await this.adminService.reportCourse(courseId  , reason , additionalInfo)
+          res.status(HTTP_statusCode.updated).json(report)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async getReports(req: Request, res: Response) {
+    getReports = async(req: Request, res: Response) => {
         try {
-            // Extract pagination parameters from the query
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-    
-            // Call the service method with pagination parameters
-            const { reports, totalPages } = await this.adminService.getReportService(page, limit);
-    
-            res.status(200).json({ reports, totalPages });
+            const { reports, totalPages } = await this.adminService.getReports(page, limit);
+            res.status(HTTP_statusCode.OK).json({ reports, totalPages });
         } catch (error: any) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-    
-
-    async reportDetail(req : Request , res :Response) {
-        try {
-            const {reportId} = req.params
-            // console.log(reportId);
-            
-            const report = await this.adminService.reportDetail(reportId)
-
-            res.status(200).json(report)
-
-            
-        } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-
-    async getCourses(req: Request, res: Response) {
+    getCourses = async(req: Request, res: Response) => {
         try {
-            
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-    
-         
             const { courses, totalCourses } = await this.adminService.getCourses(page, limit);
             const totalPages = Math.ceil(totalCourses / limit);
-            console.log(totalPages,"tot")
-    
-            res.status(200).json({ courses, totalPages });
+            res.status(HTTP_statusCode.OK).json({ courses, totalPages });
         } catch (error: any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async blockCourse(req : Request , res :Response) {
+     reportDetail = async(req : Request , res :Response) => {
+        try {
+            const {reportId} = req.params
+            const report = await this.adminService.reportDetail(reportId)
+            res.status(HTTP_statusCode.OK).json(report)
+        } catch (error : any) {
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
+        }
+    }
+
+     blockCourse = async(req : Request , res :Response) =>  {
         try {
             const { courseId } = req.params;
-
-            console.log("loof,",courseId);
-            
-
-            const response = await this.adminService.blockCourseService(courseId)
-
-            res.status(200).json(response)
+            const response = await this.adminService.blockCourse(courseId)
+            res.status(HTTP_statusCode.updated).json(response)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async unBlockCourse(req : Request , res :Response) {
-        try {
+     unBlockCourse = async(req : Request , res :Response) => {
+        try { 
             const { courseId } = req.params;
-
-            const response = await this.adminService.unBlockCourseService(courseId)
-            res.status(200).json(response)
+            const response = await this.adminService.unBlockCourse(courseId)
+            res.status(HTTP_statusCode.updated).json(response)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async getDashboard(req : Request , res :Response) {
+     getDashboard = async(req : Request , res :Response) => {
         try {
-            const response = await this.adminService.getDashboardService()
-            res.status(200).json(response)
+            const dashboard = await this.adminService.getDashboard()
+            res.status(HTTP_statusCode.OK).json(dashboard)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async getTopTutors(req : Request , res :Response) {
+     getTopTutors = async(req : Request , res :Response) => {
         try {
-            const response = await this.adminService.getTopTutorsService()
-            // console.log(response);
-            
-            res.status(200).json(response)
+            const topTutors = await this.adminService.getTopTutors()
+            res.status(HTTP_statusCode.OK).json(topTutors)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
 
-    async getTopCourses(req : Request , res :Response) {
-        try {
-            console.log("con");
-            
-            const response = await this.adminService.getTopCourseServices()
-            // console.log(response);
-            
-            res.status(200).json(response)
+     getTopCourses = async(req : Request , res :Response) => {
+        try {  
+            const topCourses = await this.adminService.getTopCourses() 
+            res.status(HTTP_statusCode.OK).json(topCourses)
         } catch (error : any) {
-            res.status(500).json({ message: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: error.message });
         }
     }
+
 }
+
+export default AdminController;

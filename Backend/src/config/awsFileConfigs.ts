@@ -33,12 +33,12 @@ export class AwsConfig {
 
   async getfile(fileName: string, folder: string): Promise<string> {
     try {
-      const store = asyncLocalStorage.getStore();
-      const referer = store?.referer;
+      // const store = asyncLocalStorage.getStore();
+      // const referer = store?.referer;
 
-      if (!referer || !referer.startsWith(ALLOWED_REFERER)) {
-        throw new Error("Unauthorized: Invalid referer");
-      }
+      // if (!referer || !referer.startsWith(ALLOWED_REFERER)) {
+      //   throw new Error("Unauthorized: Invalid referer");
+      // }
 
       const options = {
         Bucket: this.bucketName,

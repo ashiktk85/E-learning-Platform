@@ -1,57 +1,78 @@
-import { TutorRepositary } from "../repository/tutorRepositary";
+// import { TutorRepositary } from "../repository/tutorRepositary";
 import { v4 as uuidv4 } from "uuid";
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-  CreateMultipartUploadCommand,
-  UploadPartCommand,
-  CompleteMultipartUploadCommand,
-  AbortMultipartUploadCommand,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+// import {
+//   S3Client,
+//   PutObjectCommand,
+//   GetObjectCommand,
+//   DeleteObjectCommand,
+//   CreateMultipartUploadCommand,
+//   UploadPartCommand,
+//   CompleteMultipartUploadCommand,
+//   AbortMultipartUploadCommand,
+// } from "@aws-sdk/client-s3";
+// import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+
 import { AwsConfig } from "../config/awsFileConfigs";
+import { IUserRepository } from "../interfaces/user.repository.interface";
+import { IAdminRepository } from "../interfaces/admin.repository.interface";
+import ICourseRepository from "../interfaces/course.repository.interface";
+import ITutorRepository from "../interfaces/tutor.repository.interface";
+import INewCourseDetails, { ICourse, IMonthlyEnrollment, IMonthlyRevenue, ITutorDashBoard, ITutorInfo, ITutorProfile, IVideo } from "../interfaces/common.interfaces";
 
-import { UserRepositary } from "../repository/userRepository";
-import { ICourse, ISection, IVideo } from "../models/courseModel";
+// import { UserRepositary } from "../repository/userRepository";
+// import { ICourse, ISection, IVideo } from "../models/courseModel";
 
-import { CouresRepository } from "../repository/courseRepository";
-import { String } from "aws-sdk/clients/batch";
-import { compressVideo } from "../helper/videoCompression";
-import fs from 'fs';
-import userModel from "../models/userModel";
+// import { CouresRepository } from "../repository/courseRepository";
+// import { String } from "aws-sdk/clients/batch";
+// import { compressVideo } from "../helper/videoCompression";
+// import fs from 'fs';
+// import userModel from "../models/userModel";
 
-require("dotenv").config();
+// require("dotenv").config();
 
-interface CourseData {
-  courseId: string;
-  courseName: string;
-  description: string;
-  language: string;
-  tags: string[];
-  selectedCategory: string;
-  sections: {
-    name: string;
-    description: string;
-    videos: { title: string; videoUrl: string }[];
-  }[];
-  additionalDetail1: string;
-  price: string;
-  files: { type: string; url: string }[];
-  profilePhotoUrl?: string;
-}
+// interface CourseData {
+//   courseId: string;
+//   courseName: string;
+//   description: string;
+//   language: string;
+//   tags: string[];
+//   selectedCategory: string;
+//   sections: {
+//     name: string;
+//     description: string;
+//     videos: { title: string; videoUrl: string }[];
+//   }[];
+//   additionalDetail1: string;
+//   price: string;
+//   files: { type: string; url: string }[];
+//   profilePhotoUrl?: string;
+// }
 
-const aws = new AwsConfig();
+// const aws = new AwsConfig();
 
-export class TutorServices {
+ class TutorService {
+    private userRepository : IUserRepository;
+    private adminRepository : IAdminRepository;
+    private courseRepository : ICourseRepository;
+    private tutorRepository : ITutorRepository;
+
+    constructor(
+      userRepository : IUserRepository,
+      adminRepository : IAdminRepository,
+      courseRepository : ICourseRepository,
+      tutorRepository : ITutorRepository
+    ) {
+      this.userRepository = userRepository,
+      this.adminRepository = adminRepository,
+      this.courseRepository = courseRepository,
+      this.tutorRepository = tutorRepository
+    }
+
   private awsConfig = new AwsConfig();
 
-  async tutorApplicationService(files: any, data: any): Promise<void> {
-    const bucketName = "learn-sphere";
-
+  async tutorApplication(files: any, data: any): Promise<void> {
     const fileUrls: { type: string; url: string }[] = [];
-
     if (files.idProof) {
       const url = await this.awsConfig.uploadFileToS3(
         "tutorApplication/idProofs/",
@@ -59,7 +80,6 @@ export class TutorServices {
       );
       fileUrls.push({ type: "idProof", url });
     }
-
     if (files.resume) {
       const url = await this.awsConfig.uploadFileToS3(
         "tutorApplication/resume/",
@@ -67,7 +87,6 @@ export class TutorServices {
       );
       fileUrls.push({ type: "resume", url });
     }
-
     if (files.certifications) {
       for (const certificate of files.certifications) {
         const url = await this.awsConfig.uploadFileToS3(
@@ -77,156 +96,34 @@ export class TutorServices {
         fileUrls.push({ type: "certification", url });
       }
     }
-
     const applicationId = uuidv4();
     const combinedData = {
       applicationId,
       ...data,
       files: fileUrls,
     };
-
-    await TutorRepositary.saveApplication(combinedData as any);
+    await this.tutorRepository.saveApplication(combinedData as any);
   }
 
-  async createCourseService(files: any, courseData: any, email: string) {
+    async verifyLogin(applicationId: string,passcode: string): Promise<ITutorInfo> {
     try {
-      const bucketName = "learn-sphere";
-      const fileUrls: { type: string; url: string }[] = [];
-      let courseId = uuidv4();
-
-      courseData = Object.assign({}, courseData);
-
-      console.log("Course Data:", courseData);
-      console.log("Files:", files);
-
-      courseId = courseId + `-${courseData.courseName}`;
-      const tutorFolderPath = `tutors/${email}/courses/${courseId}/`;
-
-      for (const file of files) {
-        console.log("Processing File:", file);
-        
-
-        if (file.fieldname.startsWith("sections")) {
-          const folderPath = `${tutorFolderPath}videos/`;
-         
-          console.log(`Uploading video to ${folderPath}`);
-          const url = await this.awsConfig.uploadFileToS3(folderPath, file);
-          fileUrls.push({ type: "video", url });
-        } else if (file.fieldname === "thumbnail") {
-          const folderPath = `${tutorFolderPath}thumbnail/`;
-
-          console.log(`Uploading thumbnail to ${folderPath}`);
-          const url = await this.awsConfig.uploadFileToS3(folderPath, file);
-          fileUrls.push({ type: "thumbnail", url });
-        }
-      }
-
-      console.log("All files uploaded. File URLs:", fileUrls);
-
-      const combinedData = {
-        courseId,
-        ...courseData,
-        files: fileUrls,
-      };
-      // console.log("vidd",combinedData.sections[0].video,"com");
-      const res = await TutorRepositary.saveCourse(
-        combinedData as any,
-        email as string
-      );
-      console.log("Course saved successfully:", res);
-      return res;
-    } catch (error) {
-      console.error("Error creating course:", error);
-      throw error;
-    }
-  }
-
-  // async  createCourseService(files: Express.Multer.File[], courseData: any, email: string) {
-  //   try {
-  //     const bucketName = "learn-sphere";
-  //     const fileUrls: { type: string; url: string }[] = [];
-  //     let courseId = uuidv4();
-  
-  //     courseData = Object.assign({}, courseData);
-  
-  //     console.log("Course Data:", courseData);
-  //     console.log("Files:", files);
-  
-  //     courseId = courseId + `-${courseData.courseName}`;
-  //     const tutorFolderPath = `tutors/${email}/courses/${courseId}/`;
-  
-  //     for (const file of files) {
-  //       console.log("Processing File:", file);
-  
-  //       if (!file.buffer) {
-  //         throw new Error(`Invalid file buffer for file: ${file.fieldname}`);
-  //       }
-  
-  //       if (file.fieldname.includes('videos')) {
-  //         const folderPath = `${tutorFolderPath}videos/`;
-  
-  //         console.log("Compressing video...");
-  //         const compressedFile = await compressVideo(file);
-          
-  //         console.log(`Uploading compressed video to ${folderPath}`);
-  //         const url = await this.awsConfig.uploadFileToS3(folderPath, compressedFile);
-  //         fileUrls.push({ type: "video", url });
-  //       } else if (file.fieldname === 'thumbnail') {
-  //         const folderPath = `${tutorFolderPath}thumbnail/`;
-  
-  //         console.log(`Uploading thumbnail to ${folderPath}`);
-  //         const url = await this.awsConfig.uploadFileToS3(folderPath, file);
-  //         fileUrls.push({ type: "thumbnail", url });
-  //       }
-  //     }
-  
-  //     console.log("All files uploaded. File URLs:", fileUrls);
-  
-  //     const combinedData = {
-  //       courseId,
-  //       ...courseData,
-  //       files: fileUrls,
-  //     };
-  
-  //     const res = await TutorRepositary.saveCourse(
-  //       combinedData as any,
-  //       email as string
-  //     );
-  //     console.log("Course saved successfully:", res);
-  //     return res;
-  //   } catch (error) {
-  //     console.error("Error creating course:", error);
-  //     throw error;
-  //   }
-  // }
-
-  
-  async verifyLoginService(
-    applicationId: string,
-    passcode: string
-  ): Promise<any | void> {
-    try {
-      const response = await UserRepositary.verifyTutor(
+      return await this.userRepository.verifyTutor(
         applicationId,
         passcode
       );
-
-      return response;
     } catch (error: any) {
       console.error("Error verifying tutor login in services", error.message);
       throw new Error(error.message);
     }
   }
 
-  async getApplicationDataService(email: string): Promise<any> {
+  getApplicationData = async(email: string): Promise<any> => {
     try {
-      const response = await UserRepositary.getApplicantDataRepo(
+      const response = await this.userRepository.getApplicantData(
         email as string
       );
-
       if (response?.profilePhotoUrl) {
         console.log(typeof response?.profilePhotoUrl);
-
         const profileUrl = await this.awsConfig.getfile(
           response?.profilePhotoUrl,
           `tutorProfile/profileImgs/`
@@ -243,10 +140,9 @@ export class TutorServices {
     }
   }
 
-  async editProfileService(data: any) {
+    editProfile = async(data: any) : Promise<ITutorProfile> => {
     try {
-      const res = await TutorRepositary.editProfileRepo(data as any);
-      return res;
+      return await this.tutorRepository.editProfile(data as any);
     } catch (error: any) {
       console.error(
         "Error getting applicant data for tutor profile in services",
@@ -256,25 +152,60 @@ export class TutorServices {
     }
   }
 
-  async getCoursesWithSignedUrls(email: string) {
+   createCourse = async( files: any, courseData: any, email: string) : Promise<boolean> => {
     try {
-      const courses = await TutorRepositary.getCoursesByTutor(email);
-
-      const awsConfig = new AwsConfig();
+      const fileUrls: { type: string; url: string }[] = [];
+      let courseId = uuidv4();
+      courseData = Object.assign({}, courseData);
+      courseId = courseId + `-${courseData.courseName.split('').join('')}`;
+      const tutorFolderPath = `tutors/${email}/courses/${courseId}/`;
+      for (const file of files) {
+        console.log("Processing File:", file);
+        if (file.fieldname.startsWith("sections")) {
+          const folderPath = `${tutorFolderPath}videos/`;
+          console.log(`Uploading video to ${folderPath}`);
+          const url = await this.awsConfig.uploadFileToS3(folderPath, file);
+          fileUrls.push({ type: "video", url });
+        } else if (file.fieldname === "thumbnail") {
+          const folderPath = `${tutorFolderPath}thumbnail/`;
+          console.log(`Uploading thumbnail to ${folderPath}`);
+          const url = await this.awsConfig.uploadFileToS3(folderPath, file);
+          fileUrls.push({ type: "thumbnail", url });
+        }
+      }
+      console.log("All files uploaded. File URLs:");
+      const combinedData = {
+        courseId,
+        ...courseData,
+        files: fileUrls,
+      };
+      console.log("Course saved successfully:");
+      return await this.tutorRepository.saveCourse(
+        combinedData,
+        email
+      );
+    } catch (error) {
+      console.error("Error creating course:", error);
+      throw error;
+    }
+  }
+  
+   getCoursesWithSignedUrls = async(email: string) : Promise<ICourse[]> => {
+    try {
+      const courses = await this.tutorRepository.getCoursesByTutor(email);
       const coursesWithUrls = await Promise.all(
         courses.map(async (course: ICourse) => {
           const thumbnailUrl = course.thumbnail
-            ? await awsConfig.getfile(
+            ? await this.awsConfig.getfile(
                 course.thumbnail,
                 `tutors/${email}/courses/${course.courseId}/thumbnail`
               )
             : null;
-
           const sectionsWithUrls = await Promise.all(
             course.sections.map(async (section: any) => {
               const videosWithUrls = await Promise.all(
                 section.videos.map(async (video: any) => {
-                  const videoUrl = await awsConfig.getfile(
+                  const videoUrl = await this.awsConfig.getfile(
                     video.videoUrl,
                     `tutors/${email}/courses/${course.courseId}/sections/${section._id}/videos`
                   );
@@ -292,7 +223,6 @@ export class TutorServices {
           };
         })
       );
-
       return coursesWithUrls;
     } catch (error) {
       console.error("Error fetching courses with signed URLs:", error);
@@ -300,29 +230,35 @@ export class TutorServices {
     }
   }
 
-  //   async uploadProfile(email : string , file :  any) {
-  //     try {
+   kycVerify = async(email : string, data : any) : Promise<boolean> => {
+    try {  
+      const userTutor = await this.userRepository.findUser(email as any)
+      if(!userTutor) throw new Error("No user found")
+      return await this.tutorRepository.saveKyc(userTutor?.userId , data)
+    } catch (error) {
+      console.error("Error in saving kyc service:", error);
+      throw error;
+    }
+  }
 
-  //         const bucketName = "learn-sphere";
-  //         const profileKey = `tutorProfile/profileImgs/${file.originalname}`;
-
-  //         const uploadResult = await this.awsConfig.uploadFileToS3(bucketName, profileKey, file);
-
-  //         const res = await TutorRepositary.uploadProfileRepo(email as string, uploadResult)
-
-  //         return res;
-  //     } catch (error) {
-  //         console.error('Error in uploding profile in tutor service:', error);
-  //         throw error;
-  //     }
-  //   }
-  async updateCourseService(courseId: string, newData: any) {
+  kycStatusCheck = async(email : string) : Promise<boolean> =>  {
     try {
-      const update = await CouresRepository.updateCourse(
+      const user = await this.userRepository.findUser(email as string)
+      let boolean = false;
+      if(user?.kyc) user?.kyc === 'verified' ? boolean = true : boolean = false; 
+      return boolean
+    } catch (error) {
+      console.error("Error in saving kyc service:", error);
+      throw error;
+    }
+  }
+
+   updateCourse = async(courseId: string, newData: any) : Promise<INewCourseDetails> =>   {
+    try {
+      const update = await this.courseRepository.updateCourse(
         courseId as string,
         newData
       );
-
       const newCourseDetail = {
         name: update?.name,
         category: update?.category,
@@ -336,61 +272,29 @@ export class TutorServices {
     }
   }
 
-  async updateThumbnail(courseId: string, thumbnail: any) {
-    try {
-      const course = await UserRepositary.getCourse(courseId as String);
-      const thumbnailUrl = await aws.uploadFileToS3(
-        `tutors/${course?.email}/courses/${course.courseId}/thumbnail`,
-        thumbnail
-      );
-      const update = await CouresRepository.updateCourse(
-        courseId as string,
-        thumbnailUrl
-      );
 
-      const signedUrl = await aws.getfile(
-        thumbnailUrl,
-        `tutors/${course?.email}/courses/${course.courseId}/thumbnail`
-      );
-      return signedUrl;
-    } catch (error) {
-      console.error("Error fetching courses with signed URLs:", error);
-      throw error;
-    }
-  }
 
-  async getDashboard(email: string) {
+   getDashboard = async(email: string) : Promise<ITutorDashBoard> => {
     try {
-      const awsConfig = new AwsConfig();
-      const userTutor = await UserRepositary.existUser(email);
+      const userTutor = await this.userRepository.findUser(email);
       if (!userTutor) throw new Error("Tutor dosent exist.");
-
-      const totalIncome = await UserRepositary.incomeWallet(userTutor?.userId);
-
-      const tutorProfile = await TutorRepositary.getTutorDetail(email);
+      const totalIncome = await this.userRepository.incomeWallet(userTutor?.userId);
+      const tutorProfile = await this.tutorRepository.getTutorDetail(email);
       if (!tutorProfile) throw new Error("TutorProfile dosent exist.");
       let profileUrl = ""
-
       if(userTutor?.profile) {
-          profileUrl = await awsConfig.getfile(
+          profileUrl = await this.awsConfig.getfile(
           userTutor?.profile as string,
           `users/profile/${userTutor?.userId}`
         );
-      }
-
-      
-        
-      const courses = await TutorRepositary.getCoursesByTutor(email);
-
+      }       
+      const courses = await this.tutorRepository.getCoursesByTutor(email);
       const totalCourses = courses.length;
-
       const uniqueStudents = new Set();
-      courses.forEach((course) => {
+      courses.forEach((course : ICourse) => {
         course.users?.forEach((user) => uniqueStudents.add(user));
       });
-
       const totalStudents = uniqueStudents.size;
-
       const dashboardData = {
         name: userTutor?.firstName + " " + userTutor?.lastName,
         profileUrl,
@@ -400,8 +304,6 @@ export class TutorServices {
         totalCourses,
         income: totalIncome,
       };
-      //    console.log(dashboardData);
-
       return dashboardData;
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -409,98 +311,52 @@ export class TutorServices {
     }
   }
 
-  async getMonthlyData(year: number) {
+    updateVideo = async(_id : string, title : string , description : string) : Promise<IVideo> =>{
     try {
-      const userEnrollments = await TutorRepositary.getMonthlyUserEnrollments(year);
-      const revenue = await TutorRepositary.getMonthlyRevenue(year);
-        
-      
+      return await this.courseRepository.updateVid(_id as string, title as string , description as string)
+    } catch (error) {
+      console.error("Error fetching monthly  data:", error);
+      throw error;
+    }
+  }
+
+  
+   deleteVideo = async(videoId : string, courseId : string ) : Promise<boolean | null> => {
+    try {
+        return await this.courseRepository.deleteVideo(videoId as string, courseId as string )
+    } catch (error) {
+      console.error("Error fetching monthly  data:", error);
+      throw error;
+    }
+  }
+
+   getMonthlyData = async(year: number) :  Promise<{enrollments : IMonthlyEnrollment[] ,revenue :IMonthlyRevenue[] }> => {
+    try {
+      const userEnrollments = await this.tutorRepository.getMonthlyUserEnrollments(year);
+      const revenue = await this.tutorRepository.getMonthlyRevenue(year);
       return {
         enrollments : userEnrollments,
         revenue
       }
-      
     } catch (error) {
       console.error("Error fetching monthly  data:", error);
       throw error;
     }
   }
 
-  async updateVideo(_id : string, title : string , description : string) {
+  async addVideo(name : string, description : string , newVideo : any, sectionId : string , courseId : string) : Promise<IVideo> {
     try {
-     
-        const updatedVideo = await CouresRepository.updateVid(_id as string, title as string , description as string)
-      return updatedVideo;
-      
-    } catch (error) {
-      console.error("Error fetching monthly  data:", error);
-      throw error;
-    }
-  }
-
-  async deleteVideo(videoId : string, courseId : string ) {
-    try {
-     
-        const response = await CouresRepository.deleteVideoRepo(videoId as string, courseId as string )
-      return response;
-      
-    } catch (error) {
-      console.error("Error fetching monthly  data:", error);
-      throw error;
-    }
-  }
-
-  
-
-  async addVideoService(name : string, description : string , newVideo : any, sectionId : string , courseId : string) {
-    try {
-      const { tutorEmail } = await UserRepositary.getCourse(courseId)
-      const tutorFolderPath = `tutors/${tutorEmail}/courses/${courseId}/videos/`
+      const { email } = await this.userRepository.getCourse(courseId)
+      const tutorFolderPath = `tutors/${email}/courses/${courseId}/videos/`
        const url = await this.awsConfig.uploadFileToS3(tutorFolderPath , newVideo)
-
-       const update = await TutorRepositary.addVideo(name , description , url, sectionId ,courseId)
-       return update
-      
+       return  await this.tutorRepository.addVideo(name , description , url, sectionId ,courseId)
     } catch (error) {
       console.error("Error fetching monthly  data:", error);
       throw error;
     }
   }
 
-  async kycVerify(email : string, data : any) {
-    try {
-      console.log(email);
-      
-      const userTutor = await UserRepositary.existUser(email as any)
-
-      if(!userTutor) throw new Error("No user found")
-
-      const saveKyc = await TutorRepositary.saveKyc(userTutor?.userId , data)
-      
-      return true;
-    } catch (error) {
-      console.error("Error in saving kyc service:", error);
-      throw error;
-    }
-  }
-
-  async kycStatusCheck(email : string) {
-    try {
-      const user = await UserRepositary.existUser(email as string)
-      let boolean = false;
-      if(user?.kyc) user?.kyc === 'verified' ? boolean = true : boolean = false; 
-
-      return boolean
-    } catch (error) {
-      console.error("Error in saving kyc service:", error);
-      throw error;
-    }
-  }
-
-  
-  
+ }
 
 
-}
-
-
+export default TutorService;

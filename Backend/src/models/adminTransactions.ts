@@ -1,22 +1,9 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IAdminTransaction } from '../interfaces/common.interfaces';
 
-export interface IAdminTransaction extends Document {
-  transactionId: string;
-  amount: number;
-  timestamp: Date;
-  course: {
-    courseId: string;
-    courseName: string;
-    tutor: {
-      tutorId: string;
-      tutorName: string;
-    };
-    price: number;
-  };
-  status: 'pending' | 'completed' | 'failed';
-}
 
-const adminTransactionSchema: Schema = new Schema({
+
+const adminTransactionSchema: Schema = new Schema<IAdminTransaction>({
   transactionId: { type: String, required: true, unique: true },
   amount: { type: Number, required: true },
   timestamp: { type: Date, default: Date.now },

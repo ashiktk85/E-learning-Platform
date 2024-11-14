@@ -1,41 +1,5 @@
 import mongoose, { Schema, Types, Document } from 'mongoose';
-
-interface IVideo extends Document {
-  title: string;
-  description?: string;
-  videoUrl: string;
-}
-
-interface ISection extends Document {
-  title: string;
-  description?: string;
-  videos: Types.ObjectId[]; 
-}
-
-interface IUser extends Document {
-  userId: Types.ObjectId;
-  joinDate: Date; // New field to track when the user joined
-}
-
-interface ICourse extends Document {
-  courseId: string;
-  email: string;
-  name: string;
-  description: string;
-  price : number | string;
-  category: string;
-  sections: Types.ObjectId[]; 
-  tags: string[];
-  language: string;
-  ratings?: Types.ObjectId[]; 
-  comments?: Types.ObjectId[];
-  thumbnail?: string;
-  isBlocked : boolean;
-  createdAt : Date;
-  users ?: [];
-  averageRating ?: number ;
-  totalRatings ?: number;
-}
+import { ICourse, ISection, IVideo } from '../interfaces/common.interfaces';
 
 const videoSchema = new Schema<IVideo>({
   title: {

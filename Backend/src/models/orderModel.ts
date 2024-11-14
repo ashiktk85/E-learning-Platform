@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
+import { IOrder } from '../interfaces/common.interfaces';
 
-const OrderSchema = new Schema({
+const OrderSchema = new Schema<IOrder>({
   userId: { type: String, required: true },
   courseId: { type: String, required: true },
   totalAmount: { type: Number, required: true },
@@ -15,17 +16,6 @@ const OrderSchema = new Schema({
 { versionKey: false }
 );
 
-interface IOrder extends Document {
-  userId: string;
-  courseId: string;
-  totalAmount: number;
-  currency: string;
-  paymentId: string;
-  orderId: string;
-  paymentStatus: 'Pending' | 'Completed' | 'Failed';
-  createdAt: Date;
-  updatedAt: Date;
 
-}
 
 export default model<IOrder>('Order', OrderSchema);

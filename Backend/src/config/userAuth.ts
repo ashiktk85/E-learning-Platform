@@ -3,11 +3,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import { UserService } from "../services/userServices";
 import userModel from "../models/userModel";
-
-const userService = new UserService();
-
 
 async function userAuth(req: Request, res: Response, next: NextFunction) {
    try {

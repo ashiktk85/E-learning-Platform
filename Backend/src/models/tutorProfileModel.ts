@@ -1,33 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { ITutorProfile } from '../interfaces/common.interfaces';
 
-interface ITutorProfile extends Document {
-  userId: mongoose.Types.ObjectId; 
-  email : string;
-  profilePhotoUrl ?: string;
-  role : string;
-  country ?: string;
-  language ?: String;
-  bio: string;
-  education : string;
-  experience: string;
-  // expertise: string[];
-  socialLinks ?: {
-    youtube?: string;
-    instagram?: string;
-    linkedin?: string;
-    twitter?: string;
-  };
-  certifications?: {
-    title: string;
-    issuer: string;
-    date: Date;
-    certificateUrl: string;
-  }[];
-  createdAt: Date;
-  updatedAt: Date;
-}
 
-const TutorProfileSchema: Schema = new Schema({
+
+const TutorProfileSchema: Schema = new Schema<ITutorProfile>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   email: {type: String, required: true},
   role: {type: String, required: true},
@@ -37,7 +13,6 @@ const TutorProfileSchema: Schema = new Schema({
   bio: { type: String, required: true },
   education: {type: String, required: true},
   experience: {type : String },
-  // expertise: [{ type: String, required: true }],
   socialLinks: {
     youtube: { type: String },
     instagram: { type: String },

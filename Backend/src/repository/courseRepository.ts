@@ -1,48 +1,28 @@
 import mongoose, { Types } from "mongoose";
-import { Course, Section, Video } from "../models/courseModel";
+import { Course, ICourse, IVideo, Section, Video } from "../models/courseModel";
 import TutorProfile from "../models/tutorProfileModel";
+import ICourseRepository from "../interfaces/course.repository.interface";
 
-interface CourseData {
-  courseId: string;
-  courseName: string;
-  description: string;
-  language: string;
-  tags: string[];
-  selectedCategory: string;
-  sections: {
-    name: string;
-    description: string;
-    videos: {
-      description: string;
-      title: string;
-      videoUrl: string;
-    }[];
-  }[];
-  additionalDetail1: string;
-  price: string;
-  files: { type: string; url: string }[];
-}
 
-export class CouresRepository {
-  static async getUserCourses(userId: string, type: string) {
+
+export class CouresRepository implements ICourseRepository {
+
+
+   async getUserCourses(userId: string, type: string) : Promise<ICourse[]> {
     try {
       let query: any = { users: userId };
-
       if (type === "purchased") {
         query.price = { $ne: "Free" };
       } else if (type === "free") {
         query.price = "Free";
       }
-
       const courses = await Course.find(query).populate({
         path: "sections",
         populate: { path: "videos" },
-      });
-
+      }).lean();
       if (!courses) {
         throw new Error("Cannot find course.");
       }
-
       return courses;
     } catch (error: any) {
       console.log("Error in getting course detail course repo", error.message);
@@ -50,7 +30,7 @@ export class CouresRepository {
     }
   }
 
-  static async updateCourse(couresId: string, newData: any) {
+   async updateCourse(couresId: string, newData: any) : Promise <ICourse> {
     try {
       console.log("course" , couresId, newData);
       
@@ -62,9 +42,7 @@ export class CouresRepository {
           },
         },
         { new: true, upsert: true }
-      );
-      
-
+      ); 
       return updated;
     } catch (error: any) {
       console.log("Error in updating course detail course repo", error.message);
@@ -72,13 +50,12 @@ export class CouresRepository {
     }
   }
 
-  static async updateVid(_id : string, title : string , description : string) {
+   async updateVid(_id : string, title : string , description : string) : Promise<IVideo> {
     try {
       const newData = {
         title ,
         description
-      }
-      
+      } 
       const updated = await Video.findOneAndUpdate(
         { _id: _id },
         {
@@ -88,8 +65,6 @@ export class CouresRepository {
         },
         { new: true, upsert: true }
       );
-      
-
       return updated;
     } catch (error: any) {
       console.log("Error in updating course detail course repo", error.message);
@@ -97,21 +72,12 @@ export class CouresRepository {
     }
   }
 
-  static async deleteVideoRepo(videoId: string, courseId: string) {
+   async deleteVideo(videoId: string, courseId: string) : Promise<boolean | null> {
     try {
-    
-      const video = await Video.findByIdAndDelete(videoId);
-      
-      return true;
+      return await Video.findByIdAndDelete(videoId);
     } catch (error: any) {
       console.log('Error in deleting video from course repo', error.message);
       throw new Error(error.message);
     }
-  }
-  
-
-
-  
-
-  
+  } 
 }

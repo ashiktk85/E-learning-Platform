@@ -1,6 +1,7 @@
 import { AwsConfig } from "../config/awsFileConfigs";
-import Group from "../models/groupSchema";
+import Group, { Message } from "../models/groupSchema";
 import userModel from "../models/userModel";
+
 
 export class CommunityRepository {
 
@@ -40,9 +41,9 @@ export class CommunityRepository {
     }
   }
 
-  static async saveMessages(courseId: string, userId: string, message: string) {
+   static async saveMessages(courseId: string, userId: string, message: string) {
     try {
-      let group = await Group.findOne({ courseId });
+      let group = await Group.findOne({ courseId }).exec();
 
       if (!group) {
         group = new Group({
@@ -60,15 +61,16 @@ export class CommunityRepository {
         return group;
       }
 
-      group.messages.push({
+      const newMessage = new Message({
         userId,
         message,
         timestamp: new Date(),
         courseId,
-      });
-
-      await group.save();
-      return group;
+    });
+    
+    group.messages.push(newMessage);
+    await group.save();
+    return group
     } catch (error: any) {
       console.log("Error in saving messages to community repository:", error.message);
       throw new Error(error.message);

@@ -1,12 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
+import { IRating } from "../interfaces/common.interfaces";
 
-interface IRating extends Document {
-  courseId: string; 
-  userId: string;   
-  ratingValue: number;       
-  review: string;          
-  createdAt: Date;           
-}
 
 const ratingSchema = new Schema<IRating>({
   courseId: {

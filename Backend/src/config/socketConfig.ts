@@ -15,7 +15,7 @@ let io: SocketServer;
 const configSocketIO = (server: HttpServer) => {
     io = new SocketServer(server, {
         cors: {
-            origin: process.env.BASE_URL,
+            origin: "http://localhost:5173",
             methods: ["GET", "POST"],
         },
     });

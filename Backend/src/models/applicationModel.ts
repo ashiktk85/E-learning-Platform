@@ -1,29 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
-
-interface FileUrl {
-  type: string;
-  url: string;
-  signedUrl?: string; 
-}
-
-export interface ITutorApplication extends Document {
-  applicationId: string;
-  email: string;
-  tutorRole: string;
-  age: string;
-  birthday: Date;
-  gender: string;
-  phone: string;
-  degree: string;
-  fieldOfStudy: string;
-  institution: string;
-  graduationYear: string;
-  teachingExperience: string;
-  subjectsOfExpertise: string;
-  socialLinks: Map<string, string>;
-  files: FileUrl[];
-  status: 'pending' | 'accepted' | 'rejected'; 
-}
+import { Schema, model } from 'mongoose';
+import { ITutorApplication } from '../interfaces/common.interfaces';
 
 const tutorApplicationSchema = new Schema<ITutorApplication>(
   {

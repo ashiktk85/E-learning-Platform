@@ -1,17 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
-interface IReport extends Document {
-  reportId : string;
-  courseId: string;         
-       
-  reason: string;         
-  additionalInfo?: string;  
-  status: 'pending' | 'resolved'; 
-  createdAt: Date;          
-  updatedAt: Date;    
-  tutorName : string;
-  courseName : string;      
-}
+import { IReport } from '../interfaces/common.interfaces';
 
 const reportSchema: Schema<IReport> = new Schema({
   reportId: { type: String, required: true },
